@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.agentManager.name | quote }}
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app: {{ .Values.agentManager.name | quote }}
+    deployed-by: {{ .Values.agentManager.deployedBy | quote }}
+spec:
+  replicas: {{ .Values.agentManager.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.agentManager.name | quote }}
+      deployed-by: {{ .Values.agentManager.deployedBy| quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.agentManager.name | quote }}
+        deployed-by: {{ .Values.agentManager.deployedBy| quote }}
+    spec:
+      containers:
+        - name: {{ .Values.agentManager.name | quote }}
+          image: "{{ .Values.agentManager.image.repository }}:{{ .Values.agentManager.image.tag }}"
+          imagePullPolicy: {{ .Values.agentManager.image.pullPolicy | quote }}
+          
+          env:
+            - name: "TOOL_MANAGER_URL"
+              value: "{{ .Values.toolManager.name }}.svc.cluster.local:80"
+          ports:
+            - containerPort: {{ .Values.agentManager.service.targetPort }}

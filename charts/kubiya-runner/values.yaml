@@ -1,0 +1,182 @@
+namespace: "kubiya"
+jwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
+subject: "jghfjgf"
+terminationGracePeriodSeconds: 300
+organization: "your_organization_name"
+uuid: "unique_identifier"
+natsServerUrl: "tls://connect.ngs.global"
+
+
+kubiyaOperator:
+  name: "kubiya-operator"
+  replicas: 1
+  image:
+    repository: ghcr.io/kubiyabot/kubiya-operator
+    pullPolicy: Always
+    tag: latest
+  volumeMounts: 
+  - name: nats-creds-volume
+    mountPath: "/etc/nats"
+    readOnly: true
+  volumes:
+    - name: nats-creds-volume
+      secret:
+        secretName: nats-creds # pragma: allowlist secret
+        items:
+          - key: nats.creds
+            path: nats.creds
+  ports:
+    containerPort: 80
+
+agentManager:
+  name: "agent-manager"
+  replicas: 2
+  image:
+    repository: ghcr.io/kubiyabot/agent-manager   
+    pullPolicy: Always
+    tag: v0.0.3  
+  service:
+    port: 80
+    targetPort: 8080
+    serviceType: "ClusterIP"
+  deployedBy: "kubiya"
+
+pulseSender:
+  name: "pulse-sender"
+  replicas: 1
+  natsSubject: "nats_pulse_subject"
+  image:
+    repository: ghcr.io/kubiyabot/pulse-sender
+    pullPolicy: Always
+    tag: runner_v2
+  command:
+    - "/app"
+    - "--pulse"
+  service:
+    type: ClusterIP
+    port: 80
+  volumes: 
+  - name: nats-creds-volume
+    secret:
+      secretName: nats-creds # pragma: allowlist secret
+      items:
+        - key: nats.creds
+          path: nats.creds
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: 
+  - name: nats-creds-volume
+    mountPath: "/etc/nats"
+    readOnly: true
+
+daggerDaemonset:  
+
+
+  name: "dagger-dagger-helm-engine"
+  namespace: "dagger"
+  helmChartVersion: 0.1.9
+  AppVersion: v0.11.6
+  SecurityContext:
+    runAsUser: 0
+    runAsGroup: 1001
+    fsGroup: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+  privileged: true
+  capabilities:
+    add:
+      - ALL
+  image:
+    repository: registry.dagger.io/engine
+    pullPolicy: IfNotPresent
+    tag: v0.11.6
+  args:
+    - "--oci-max-parallelism"
+    - "num-cpu"
+  resources:
+    limits: {}
+    requests: {}
+    
+  readinessProbe:
+    exec:
+      command: ["buildctl", "debug", "workers"]
+    failureThreshold: 10
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    successThreshold: 1
+    timeoutSeconds: 30
+
+  additionalVolumeMounts:
+    - name: varlibdagger
+      mountPath: /var/lib/dagger-{{ .Values.uuid }}
+      readOnly: true
+    - name: varrundagger
+      mountPath: /var/run/buildkit-{{ .Values.uuid }}
+      readOnly: true
+  additionalVolumes:
+    - name: varlibdagger
+      hostPath:
+        path: /var/lib/dagger
+    - name: varrundagger
+      hostPath:
+        path: /var/run/dagger
+  
+
+natsCreds:
+  name: "nats-creds"
+
+kubiyaSuperRole:
+  name: "kubiya-super-role"
+  
+kubiyaSuperRoleBinding:
+  name: "kubiya-super-role-binding"
+
+toolManager:
+  name: "tool-manager"
+  deployedBy: kubiya
+  image:
+    repository: ghcr.io/kubiyabot/kubiya-tool-manager
+    pullPolicy: Always
+    tag: latest
+  service:
+    port: 80
+  containerPort: 3001
+  serviceType: "ClusterIP"
+  volumes: 
+  - name: nats-creds-volume
+    secret:
+      secretName: nats-creds # pragma: allowlist secret
+      items:
+        - key: nats.creds
+          path: nats.creds
+  # Additional volumeMounts on the output Deployment definition.
+  volumeMounts: 
+  - name: nats-creds-volume
+    mountPath: "/opt"
+
+  sdkServer:
+    name: "kubiya-sdk-server"
+    image:
+      repository: ghcr.io/kubiyabot/sdk-py
+      pullPolicy: Always
+      tag: v0.2.0
+    command: 
+      - "python"
+      - "-m"
+      - "kubiya_sdk"
+      - "server"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8000"
+    containerPort: 8000
+    defaultMode: 420
+ 
+  
+
+daggerSuperRole:
+  name: "dagger-super-role"
+
+daggerSuperRoleBinding:
+  name: "dagger-super-role-binding"
+
+kubiyaSuperAccount:
+  name: "kubiya-super-account"

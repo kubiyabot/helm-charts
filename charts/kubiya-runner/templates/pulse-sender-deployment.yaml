@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.pulseSender.name | quote }}
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app: {{ .Values.pulseSender.name | quote }}
+spec:
+  replicas: {{ .Values.pulseSender.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.pulseSender.name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.pulseSender.name | quote }}
+    spec:
+      serviceAccountName: {{ .Values.kubiyaSuperAccount.name | quote }}
+      containers:
+        - name: {{ .Values.pulseSender.name | quote }}
+          image: "{{ .Values.pulseSender.image.repository }}:{{ .Values.pulseSender.image.tag }}"
+          imagePullPolicy: {{ .Values.pulseSender.image.pullPolicy | quote }}
+          command: {{ .Values.pulseSender.command | toYaml | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.pulseSender.service.port }}
+          env:
+            - name: "NATS_SERVER"
+              value: "{{ .Values.natsServerUrl }}"
+            - name: "NATS_SUBJECT"
+              value: "{{ .Values.pulseSubject }}"
+            - name: "NATS_CREDENTIAL_FILE"
+              value: "/etc/nats/nats.creds"
+            - name: "NAMESPACE"
+              value: "{{ .Values.namespace }}"
+        {{- with .Values.pulseSender.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.pulseSender.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

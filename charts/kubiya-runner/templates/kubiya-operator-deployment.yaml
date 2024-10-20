@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.kubiyaOperator.name | quote }}
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app: {{ .Values.kubiyaOperator.name | quote }}
+spec:
+  replicas: {{ .Values.kubiyaOperator.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.kubiyaOperator.name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.kubiyaOperator.name | quote }}
+    spec:
+      serviceAccountName: {{ .Values.kubiyaSuperAccount.name | quote }}
+      containers:
+        - name: {{ .Values.kubiyaOperator.name | quote }}
+          image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
+          imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
+          env:
+              - name: "NATS_SERVER"
+                value: "{{ .Values.natsServerUrl }}"
+              - name: "NATS_SUBJECT"
+                value: "{{ .Values.subject }}"
+              - name: "NATS_CREDENTIAL_FILE"
+                value: "/etc/nats/nats.creds"
+              - name: "NAMESPACE"
+                value: "{{ .Values.namespace }}"
+        {{- with .Values.kubiyaOperator.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.kubiyaOperator.volumes }}
+      volumes:
+         {{- toYaml . | nindent 8 }}
+      {{- end }}
