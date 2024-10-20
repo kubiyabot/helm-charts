@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubiya Helm Charts Repository</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .chart-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .chart-card h3 {
+            margin-top: 0;
+        }
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kubiya Helm Charts Repository</h1>
+    
+    <p>Welcome to the Kubiya Helm Charts repository. This repository contains Helm charts for various Kubiya components and tools.</p>
+    
+    <h2>Usage</h2>
+    <p>To use these charts, add this repository to your Helm installation:</p>
+    <pre><code>helm repo add kubiya https://kubiyabot.github.io/helm-charts
+helm repo update</code></pre>
+
+    <h2>Available Charts</h2>
+    <div id="charts-container">
+        <!-- Chart cards will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // This is a placeholder for dynamic content. In a real application, 
+        // you would fetch this data from your Helm repository index.yaml or a custom API.
+        const charts = [
+            { 
+                name: "kubiya-runner", 
+                description: "Deploys a Kubiya Runner, a lightweight Kubernetes operator that enables AI Teammates to run within your cluster.",
+                version: "0.1.0"
+            },
+            // Add more charts here as they become available
+        ];
+
+        const chartsContainer = document.getElementById('charts-container');
+
+        charts.forEach(chart => {
+            const chartCard = document.createElement('div');
+            chartCard.className = 'chart-card';
+            chartCard.innerHTML = `
+                <h3>${chart.name}</h3>
+                <p>${chart.description}</p>
+                <p>Version: ${chart.version}</p>
+                <pre><code>helm install my-${chart.name} kubiya/${chart.name}</code></pre>
+            `;
+            chartsContainer.appendChild(chartCard);
+        });
+    </script>
+</body>
+</html>
