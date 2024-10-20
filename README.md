@@ -14,7 +14,7 @@ To use the charts from this repository, follow these steps:
 
 1. Add the Helm repository:
    ```
-   helm repo add kubiya https://[YOUR_GITHUB_USERNAME].github.io/helm-charts
+   helm repo add kubiya https://kubiyabot.github.io/helm-charts
    ```
 
 2. Update your Helm repositories:
@@ -33,7 +33,7 @@ To develop or modify these charts:
 
 1. Clone this repository:
    ```
-   git clone https://github.com/[YOUR_GITHUB_USERNAME]/helm-charts.git
+   git clone https://github.com/kubiyabot/helm-charts.git
    ```
 
 2. Make your changes to the desired chart under the `charts/` directory.

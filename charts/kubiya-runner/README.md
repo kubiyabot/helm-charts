@@ -7,7 +7,7 @@ This repository contains the Helm chart for deploying the Kubiya Runner, a key c
 ```
 kubiya-helm-charts/
 ├── charts/
-│   └── kubiya-operator/
+│   └── kubiya-runner/
 │       ├── Chart.yaml
 │       ├── values.yaml
 │       ├── templates/
@@ -44,7 +44,7 @@ The following table lists the configurable parameters of the Kubiya Runner chart
 | `image.tag` | Image tag | `latest` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 
-For more information on configurable parameters, please refer to the [values.yaml](./charts/kubiya-operator/values.yaml) file.
+For more information on configurable parameters, please refer to the [values.yaml](./charts/kubiya-runner/values.yaml) file.
 
 ## Contributing
 
