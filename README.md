@@ -50,4 +50,4 @@ We welcome contributions to improve our Helm charts. Please feel free to submit 
 
 ## License
 
-[Specify your license here]
+This project is licensed under the [Apache License 2.0](LICENSE).
