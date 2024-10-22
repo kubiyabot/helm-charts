@@ -41,33 +41,6 @@ agentManager:
     serviceType: "ClusterIP"
   deployedBy: "kubiya"
 
-pulseSender:
-  name: "pulse-sender"
-  replicas: 1
-  natsSubject: "nats_pulse_subject"
-  image:
-    repository: ghcr.io/kubiyabot/pulse-sender
-    pullPolicy: Always
-    tag: runner_v2
-  command:
-    - "/app"
-    - "--pulse"
-  service:
-    type: ClusterIP
-    port: 80
-  volumes: 
-  - name: nats-creds-volume
-    secret:
-      secretName: nats-creds # pragma: allowlist secret
-      items:
-        - key: nats.creds
-          path: nats.creds
-  # Additional volumeMounts on the output Deployment definition.
-  volumeMounts: 
-  - name: nats-creds-volume
-    mountPath: "/etc/nats"
-    readOnly: true
-
 daggerDaemonset:  
 
 
