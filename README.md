@@ -52,4 +52,4 @@ We welcome contributions to improve our Helm charts. Please feel free to submit 
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
