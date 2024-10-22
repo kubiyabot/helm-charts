@@ -79,10 +79,10 @@ daggerDaemonset:
 
   additionalVolumeMounts:
     - name: varlibdagger
-      mountPath: /var/lib/dagger-{{ .Values.uuid }}
+      mountPath: /var/lib/dagger
       readOnly: true
     - name: varrundagger
-      mountPath: /var/run/buildkit-{{ .Values.uuid }}
+      mountPath: /var/run/buildkit
       readOnly: true
   additionalVolumes:
     - name: varlibdagger
