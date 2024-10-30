@@ -1,8 +1,9 @@
+---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Values.daggerSuperRole.name | quote }}
-  namespace: {{ .Values.daggerDaemonset.namespace | quote }}
+  name: {{ .Values.daggerRole.name | quote }}
+  namespace: {{ .Release.Namespace }}
 rules:
   - apiGroups: [ "" ]
     resources: ["*"]

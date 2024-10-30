@@ -1,11 +1,11 @@
-namespace: "kubiya"
+namespace: kubiya
 jwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
+secondJwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
 subject: "jghfjgf"
 terminationGracePeriodSeconds: 300
 organization: "your_organization_name"
 uuid: "unique_identifier"
 natsServerUrl: "tls://connect.ngs.global"
-
 
 kubiyaOperator:
   name: "kubiya-operator"
@@ -15,13 +15,13 @@ kubiyaOperator:
     pullPolicy: Always
     tag: latest
   volumeMounts: 
-  - name: nats-creds-volume
+  - name: runner-secret-volume
     mountPath: "/etc/nats"
     readOnly: true
   volumes:
-    - name: nats-creds-volume
+    - name: runner-secret-volume
       secret:
-        secretName: nats-creds # pragma: allowlist secret
+        secretName: runner-secret # pragma: allowlist secret
         items:
           - key: nats.creds
             path: nats.creds
@@ -39,62 +39,20 @@ agentManager:
     port: 80
     targetPort: 8080
     serviceType: "ClusterIP"
-  deployedBy: "kubiya"
-
-daggerDaemonset:  
-
-
-  name: "dagger-dagger-helm-engine"
-  namespace: "dagger"
-  helmChartVersion: 0.1.9
-  AppVersion: v0.11.6
-  SecurityContext:
-    runAsUser: 0
-    runAsGroup: 1001
-    fsGroup: 1001
-    fsGroupChangePolicy: "OnRootMismatch"
-  privileged: true
-  capabilities:
-    add:
-      - ALL
-  image:
-    repository: registry.dagger.io/engine
-    pullPolicy: IfNotPresent
-    tag: v0.11.6
-  args:
-    - "--oci-max-parallelism"
-    - "num-cpu"
-  resources:
-    limits: {}
-    requests: {}
-    
-  readinessProbe:
-    exec:
-      command: ["buildctl", "debug", "workers"]
-    failureThreshold: 10
-    initialDelaySeconds: 5
-    periodSeconds: 15
-    successThreshold: 1
-    timeoutSeconds: 30
-
-  additionalVolumeMounts:
-    - name: varlibdagger
-      mountPath: /var/lib/dagger
-      readOnly: true
-    - name: varrundagger
-      mountPath: /var/run/buildkit
-      readOnly: true
-  additionalVolumes:
-    - name: varlibdagger
-      hostPath:
-        path: /var/lib/dagger
-    - name: varrundagger
-      hostPath:
-        path: /var/run/dagger
-  
-
-natsCreds:
-  name: "nats-creds"
+  volumeMounts:
+  - name: creds-volume
+    mountPath: "/opt/"
+    readOnly: true
+  - name: shared-volume
+    mountPath: "/tmp/kubiya_shared_tools"
+    readOnly: false
+  volumes:
+    - name: creds-volume
+      secret:
+        secretName: runner-secret # pragma: allowlist secret
+        items:
+          - key: nats.creds
+            path: nats.creds
 
 kubiyaSuperRole:
   name: "kubiya-super-role"
@@ -143,13 +101,39 @@ toolManager:
     containerPort: 8000
     defaultMode: 420
  
-  
-
-daggerSuperRole:
+daggerRole:
   name: "dagger-super-role"
 
-daggerSuperRoleBinding:
+daggerRoleBinding:
   name: "dagger-super-role-binding"
 
 kubiyaSuperAccount:
   name: "kubiya-super-account"
+
+dagger:
+  enabled: true
+  engine:
+    image:
+      ref: registry.dagger.io/engine:v0.11.6
+    config: |
+      debug = true
+      insecure-entitlements = ["security.insecure"]
+      [registry."ghcr.io"]
+        http = true
+      [registry."ttl.sh"]
+        http = true
+      [registry."docker.io"]
+        http = true
+      [registry."cache-registry-svc.kubiya"]
+      [log]
+        format = "json"
+      
+  magicache:
+    enabled: false
+    ### Create your token via https://docs.dagger.io/manuals/user/cloud-get-started/#step-2-connect-to-dagger-cloud
+    #
+    # token: YOUR_DAGGER_CLOUD_TOKEN
+
+    ### If secretName is set, a new secret will NOT be created
+    #
+    # secretName: EXISTING_SECRET_NAME
