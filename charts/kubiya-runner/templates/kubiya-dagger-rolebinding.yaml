@@ -1,8 +1,9 @@
+---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Values.daggerSuperRoleBinding.name | quote }}
-  namespace: {{ .Values.daggerDaemonset.namespace | quote }}
+  name: {{ .Values.daggerRoleBinding.name | quote }}
+  namespace: {{ .Release.Namespace }}
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.kubiyaSuperAccount.name | quote }}
@@ -10,4 +11,4 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ .Values.daggerSuperRole.name | quote }}
+  name: {{ .Values.daggerRole.name | quote }}

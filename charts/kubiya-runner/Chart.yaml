@@ -15,7 +15,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.3
+version: 0.1.5
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -24,11 +24,9 @@ version: 0.1.3
 # appVersion: "1.0"
 
 dependencies: 
-# official command: helm install my-dagger-helm oci://registry.dagger.io/dagger-helm --version 0.13.6
-# image: {{ if .Values.engine.image.ref }}{{ .Values.engine.image.ref }}{{ else }}registry.dagger.io/engine:v{{ .Chart.Version }}{{ end }}
-# I need to set v0.11.6 as the version for the image and also pass the engine.image.ref registry.dagger.io/engine
-- name: dagger-engine
+- name: dagger-helm
   version: 0.13.6
-  repository: https://github.com/dagger/dagger.git
-  condition: dagger-engine.enabled
+  repository: oci://registry.dagger.io
+  alias: dagger
+  condition: dagger.enabled
    
