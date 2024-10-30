@@ -106,7 +106,7 @@ toolManager:
   name: "tool-manager"
   deployedBy: kubiya
   image:
-    repository: ghcr.io/kubiyabot/kubiya-tool-manager
+    repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: Always
     tag: latest
   service:
