@@ -106,7 +106,7 @@ toolManager:
   name: "tool-manager"
   deployedBy: kubiya
   image:
-    repository: ghcr.io/kubiyabot/kubiya-tool-manager
+    repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: Always
     tag: latest
   service:
@@ -153,3 +153,9 @@ daggerSuperRoleBinding:
 
 kubiyaSuperAccount:
   name: "kubiya-super-account"
+
+daggerEngine:
+  enabled: true
+  image:
+    ref: registry.dagger.io/engine
+    tag: v0.11.6
