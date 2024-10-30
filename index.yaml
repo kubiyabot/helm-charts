@@ -2,6 +2,21 @@ apiVersion: v1
 entries:
   kubiya-runner:
   - apiVersion: v2
+    created: "2024-10-30T16:13:46.908396475Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: oci://registry.dagger.io
+      version: 0.13.6
+    description: A Helm chart for deploying the Kubiya operator and related services
+    digest: c34e8ee0797e31c243724b412b0003a50228b0b542589cb19b6e5ab03d825efe
+    name: kubiya-runner
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.1.6/kubiya-runner-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     created: "2024-10-30T15:53:41.212652621Z"
     dependencies:
     - alias: dagger
@@ -25,4 +40,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.1.4/kubiya-runner-0.1.4.tgz
     version: 0.1.4
-generated: "2024-10-30T15:53:41.212665715Z"
+generated: "2024-10-30T16:13:46.908412645Z"
