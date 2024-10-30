@@ -33,17 +33,3 @@ spec:
       volumes:
          {{- toYaml . | nindent 8 }}
       {{- end }}
-
-      #     volumeMounts:
-      #       - mountPath: /opt/
-      #         name: nats-creds-volume
-      #         readOnly: true
-      #       - mountPath: /tmp/kubiya_shared_tools
-      #         name: shared-volume
-      #         readOnly: false
-      # volumes:
-      #   - name: nats-creds-volume
-      #     secret:
-      #       secretName: runner-secret
-      #   - name: shared-volume
-      #     emptyDir: {}
