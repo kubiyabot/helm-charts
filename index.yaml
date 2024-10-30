@@ -10,13 +10,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.1.4/kubiya-runner-0.1.4.tgz
     version: 0.1.4
-  - apiVersion: v2
-    created: "2024-10-22T14:59:18.745193631Z"
-    description: A Helm chart for deploying the Kubiya operator and related services
-    digest: db0420af3f1a7c4c758f7b6b71d77a661815b022c766b0094fcc8b0e8e45d623
-    name: kubiya-runner
-    type: application
-    urls:
-    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.1.3/kubiya-runner-0.1.3.tgz
-    version: 0.1.3
 generated: "2024-10-30T12:26:37.528893772Z"
