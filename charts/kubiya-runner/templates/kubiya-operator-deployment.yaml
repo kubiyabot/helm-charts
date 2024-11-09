@@ -2,23 +2,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.kubiyaOperator.name | quote }}
-  namespace: {{ .Values.namespace | quote }}
+  name: {{ include "kubiya-runner.name" . }}-kubiya-operator
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ .Values.kubiyaOperator.name | quote }}
+    {{- include "kubiya-runner-kubiya-operator.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.kubiyaOperator.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.kubiyaOperator.name | quote }}
+      {{- include "kubiya-runner-kubiya-operator.selectorLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: {{ .Values.kubiyaOperator.name | quote }}
+        {{- include "kubiya-runner-kubiya-operator.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ .Values.kubiyaSuperAccount.name | quote }}
       containers:
-        - name: {{ .Values.kubiyaOperator.name | quote }}
+        - name: {{ include "kubiya-runner.name" . }}-kubiya-operator
           image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
           imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
           ports:
@@ -31,7 +31,7 @@ spec:
               - name: "NATS_CREDENTIAL_FILE"
                 value: "/etc/nats/nats.creds"
               - name: "NAMESPACE"
-                value: "{{ .Values.namespace }}"
+                value: "{{ .Release.Namespace }}"
         {{- with .Values.kubiyaOperator.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

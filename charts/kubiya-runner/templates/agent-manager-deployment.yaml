@@ -2,27 +2,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.agentManager.name | quote }}
-  namespace: {{ .Values.namespace | quote }}
+  name: {{ include "kubiya-runner.name" . }}-agent-manager
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ .Values.agentManager.name | quote }}
+    {{- include "kubiya-runner-agent-manager.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.agentManager.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.agentManager.name | quote }}
+      {{- include "kubiya-runner-agent-manager.selectorLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: {{ .Values.agentManager.name | quote }}
+        {{- include "kubiya-runner-agent-manager.labels" . | indent 8 }}
     spec:
       containers:
-        - name: {{ .Values.agentManager.name | quote }}
+        - name: {{ include "kubiya-runner.name" . }}-agent-manager
           image: "{{ .Values.agentManager.image.repository }}:{{ .Values.agentManager.image.tag }}"
           imagePullPolicy: {{ .Values.agentManager.image.pullPolicy | quote }}          
           env:
             - name: "TOOL_MANAGER_URL"
-              value: "{{ .Values.toolManager.name }}.svc.cluster.local:80"
+              value: "tool-manager.svc.cluster.local:{{ .Values.toolManager.service.targetPort }}"
           ports:
             - containerPort: {{ .Values.agentManager.service.targetPort }}
         {{- with .Values.toolManager.volumeMounts }}

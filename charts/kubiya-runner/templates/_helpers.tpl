@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "runnerv2.name" -}}
+{{- define "kubiya-runner.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "runnerv2.fullname" -}}
+{{- define "kubiya-runner.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,37 +26,114 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "runnerv2.chart" -}}
+{{- define "kubiya-runner.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "runnerv2.labels" -}}
-helm.sh/chart: {{ include "runnerv2.chart" . }}
-{{ include "runnerv2.selectorLabels" . }}
+{{- define "kubiya-runner.labels" -}}
+helm.sh/chart: {{ include "kubiya-runner.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ include "kubiya-runner.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/part-of: {{ template "kubiya-runner.name" . }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "runnerv2.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "runnerv2.name" . }}
+{{- define "kubiya-runner.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kubiya-runner.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
+# ----------------------------------------------
+# TODO: remove this?
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "runnerv2.serviceAccountName" -}}
+{{- define "kubiya-runner.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "runnerv2.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "kubiya-runner.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+
+{{/*
+Common labels
+*/}}
+{{- define "kubiya-runner-common.labels" -}}
+helm.sh/chart: {{ include "kubiya-runner.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/part-of: {{ template "kubiya-runner.name" . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Common Selector labels
+*/}}
+{{- define "kubiya-runner-common.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kubiya-runner.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+
+{{/*
+Agent Manager labels
+*/}}
+
+{{- define "kubiya-runner-agent-manager.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: agent-manager
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "kubiya-runner-agent-manager.selectorLabels" }}
+{{ include "kubiya-runner.selectorLabels" . }}
+app.kubernetes.io/component: agent-manager
+{{- end }}
+
+{{/*
+Tool Manager labels
+*/}}
+
+{{- define "kubiya-runner-tool-manager.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: tool-manager
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "kubiya-runner-tool-manager.selectorLabels" }}
+{{ include "kubiya-runner.selectorLabels" . }}
+app.kubernetes.io/component: tool-manager
+{{- end }}
+
+{{/*
+Kubiya Operator labels
+*/}}
+
+{{- define "kubiya-runner-kubiya-operator.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: kubiya-operator
+{{- end }}
+
+{{/*
+Kubiya Operator Selector labels
+*/}}
+{{- define "kubiya-runner-kubiya-operator.selectorLabels" }}
+{{ include "kubiya-runner.selectorLabels" . }}
+app.kubernetes.io/component: kubiya-operator
 {{- end }}
