@@ -2,32 +2,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kubiya-runner.name" . }}-kubiya-operator
+  name: kubiya-operator
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kubiya-runner-kubiya-operator.labels" . | indent 4 }}
+    {{- include "kubiya-operator.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.kubiyaOperator.replicas }}
   selector:
     matchLabels:
-      {{- include "kubiya-runner-kubiya-operator.selectorLabels" . | indent 6 }}
+      {{- include "kubiya-operator.selectorLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        {{- include "kubiya-runner-kubiya-operator.labels" . | indent 8 }}
+        {{- include "kubiya-operator.labels" . | indent 8 }}
     spec:
-      serviceAccountName: {{ .Values.kubiyaSuperAccount.name | quote }}
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName" . | indent 8}}
       containers:
-        - name: {{ include "kubiya-runner.name" . }}-kubiya-operator
+        - name: kubiya-operator
           image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
           imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
           ports:
             - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
           env:
               - name: "NATS_SERVER"
-                value: "{{ .Values.natsServerUrl }}"
+                value: "{{ .Values.nats.natsServerUrl }}"
               - name: "NATS_SUBJECT"
-                value: "{{ .Values.subject }}"
+                value: "{{ .Values.nats.subject }}"
               - name: "NATS_CREDENTIAL_FILE"
                 value: "/etc/nats/nats.creds"
               - name: "NAMESPACE"

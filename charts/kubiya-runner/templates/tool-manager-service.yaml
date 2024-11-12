@@ -2,13 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.toolManager.name | quote }}
-  namespace: {{ .Values.namespace | quote }}
+  name: tool-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tool-manager.labels" . | indent 4 }}
 spec:
   selector:
-    app: {{ .Values.toolManager.name | quote }}
+    {{- include "tool-manager.selectorLabels" . | indent 4 }}
   ports:
     - name: http
-      port: {{ .Values.toolManager.service.port }}
-      targetPort: {{ .Values.toolManager.containerPort }}
-  type: {{ .Values.toolManager.serviceType | quote }}
+      port: {{ .Values.tool.service.port }}
+      targetPort: {{ .Values.tool.service.targetPort }}
+  type: {{ .Values.tool.service.serviceType | quote }}

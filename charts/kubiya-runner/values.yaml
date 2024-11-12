@@ -1,14 +1,26 @@
-namespace: kubiya
-jwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
-secondJwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
-subject: "jghfjgf"
-terminationGracePeriodSeconds: 300
-organization: "your_organization_name"
-uuid: "unique_identifier"
-natsServerUrl: "tls://connect.ngs.global"
+nats:
+  jwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
+  secondJwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
+  natsServerUrl: "tls://connect.ngs.global"
+  subject: "jghfjgf"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated as "RELEASE_NAME"
+  name: ""
+  # TODO: check if we making calls to kubectl or API which need this
+  automountServiceAccountToken: true
+
+# TODO - isnt used ic code?
+# terminationGracePeriodSeconds: f30
+
+kubiyaRunnerMeta:
+  organization: "your_organization_name"
+  kubiyaAgentUUID: "unique_identifier"
 
 kubiyaOperator:
-  name: "kubiya-operator"
   replicas: 1
   image:
     repository: ghcr.io/kubiyabot/kubiya-operator
@@ -27,9 +39,8 @@ kubiyaOperator:
             path: nats.creds
   ports:
     containerPort: 80
-
+    
 agentManager:
-  name: "agent-manager"
   replicas: 2
   image:
     repository: ghcr.io/kubiyabot/agent-manager   
@@ -54,15 +65,7 @@ agentManager:
           - key: nats.creds
             path: nats.creds
 
-kubiyaSuperRole:
-  name: "kubiya-super-role"
-  
-kubiyaSuperRoleBinding:
-  name: "kubiya-super-role-binding"
-
 toolManager:
-  name: "tool-manager"
-  deployedBy: kubiya
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: Always
@@ -84,11 +87,11 @@ toolManager:
     mountPath: "/opt"
 
   sdkServer:
-    name: "kubiya-sdk-server"
     image:
       repository: ghcr.io/kubiyabot/sdk-py
       pullPolicy: Always
       tag: v0.2.0
+    # TODO replace with args or extraArgs or cmdOverride
     command: 
       - "python"
       - "-m"
@@ -100,15 +103,6 @@ toolManager:
       - "8000"
     containerPort: 8000
     defaultMode: 420
- 
-daggerRole:
-  name: "dagger-super-role"
-
-daggerRoleBinding:
-  name: "dagger-super-role-binding"
-
-kubiyaSuperAccount:
-  name: "kubiya-super-account"
 
 dagger:
   enabled: true

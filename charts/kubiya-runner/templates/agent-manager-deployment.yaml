@@ -2,34 +2,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kubiya-runner.name" . }}-agent-manager
+  name: agent-manager
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kubiya-runner-agent-manager.labels" . | indent 4 }}
+    {{- include "agent-manager.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.agentManager.replicas }}
   selector:
     matchLabels:
-      {{- include "kubiya-runner-agent-manager.selectorLabels" . | indent 6 }}
+      {{- include "agent-manager.selectorLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        {{- include "kubiya-runner-agent-manager.labels" . | indent 8 }}
+        {{- include "agent-manager.labels" . | indent 8 }}
     spec:
       containers:
-        - name: {{ include "kubiya-runner.name" . }}-agent-manager
+        - name: agent-manager
           image: "{{ .Values.agentManager.image.repository }}:{{ .Values.agentManager.image.tag }}"
           imagePullPolicy: {{ .Values.agentManager.image.pullPolicy | quote }}          
           env:
             - name: "TOOL_MANAGER_URL"
-              value: "tool-manager.svc.cluster.local:{{ .Values.toolManager.service.targetPort }}"
+              value: "tool-manager:{{ .Values.toolManager.service.targetPort }}"
           ports:
             - containerPort: {{ .Values.agentManager.service.targetPort }}
-        {{- with .Values.toolManager.volumeMounts }}
+        {{- with .Values.agentManager.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.toolManager.volumes }}
+      {{- with .Values.agentManager.volumes }}
       volumes:
          {{- toYaml . | nindent 8 }}
       {{- end }}

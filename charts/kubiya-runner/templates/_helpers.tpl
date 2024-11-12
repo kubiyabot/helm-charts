@@ -31,39 +31,15 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
-*/}}
-{{- define "kubiya-runner.labels" -}}
-helm.sh/chart: {{ include "kubiya-runner.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{ include "kubiya-runner.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-app.kubernetes.io/part-of: {{ template "kubiya-runner.name" . }}
-{{- end }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "kubiya-runner.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kubiya-runner.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-# ----------------------------------------------
-# TODO: remove this?
-{{/*
-Create the name of the service account to use
+Create the name of the service account to use for kubiyaoperator #TODO: rename?
 */}}
 {{- define "kubiya-runner.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "kubiya-runner.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "kubiya-runner.name" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
 
 {{/*
 Common labels
@@ -86,29 +62,26 @@ app.kubernetes.io/name: {{ include "kubiya-runner.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-
 {{/*
 Agent Manager labels
 */}}
-
-{{- define "kubiya-runner-agent-manager.labels" }}
+{{- define "agent-manager.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
 app.kubernetes.io/component: agent-manager
 {{- end }}
 
 {{/*
-Selector labels
+Agent Manager Selector labels
 */}}
-{{- define "kubiya-runner-agent-manager.selectorLabels" }}
-{{ include "kubiya-runner.selectorLabels" . }}
+{{- define "agent-manager.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
 app.kubernetes.io/component: agent-manager
 {{- end }}
 
 {{/*
 Tool Manager labels
 */}}
-
-{{- define "kubiya-runner-tool-manager.labels" }}
+{{- define "tool-manager.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
 app.kubernetes.io/component: tool-manager
 {{- end }}
@@ -116,16 +89,15 @@ app.kubernetes.io/component: tool-manager
 {{/*
 Selector labels
 */}}
-{{- define "kubiya-runner-tool-manager.selectorLabels" }}
-{{ include "kubiya-runner.selectorLabels" . }}
+{{- define "tool-manager.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
 app.kubernetes.io/component: tool-manager
 {{- end }}
 
 {{/*
 Kubiya Operator labels
 */}}
-
-{{- define "kubiya-runner-kubiya-operator.labels" }}
+{{- define "kubiya-operator.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
 app.kubernetes.io/component: kubiya-operator
 {{- end }}
@@ -133,7 +105,7 @@ app.kubernetes.io/component: kubiya-operator
 {{/*
 Kubiya Operator Selector labels
 */}}
-{{- define "kubiya-runner-kubiya-operator.selectorLabels" }}
-{{ include "kubiya-runner.selectorLabels" . }}
+{{- define "kubiya-operator.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
 app.kubernetes.io/component: kubiya-operator
 {{- end }}
