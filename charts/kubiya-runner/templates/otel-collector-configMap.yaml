@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubiya-runner-common.labels" . | nindent 4 }}
+    app.kubernetes.io/component: otel-collector
+data:
+  otel-collector-config.yaml: |
+    # Otel-collector configuration file
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:3000
+
+      # Kubernetes API server (kube-apiserver) metrics via otel-collector receiver
+      k8s_events:
+        auth_type: serviceAccount
+        namespaces:
+          - {{ .Release.Namespace }};
+
+      # Kubelet metrics via otel-collector receiver
+      # TODO remove hardcoded namespace
+      prometheus:
+        config:
+          scrape_configs:
+          # Kube-state-metrics exporter metrics receiver
+          - job_name: 'kube-state-metrics'
+            scrape_interval: 30s
+            static_configs:
+              - targets: ['kube-state-metrics:8080']
+            kubernetes_sd_configs:
+              - role: endpoints
+                namespaces:
+                  names:
+                    - {{ .Release.Namespace }}
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
+                regex: kube-state-metrics
+                action: keep
+          
+          # Dynamic service discovery for Kubiya apps, for all metrics exposed by services on default /metrics endpoint
+          - job_name: "kubiya-apps"
+            scrape_interval: 10s
+            kubernetes_sd_configs:
+              - role: service
+                namespaces:
+                  names: ["{{ .Release.Namespace }}"]
+            relabel_configs:
+              # Keep only services we want to scrape
+              # TODO add more once exporters are ready
+              - source_labels: [__meta_kubernetes_service_name]
+                action: keep
+                regex: (tool-manager|agent-manager)
+              # Add app label
+              - source_labels: [__meta_kubernetes_service_name]
+                target_label: app
+              # Use the service port
+              - source_labels: [__meta_kubernetes_service_port_number]
+                target_label: __metrics_port__
+
+    #TODO: remove hardcoded namespace
+    processors:
+      k8sattributes:
+        auth_type: serviceAccount
+        filter:
+            namespace: {{ .Release.Namespace }}
+      
+      batch:
+      
+      resource:
+        attributes:
+        # TODO: instance and cluster drop
+          - key: "organization"
+            value: {{ .Values.Organization }}
+            action: upsert
+          - key: "runner"
+            value: {{ .Release.Name }}
+            action: upsert
+            
+      metricstransform:
+        transforms:
+          - include: '.*'
+            match_type: regexp
+            action: update
+            operations:
+              - action: update_label
+                label: "organization"
+                new_label: "organization"
+                new_value: {{ .Values.Organization }}
+              - action: add_label
+                label: "kubiya_type"
+                new_label: "kubiya_type"
+                new_value: "customers-runners"
+              - action: add_label
+                label: "runner"
+                new_label: "runner"
+                new_value: {{ include "runner.name" . | indent 8}}
+
+    exporters:
+      # Debug output for testing
+      # debug:
+      #   verbosity: normal
+      #   sampling_initial: 5
+      #   @sampling_thereafter: 200
+      natsexporter:
+        org: {{ .Values.Organization }}
+        endpoint: tls://connect.ngs.global
+        creds_file: /etc/nats/nats.creds
+
+    service:
+      pipelines:
+        logs:
+          receivers: [ k8s_events ]
+          processors: [ batch, resource ]
+          exporters: [ natsexporter ]
+        metrics:
+          receivers: [ prometheus ]
+          processors: [ metricstransform, k8sattributes, batch, resource ]
+          exporters: [ natsexporter ]
+        traces:
+          receivers: [ otlp ]
+          processors: [ batch ]
+          exporters: [ natsexporter ]
+      telemetry:
+        logs:

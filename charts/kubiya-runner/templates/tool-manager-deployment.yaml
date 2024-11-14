@@ -5,7 +5,7 @@ metadata:
   name: agent-manager
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "tool-manager.labels" . | indent 4 }}
+    {{- include "tool-manager.labels" . | nindent 4 }}
 spec:
   replicas: 3
   selector:

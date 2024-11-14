@@ -30,4 +30,12 @@ dependencies:
   repository: oci://registry.dagger.io
   alias: dagger
   condition: dagger.enabled
-   
+- name: kube-state-metrics
+  version: 5.27.0
+  repository: "https://prometheus-community.github.io/helm-charts"
+  alias: kubeStateMetrics
+  condition: kubeStateMetrics.enabled
+- name: opentelemetry-collector
+  version: 0.109.0
+  repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  condition: opentelemetryCollector.enabled

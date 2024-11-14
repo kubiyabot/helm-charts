@@ -11,6 +11,6 @@ spec:
     {{- include "tool-manager.selectorLabels" . | indent 4 }}
   ports:
     - name: http
-      port: {{ .Values.tool.service.port }}
-      targetPort: {{ .Values.tool.service.targetPort }}
-  type: {{ .Values.tool.service.serviceType | quote }}
+      port: {{ .Values.toolManager.service.port }}
+      targetPort: {{ .Values.toolManager.service.targetPort }}
+  type: {{ .Values.toolManager.service.type | quote }}

@@ -1,26 +1,130 @@
-nats:
-  jwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
-  secondJwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
-  natsServerUrl: "tls://connect.ngs.global"
-  subject: "jghfjgf"
+# TODO: remove this
+# Namespace: "kubiya"
+# Organization: "kubiya-test-sniff"
+# RunnerName: "sergey-metrics-test"
+# Subject: "kubiya-test-sniff.sergey-metrics-test.incoming"
+# Jwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSk5TVXhXUkVvME0wWktURUkzTWtOWVExcEpVRnBHTWtsRk0wdENURkZFVDBwSE56VldSbFV5VGswMFRWZFZNbE5YVmpKUklpd2lhV0YwSWpveE56TXdOak0xTXpVMkxDSnBjM01pT2lKQlExUkJVVm8yVFZkU1YwdE9SRWxLUlVaTFRFSkpSakpNUkZCVlJrdFdTMU5PTlVkTVUwdEhVa1l6TjFKSU1rVlVWVmxOVTAxQ1ZDSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppNXpaWEpuWlhrdGJXVjBjbWxqY3kxMFpYTjBJaXdpYzNWaUlqb2lWVUpKVEVWRldrUk5SVE5RVVU0elRWRlBURnBCV0VaUE0xSlNUekl5VUVGT1QxVkdWRlpNVlVOVFFWZEVSa05UUXpaWk5GWldOek1pTENKdVlYUnpJanA3SW5CMVlpSTZlMzBzSW5OMVlpSTZlMzBzSW1semMzVmxjbDloWTJOdmRXNTBJam9pUVVGWVQxQlVOVTFIU2t0VVN6WTJVRGROVnpKU1VrbE1VVmhJUXpaRVdrdFVWRTgyU0ZkRVdFOUxTbEZPUlVsSlNVOU5WVm8wUWxNaUxDSjBlWEJsSWpvaWRYTmxjaUlzSW5abGNuTnBiMjRpT2pKOWZRLmlsT21KcWx5c1ZwV2l1SDAtZVdwOXYzZFF5WE5zY0NaT1VwNW55LVYwd3hTWWVoTWlqcHdJX18xMUs0MUdHLVZYTXpCNUNtR3FOZlY1M1dMV1FtOEFnCi0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUpYWjNQQklSRVpMNE1VWjRVUFBBV1E0M0FPU1pGSUdITTJQSEczNU5XSUVHNjdWNkNMV0hMTkEKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
+# SecondJwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSXpUMEZCUWtKWlNWTk1RemREVkRORlNGZFVWVlZhVWpkQlQxWkVUalZDUmt0T1UwWlFWMWRKVVVaRFVGbEhTbFF6VmxGUklpd2lhV0YwSWpveE56SXdNREF5TkRNekxDSnBjM01pT2lKQlJFMDJOMUphVmxwUk5FaFBVMGhPTWxORVNsQlVRbFpZTTAwM1dWaEpUVE15TkRkS1JVeFZVRFJRVHpWT1dVbEpORmRLUjB0VVZpSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppSXNJbk4xWWlJNklsVkVRa00xVkVwS1MwNVBTbFl6UVZWTldUZEpUbFJCUWpaYVYxVk1UbEJNTkV0VFdWWk9VemRMU2xjelJUZExSME5FU1ZwUVFVOUpJaXdpYm1GMGN5STZleUp3ZFdJaU9udDlMQ0p6ZFdJaU9udDlMQ0pwYzNOMVpYSmZZV05qYjNWdWRDSTZJa0ZCV0U5UVZEVk5SMHBMVkVzMk5sQTNUVmN5VWxKSlRGRllTRU0yUkZwTFZGUlBOa2hYUkZoUFMwcFJUa1ZKU1VsUFRWVmFORUpUSWl3aWRIbHdaU0k2SW5WelpYSWlMQ0oyWlhKemFXOXVJam95ZlgwLmdBbmo1Tnc4aXpvWjNTZXB2U1VzandEZ2xaSlVEQ0p2WGlPb3pXemRocGhGdG03TElud1JoclhTS05RcE9UeUpadm5XM2QyYWg0bmZIMzFBVkF1S0J3Ci0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUdCMzNYMkdFVEJOQldZU1ZNTDRDQVFQNUpJWFpKTzJKV0ZaUEpWRkczQTdJUDdFVFRTWk9VNDQKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
+# Uuid: "679adc53-7068-4454-aa9f-16df30b14a50"
+# AgentManagerImage: "ghcr.io/kubiyabot/agent-manager:0.0.15"
+# ToolManagerImage: "ghcr.io/kubiyabot/tool-manager:2a689e758f0d4c9aeeb464c4847b8749409cf8d2"
+# SdkServerImage: "ghcr.io/kubiyabot/sdk-py:v0.45.1"
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated as "RELEASE_NAME"
-  name: ""
-  # TODO: check if we making calls to kubectl or API which need this
-  automountServiceAccountToken: true
+# by default, runner name is generated from release name, override if needed
+# will be propogated as a value to otel-collector configMap -> runner label
+runnerNameOverride: ""
 
-# TODO - isnt used ic code?
-# terminationGracePeriodSeconds: f30
+imagePullSecrets: []
 
-kubiyaRunnerMeta:
-  organization: "your_organization_name"
-  kubiyaAgentUUID: "unique_identifier"
+opentelemetry-collector:
+  enabled: false
+
+  image:
+    # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
+    repository: ghcr.io/kubiyabot/otel-connector
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: release-0.1.1
+    # When digest is set to a non-empty value, images will be pulled by digest (regardless of tag value).
+    digest: ""
+
+  mode: deployment
+
+  command:
+    name: "otelcol-k8s"
+
+  replicaCount: 1
+  
+  configMap:
+    create: false
+    existingName: "otel-collector-config"
+    existingKey: "otel-collector-config.yaml"
+
+  # Set meainingful values based on measured statistic for particular runner deployment.
+  # Consider magicache effect on resources not yet measured. 
+  # As of writing this, resources configured mainly to avoid possible and unexpected OOM kills/throtling in prod env,
+  # and limited not to grow infinitly. 
+  # Resources are defined here to help with support mandatoryu validation compliancies as well.
+  
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+dagger:
+  enabled: true
+  
+  engine:
+    image:
+      # TODO: revert to 0.11.6 if latest is not stable/compatible with runner
+      # ref: registry.dagger.io/engine:v0.11.6
+      # TODO: remove debug when tested - performance penalty
+      ref: registry.dagger.io/engine:v0.13.6
+    
+    config: |
+      # debug = true
+      insecure-entitlements = ["security.insecure"]
+      [registry."ghcr.io"]
+        http = true
+      [registry."ttl.sh"]
+        http = true
+      [registry."docker.io"]
+        http = true
+      [registry."cache-registry-svc.kubiya"]
+      [log]
+        format = "json"
+    
+    # Set meainingful values based on measured statistic for particular runner deployment.
+    # Consider magicache effect on resources not yet measured. 
+    # As of writing this, resources configured mainly to avoid possible and unexpected OOM kills/throtling in prod env,
+    # and limited not to grow infinitly. 
+    # Resources are defined here to help with support mandatoryu validation compliancies as well.
+    resources:
+      limits:
+        cpu: "4"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+  
+  magicache:
+    # Secret must be created manually in the runner namespace per each client side runner.
+    enabled: false
+    # url: https://api.dagger.cloud/magicache
+    # token: YOUR_DAGGER_CLOUD_TOKEN
+    # secretName: EXISTING_SECRET_NAME
+
+
+# kube-state-metrics subchart configuration
+kube-state-metrics:
+  enabled: true
+  # Default values for kube-state-metrics.
+  image:
+    tag: "2.14.0"
+  updateStrategy: Recreate
+  revisionHistoryLimit: 2
+  # TODO keep if rbac role is not applied or metrics are not collected
+  # namespaces: "kubiya"
+  releaseNamespace: true
+  rbac:
+    useClusterRole: false
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+  selfMonitor:
+    enabled: true
+    telemetryHost: 0.0.0.0
+    telemetryPort: 8081
 
 kubiyaOperator:
+  name: "kubiya-operator"
   replicas: 1
   image:
     repository: ghcr.io/kubiyabot/kubiya-operator
@@ -39,6 +143,12 @@ kubiyaOperator:
             path: nats.creds
   ports:
     containerPort: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated as "RELEASE_NAME-operator"
+    name: ""
     
 agentManager:
   replicas: 2
@@ -66,14 +176,16 @@ agentManager:
             path: nats.creds
 
 toolManager:
+  name: "tool-manager"
+  deployedBy: kubiya
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: Always
     tag: latest
   service:
     port: 80
-  containerPort: 3001
-  serviceType: "ClusterIP"
+    targetPort: 3001
+    type: "ClusterIP"
   volumes: 
   - name: nats-creds-volume
     secret:
@@ -87,6 +199,7 @@ toolManager:
     mountPath: "/opt"
 
   sdkServer:
+    name: "kubiya-sdk-server"
     image:
       repository: ghcr.io/kubiyabot/sdk-py
       pullPolicy: Always
@@ -103,31 +216,3 @@ toolManager:
       - "8000"
     containerPort: 8000
     defaultMode: 420
-
-dagger:
-  enabled: true
-  engine:
-    image:
-      ref: registry.dagger.io/engine:v0.11.6
-    config: |
-      debug = true
-      insecure-entitlements = ["security.insecure"]
-      [registry."ghcr.io"]
-        http = true
-      [registry."ttl.sh"]
-        http = true
-      [registry."docker.io"]
-        http = true
-      [registry."cache-registry-svc.kubiya"]
-      [log]
-        format = "json"
-      
-  magicache:
-    enabled: false
-    ### Create your token via https://docs.dagger.io/manuals/user/cloud-get-started/#step-2-connect-to-dagger-cloud
-    #
-    # token: YOUR_DAGGER_CLOUD_TOKEN
-
-    ### If secretName is set, a new secret will NOT be created
-    #
-    # secretName: EXISTING_SECRET_NAME
