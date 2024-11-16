@@ -1,14 +1,15 @@
 # TODO: remove this
 # Namespace: "kubiya"
-# Organization: "kubiya-test-sniff"
+organization: "kubiya-test-sniff"
+kubiyaAgentUUID: "679adc53-7068-4454-aa9f-16df30b14a50"
 # RunnerName: "sergey-metrics-test"
 # Subject: "kubiya-test-sniff.sergey-metrics-test.incoming"
-# Jwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSk5TVXhXUkVvME0wWktURUkzTWtOWVExcEpVRnBHTWtsRk0wdENURkZFVDBwSE56VldSbFV5VGswMFRWZFZNbE5YVmpKUklpd2lhV0YwSWpveE56TXdOak0xTXpVMkxDSnBjM01pT2lKQlExUkJVVm8yVFZkU1YwdE9SRWxLUlVaTFRFSkpSakpNUkZCVlJrdFdTMU5PTlVkTVUwdEhVa1l6TjFKSU1rVlVWVmxOVTAxQ1ZDSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppNXpaWEpuWlhrdGJXVjBjbWxqY3kxMFpYTjBJaXdpYzNWaUlqb2lWVUpKVEVWRldrUk5SVE5RVVU0elRWRlBURnBCV0VaUE0xSlNUekl5VUVGT1QxVkdWRlpNVlVOVFFWZEVSa05UUXpaWk5GWldOek1pTENKdVlYUnpJanA3SW5CMVlpSTZlMzBzSW5OMVlpSTZlMzBzSW1semMzVmxjbDloWTJOdmRXNTBJam9pUVVGWVQxQlVOVTFIU2t0VVN6WTJVRGROVnpKU1VrbE1VVmhJUXpaRVdrdFVWRTgyU0ZkRVdFOUxTbEZPUlVsSlNVOU5WVm8wUWxNaUxDSjBlWEJsSWpvaWRYTmxjaUlzSW5abGNuTnBiMjRpT2pKOWZRLmlsT21KcWx5c1ZwV2l1SDAtZVdwOXYzZFF5WE5zY0NaT1VwNW55LVYwd3hTWWVoTWlqcHdJX18xMUs0MUdHLVZYTXpCNUNtR3FOZlY1M1dMV1FtOEFnCi0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUpYWjNQQklSRVpMNE1VWjRVUFBBV1E0M0FPU1pGSUdITTJQSEczNU5XSUVHNjdWNkNMV0hMTkEKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
-# SecondJwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSXpUMEZCUWtKWlNWTk1RemREVkRORlNGZFVWVlZhVWpkQlQxWkVUalZDUmt0T1UwWlFWMWRKVVVaRFVGbEhTbFF6VmxGUklpd2lhV0YwSWpveE56SXdNREF5TkRNekxDSnBjM01pT2lKQlJFMDJOMUphVmxwUk5FaFBVMGhPTWxORVNsQlVRbFpZTTAwM1dWaEpUVE15TkRkS1JVeFZVRFJRVHpWT1dVbEpORmRLUjB0VVZpSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppSXNJbk4xWWlJNklsVkVRa00xVkVwS1MwNVBTbFl6UVZWTldUZEpUbFJCUWpaYVYxVk1UbEJNTkV0VFdWWk9VemRMU2xjelJUZExSME5FU1ZwUVFVOUpJaXdpYm1GMGN5STZleUp3ZFdJaU9udDlMQ0p6ZFdJaU9udDlMQ0pwYzNOMVpYSmZZV05qYjNWdWRDSTZJa0ZCV0U5UVZEVk5SMHBMVkVzMk5sQTNUVmN5VWxKSlRGRllTRU0yUkZwTFZGUlBOa2hYUkZoUFMwcFJUa1ZKU1VsUFRWVmFORUpUSWl3aWRIbHdaU0k2SW5WelpYSWlMQ0oyWlhKemFXOXVJam95ZlgwLmdBbmo1Tnc4aXpvWjNTZXB2U1VzandEZ2xaSlVEQ0p2WGlPb3pXemRocGhGdG03TElud1JoclhTS05RcE9UeUpadm5XM2QyYWg0bmZIMzFBVkF1S0J3Ci0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUdCMzNYMkdFVEJOQldZU1ZNTDRDQVFQNUpJWFpKTzJKV0ZaUEpWRkczQTdJUDdFVFRTWk9VNDQKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
-# Uuid: "679adc53-7068-4454-aa9f-16df30b14a50"
-# AgentManagerImage: "ghcr.io/kubiyabot/agent-manager:0.0.15"
-# ToolManagerImage: "ghcr.io/kubiyabot/tool-manager:2a689e758f0d4c9aeeb464c4847b8749409cf8d2"
-# SdkServerImage: "ghcr.io/kubiyabot/sdk-py:v0.45.1"
+nats:
+  jwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSk5TVXhXUkVvME0wWktURUkzTWtOWVExcEpVRnBHTWtsRk0wdENURkZFVDBwSE56VldSbFV5VGswMFRWZFZNbE5YVmpKUklpd2lhV0YwSWpveE56TXdOak0xTXpVMkxDSnBjM01pT2lKQlExUkJVVm8yVFZkU1YwdE9SRWxLUlVaTFRFSkpSakpNUkZCVlJrdFdTMU5PTlVkTVUwdEhVa1l6TjFKSU1rVlVWVmxOVTAxQ1ZDSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppNXpaWEpuWlhrdGJXVjBjbWxqY3kxMFpYTjBJaXdpYzNWaUlqb2lWVUpKVEVWRldrUk5SVE5RVVU0elRWRlBURnBCV0VaUE0xSlNUekl5VUVGT1QxVkdWRlpNVlVOVFFWZEVSa05UUXpaWk5GWldOek1pTENKdVlYUnpJanA3SW5CMVlpSTZlMzBzSW5OMVlpSTZlMzBzSW1semMzVmxjbDloWTJOdmRXNTBJam9pUVVGWVQxQlVOVTFIU2t0VVN6WTJVRGROVnpKU1VrbE1VVmhJUXpaRVdrdFVWRTgyU0ZkRVdFOUxTbEZPUlVsSlNVOU5WVm8wUWxNaUxDSjBlWEJsSWpvaWRYTmxjaUlzSW5abGNuTnBiMjRpT2pKOWZRLmlsT21KcWx5c1ZwV2l1SDAtZVdwOXYzZFF5WE5zY0NaT1VwNW55LVYwd3hTWWVoTWlqcHdJX18xMUs0MUdHLVZYTXpCNUNtR3FOZlY1M1dMV1FtOEFnCi0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUpYWjNQQklSRVpMNE1VWjRVUFBBV1E0M0FPU1pGSUdITTJQSEczNU5XSUVHNjdWNkNMV0hMTkEKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
+  secondJwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSXpUMEZCUWtKWlNWTk1RemREVkRORlNGZFVWVlZhVWpkQlQxWkVUalZDUmt0T1UwWlFWMWRKVVVaRFVGbEhTbFF6VmxGUklpd2lhV0YwSWpveE56SXdNREF5TkRNekxDSnBjM01pT2lKQlJFMDJOMUphVmxwUk5FaFBVMGhPTWxORVNsQlVRbFpZTTAwM1dWaEpUVE15TkRkS1JVeFZVRFJRVHpWT1dVbEpORmRLUjB0VVZpSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppSXNJbk4xWWlJNklsVkVRa00xVkVwS1MwNVBTbFl6UVZWTldUZEpUbFJCUWpaYVYxVk1UbEJNTkV0VFdWWk9VemRMU2xjelJUZExSME5FU1ZwUVFVOUpJaXdpYm1GMGN5STZleUp3ZFdJaU9udDlMQ0p6ZFdJaU9udDlMQ0pwYzNOMVpYSmZZV05qYjNWdWRDSTZJa0ZCV0U5UVZEVk5SMHBMVkVzMk5sQTNUVmN5VWxKSlRGRllTRU0yUkZwTFZGUlBOa2hYUkZoUFMwcFJUa1ZKU1VsUFRWVmFORUpUSWl3aWRIbHdaU0k2SW5WelpYSWlMQ0oyWlhKemFXOXVJam95ZlgwLmdBbmo1Tnc4aXpvWjNTZXB2U1VzandEZ2xaSlVEQ0p2WGlPb3pXemRocGhGdG03TElud1JoclhTS05RcE9UeUpadm5XM2QyYWg0bmZIMzFBVkF1S0J3Ci0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUdCMzNYMkdFVEJOQldZU1ZNTDRDQVFQNUpJWFpKTzJKV0ZaUEpWRkczQTdJUDdFVFRTWk9VNDQKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
+registryTls:
+  crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ4VENDQXRtZ0F3SUJBZ0lVTVBIY1RMN1FGNmMrYlhtNElxTEUzeXVhK1lrd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2NURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWtOQk1SSXdFQVlEVlFRSERBbFRkVzV1ZVhaaApiR1V4RHpBTkJnTlZCQW9NQmt0MVltbDVZVEVNTUFvR0ExVUVDd3dEVWs1RU1TSXdJQVlEVlFRRERCbGpZV05vClpTMXlaV2RwYzNSeWVTMXpkbU11YTNWaWFYbGhNQjRYRFRJME1UQXdNakV5TkRZeU4xb1hEVEkzTURrd01qRXkKTkRZeU4xb3djVEVMTUFrR0ExVUVCaE1DVlZNeEN6QUpCZ05WQkFnTUFrTkJNUkl3RUFZRFZRUUhEQWxUZFc1dQplWFpoYkdVeER6QU5CZ05WQkFvTUJrdDFZbWw1WVRFTU1Bb0dBMVVFQ3d3RFVrNUVNU0l3SUFZRFZRUUREQmxqCllXTm9aUzF5WldkcGMzUnllUzF6ZG1NdWEzVmlhWGxoTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEEKTUlJQkNnS0NBUUVBM3c5b2dVUGptaVNaMDR1OU4vR3hKRmhCT01QYzQ3MXJLR1ozZVc2bW43NW1FTjNzV2R1cwpzVStkK1lNSE9HYjBUT3FlcHhMUUtvMWNRYjVRUmlRTGxOVTJWRGgrTjVhZVVmdVJUU1MwczNRWTAxd1k1Z3ozCnIvaFc3ZllEOVVpTUpTeFhYK01DU2hsQ0NTUm52N2hncmloQWlGdXcyZUs3bjQyWjByYms2MUJmaGNBRWxZbmEKdExoRjBwcWxvNGlsSHZaUGEwdzRFMzJBdkJJTzZ5YjlKb1V0N1JRMVNta3VLRDJsY2dqMVlKSjQ2SmxKUGtFWgowL21Zc3ZwZUZBOVBmQnZGdkZ6K0VyMitMd09JKzcxNFRtTnNITXVERjRyNzVNeFF5ekpaYTNxT3Rud3paTEVYCjlHYThHZ1AxVG9jVGtlRnVMUmhjVWQ4M3M5eWJIS0o1bHdJREFRQUJvNEdBTUg0d0RnWURWUjBQQVFIL0JBUUQKQWdXZ01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNRGdHQTFVZEVRUXhNQytDR1dOaFkyaGxMWEpsWjJsegpkSEo1TFhOMll5NXJkV0pwZVdHQ0VtTmhZMmhsTFhKbFoybHpkSEo1TFhOMll6QWRCZ05WSFE0RUZnUVVxQlpGCkZKZEZLQ1M0SGtSYWxtNmM1WFFORlJVd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHYXlraDhhV3QwaTdpNnMKOGZZRHlZVE8wMjZOYjQ5dWNUZDRpKzgySGFCdm01ZFJxbVQ5U0V4eFJYL3RTanMraGpHRnpYTWVtY0lva3FKLwpFNWtSYlcrbFNveWUwQkdkTVBPcVJNZW1tcEI4WG9DZmo0ZWg0WkxtbDRrbGVSZEEzRU96OHJSRExxb0MxdmJiClluU2RwTjFHbUFJOUtpdjJ0N3hjVVl0Nm1SM2FqYVBLZHVWOXNkakRrZDBDQm1EckhNRXJ4a3AzdDVXOHc5aW8KN2IxRjE3MFBSRldJNVY3c3JtQlFwK0t6UTJsZEdyODdxZFI1eE1wZlU4Z0IvKzgyRXlZcjA1WTJsNmhrY1BGbgpzMnBPTUV4UFVVN05xQlMxeURoR3lXZVVJTE9ydmFuWjh3L1UyVDFScjd1bTBGK0Y0a3hTMHZNMDhyYmRIMzNPCjVyUDV1OEk9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K" # pragma: allowlist secret
+  key: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRGZEMmlCUStPYUpKblQKaTcwMzhiRWtXRUU0dzl6anZXc29abmQ1YnFhZnZtWVEzZXhaMjZ5eFQ1MzVnd2M0WnZSTTZwNm5FdEFxalZ4Qgp2bEJHSkF1VTFUWlVPSDQzbHA1Uis1Rk5KTFN6ZEJqVFhCam1EUGV2K0ZidDlnUDFTSXdsTEZkZjR3SktHVUlKCkpHZS91R0N1S0VDSVc3RFo0cnVmalpuU3R1VHJVRitGd0FTVmlkcTB1RVhTbXFXamlLVWU5azlyVERnVGZZQzgKRWc3ckp2MG1oUzN0RkRWS2FTNG9QYVZ5Q1BWZ2tuam9tVWsrUVJuVCtaaXkrbDRVRDA5OEc4VzhYUDRTdmI0dgpBNGo3dlhoT1kyd2N5NE1YaXZ2a3pGRExNbGxyZW82MmZETmtzUmYwWnJ3YUEvVk9oeE9SNFc0dEdGeFIzemV6CjNKc2Nvbm1YQWdNQkFBRUNnZ0VBSktHSXBYWExLbFNwYUZxeDY3Nkd1ek85SGovWUJoUmt4U0V5ckovMXdCVUoKK09vZzlzN0RDT2xNeFoxMWNaZEN0bUR2UmZ1cWNOcC9GSkxXNXZYamF3RXFwMkVScFRwWWJKazJEdWVndnptcApIQWlyVkJnOEVzdGpKemY0Qlc5eENHZkVQNHh0bzFLTGpDbk0yZWpEQThhN2Rra3NmVk9sUVRvRlVWdlVzeW5VCjBYSTNtY01pM1pzMWdodDNuRXdWSjBMbGVwT2FvQi9iOUhjY2Q0TGN2M2dGWnlOdkVpckgyeDdWMmYremRKQ3QKcXpQLzlXMVR5aE42VWRlMENuVjFTLzh0QTFYQW56MW05VmIyK2h4ZkM5MDlZREJLV3RqVjVQT01aZU5xUVFqVwpqaXpTNnE1dE1UZWpzd1RYRkRMRThKYk4yU3Zld0s2OVZIUkdtdXU3dVFLQmdRRHZtNzNHYStYNy9nVFR3bFJjCk4vSTJ1Q1hSOE5HNW90ZGZjbkFPU2lnc2hpc0tPaHpoSnJlVHVnQm9HeXQyWHU3N2FWQ3EzWHJtdDNVOUhxZVUKSzB1TDdONm1zNzdUWUp4ZHd3RkpOaWJBbWpXRVlDbnR4eldaWjd5Um1zcGg1YnZEL2x0WXpEdFVBZ0QybHZXbwpVTm1YL3VZQ3NZcXZpSmhzdFMxWkF4WklLUUtCZ1FEdVVkdmYyYmx6OTRkYTNVb0tNNjlyZ044QmgxaEwybUVmCnhQeXFZSHFtOGVXaklWL0U4WXM4UTFZSm1KOEZ3dVlyWnREQmMrRTBMeCtaK2FEdy9IdksyZUY3K25Wc0FGUEcKYkhacDhYRkFITlVMdWlwVVlzWjRqaTFYTDEwdEtXZVozN0FVdEpFM3drZ28yZ1NDcHVLVkU1Q2xDTDVoRXIyZAorWVU5QVQzcnZ3S0JnUUMva1Vmb0ZTb2FENXh5WllNbSs3L1dpZUlLK0x2azdGRy9TUEpZS21mMk9RcStNWG9YCmRPbiszUTRvTGRqUTJkTytCQlJ2bDRZRVloY0UxN1pwbXpmYVZuWW8xN3F3cXlRNVBvaVByUkRNbWo1QmFOVDgKKzNGYUJmdFllbVptWU5OL1BxUnYyVkZ4dCt4bk9vaUxtcUJ0aW1rQkxFdFNUaVozZTE4WE5JV2pDUUtCZ1FDcgppSW5zNWlaZ3ZPSlUyWUJJTllsbXBGeGZHazdJVWdla09VSHZWQUFVRjNwRTMybXlOSFVXVEJVcVZRcm90NjY1CndJZ3pKYmdMdW50UmRXYU03ZjRnTkpEaWpwUmp4eHlGYmw0UXhUTFJoYThtZ0xtbEFXOS9LRDZrU1RnVW9IK3MKTmwvamwxQUt4VER4RG5NK291WGxqUzZJU3ZIVXB3dUtJQ1h4a2VwQ3V3S0JnUUM2MEZlbGkwU29aSzUvWlpWagorRHp3WW5ZaXdVZ3ZyRXhUWkxtMXhsanoveFRkRzc4OWZ5c3p4T0UrdzFQUHNOTFROYW05L0RYeXNMaUJKdDJUCjMvc1dZVk5Qc3BWR1FsMVUxOEpCSzZVZlFBOVB1QmF3ZnhMSWRiaTluc1lXYnQyK1pzcW9NOGtPUThSMlVJS3oKSlFidFcrTUVZZ2k0L0wrZ0MxSkNaZ1BvUFE9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==" # pragma: allowlist secret
 
 # by default, runner name is generated from release name, override if needed
 # will be propogated as a value to otel-collector configMap -> runner label
@@ -16,36 +17,42 @@ runnerNameOverride: ""
 
 imagePullSecrets: []
 
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # Whether to automatically mount a service account token
+  automountServiceAccountToken: true
+
 opentelemetry-collector:
   enabled: false
 
+  # Using image build with custom implementation of nats-exporter to be able to push
+  # telemetry and metrics from NATS server.
   image:
     # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
     repository: ghcr.io/kubiyabot/otel-connector
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: release-0.1.1
-    # When digest is set to a non-empty value, images will be pulled by digest (regardless of tag value).
-    digest: ""
 
   mode: deployment
 
-  command:
-    name: "otelcol-k8s"
+  # TODO: remove once tested with default command for our otel-collector image
+  # command:
+  #   name: "otelcol-k8s"
 
   replicaCount: 1
-  
+
   configMap:
     create: false
     existingName: "otel-collector-config"
     existingKey: "otel-collector-config.yaml"
 
-  # Set meainingful values based on measured statistic for particular runner deployment.
-  # Consider magicache effect on resources not yet measured. 
-  # As of writing this, resources configured mainly to avoid possible and unexpected OOM kills/throtling in prod env,
-  # and limited not to grow infinitly. 
-  # Resources are defined here to help with support mandatoryu validation compliancies as well.
-  
+  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+  # Apart from resource management goals, these are required for compliance checkl as well.
   resources:
     limits:
       cpu: "2"
@@ -54,16 +61,68 @@ opentelemetry-collector:
       cpu: 250m
       memory: 256Mi
 
+  # NATS credentials secret
+  extraVolumes:
+  - name: nats-creds-volume
+    secret:
+      secretName: nats-creds # pragma: allowlist secret
+      items:
+      - key: nats.creds
+        path: nats.creds
+  extraVolumeMounts:
+  - name: nats-creds-volume
+    mountPath: "/opt"
+    readOnly: true
+
+  serviceAccount:
+    create: true
+    name: "otel-collector-sa-token"
+  # TODO: remove if tested positively without clusterRole
+  # or add Role and RoleBinding from original runner template, to avoid ClusterRole
+  # clusterRole:
+  # # Specifies whether a clusterRole should be created
+  # # Some presets also trigger the creation of a cluster role and cluster role binding.
+  # # If using one of those presets, this field is no-op.
+  # create: false
+  # # Annotations to add to the clusterRole
+  # # Can be used in combination with presets that create a cluster role.
+  # annotations: {}
+  # # The name of the clusterRole to use.
+  # # If not set a name is generated using the fullname template
+  # # Can be used in combination with presets that create a cluster role.
+  # name: ""
+  # # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  # # Can be used in combination with presets that create a cluster role to add additional rules.
+  # rules: []
+  # # - apiGroups:
+  # #   - ''
+  # #   resources:
+  # #   - 'pods'
+  # #   - 'nodes'
+  # #   verbs:
+  # #   - 'get'
+  # #   - 'list'
+  # #   - 'watch'
+
+  # clusterRoleBinding:
+  #   # Annotations to add to the clusterRoleBinding
+  #   # Can be used in combination with presets that create a cluster role binding.
+  #   annotations: {}
+  #   # The name of the clusterRoleBinding to use.
+  #   # If not set a name is generated using the fullname template
+  #   # Can be used in combination with presets that create a cluster role binding.
+  #   name: ""
+
 dagger:
   enabled: true
-  
+
   engine:
     image:
       # TODO: revert to 0.11.6 if latest is not stable/compatible with runner
       # ref: registry.dagger.io/engine:v0.11.6
       # TODO: remove debug when tested - performance penalty
       ref: registry.dagger.io/engine:v0.13.6
-    
+
     config: |
       # debug = true
       insecure-entitlements = ["security.insecure"]
@@ -76,12 +135,9 @@ dagger:
       [registry."cache-registry-svc.kubiya"]
       [log]
         format = "json"
-    
-    # Set meainingful values based on measured statistic for particular runner deployment.
-    # Consider magicache effect on resources not yet measured. 
-    # As of writing this, resources configured mainly to avoid possible and unexpected OOM kills/throtling in prod env,
-    # and limited not to grow infinitly. 
-    # Resources are defined here to help with support mandatoryu validation compliancies as well.
+
+    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+    # Apart from resource management goals, these are required for compliance checkl as well.
     resources:
       limits:
         cpu: "4"
@@ -89,7 +145,7 @@ dagger:
       requests:
         cpu: "1"
         memory: 1Gi
-  
+
   magicache:
     # Secret must be created manually in the runner namespace per each client side runner.
     enabled: false
@@ -98,26 +154,32 @@ dagger:
     # secretName: EXISTING_SECRET_NAME
 
 
-# kube-state-metrics subchart configuration
-kube-state-metrics:
+    # kube-state-metrics subchart configuration
+kubeStateMetrics:
   enabled: true
+
   # Default values for kube-state-metrics.
   image:
     tag: "2.14.0"
   updateStrategy: Recreate
+
   revisionHistoryLimit: 2
   # TODO keep if rbac role is not applied or metrics are not collected
   # namespaces: "kubiya"
   releaseNamespace: true
   rbac:
     useClusterRole: false
+    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+    # Apart from resource management goals, these are required for compliance checkl as well.
+
   resources:
     limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 256Mi
     requests:
       cpu: 10m
       memory: 32Mi
+
   selfMonitor:
     enabled: true
     telemetryHost: 0.0.0.0
@@ -130,89 +192,143 @@ kubiyaOperator:
     repository: ghcr.io/kubiyabot/kubiya-operator
     pullPolicy: Always
     tag: latest
-  volumeMounts: 
+  volumeMounts:
   - name: runner-secret-volume
     mountPath: "/etc/nats"
     readOnly: true
   volumes:
-    - name: runner-secret-volume
-      secret:
-        secretName: runner-secret # pragma: allowlist secret
-        items:
-          - key: nats.creds
-            path: nats.creds
+  - name: runner-secret-volume
+    secret:
+      secretName: runner-secret # pragma: allowlist secret
+      items:
+      - key: nats.creds
+        path: nats.creds
   ports:
     containerPort: 80
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated as "RELEASE_NAME-operator"
-    name: ""
-    
+
 agentManager:
   replicas: 2
   image:
-    repository: ghcr.io/kubiyabot/agent-manager   
+    repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: Always
-    tag: v0.0.3  
+    tag: 0.0.15
   service:
     port: 80
     targetPort: 8080
     serviceType: "ClusterIP"
-  volumeMounts:
-  - name: creds-volume
-    mountPath: "/opt/"
-    readOnly: true
-  - name: shared-volume
-    mountPath: "/tmp/kubiya_shared_tools"
-    readOnly: false
+
+  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+  # Apart from resource management goals, these are required for compliance checkl as well.
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
   volumes:
-    - name: creds-volume
-      secret:
-        secretName: runner-secret # pragma: allowlist secret
-        items:
-          - key: nats.creds
-            path: nats.creds
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
+      secretName: nats-creds-customer
+  volumeMounts:
+  - mountPath: /nats/
+    name: nats-creds-volume
+    readOnly: true
 
 toolManager:
-  name: "tool-manager"
-  deployedBy: kubiya
-  image:
-    repository: ghcr.io/kubiyabot/tool-manager
-    pullPolicy: Always
-    tag: latest
-  service:
-    port: 80
-    targetPort: 3001
-    type: "ClusterIP"
-  volumes: 
+  replicas: 3
+  volumes:
   - name: nats-creds-volume
     secret:
       secretName: nats-creds # pragma: allowlist secret
       items:
-        - key: nats.creds
-          path: nats.creds
-  # Additional volumeMounts on the output Deployment definition.
-  volumeMounts: 
-  - name: nats-creds-volume
-    mountPath: "/opt"
+      - key: nats.creds
+        path: nats.creds
+  - name: shared-volume
+    emptyDir: {}
+  - name:
+
+    secret:
+      secretName: registry-tls-secret
+      defaultMode: 420
+  image:
+    repository: ghcr.io/kubiyabot/tool-manager
+    pullPolicy: Always
+    tag: 2a689e758f0d4c9aeeb464c4847b8749409cf8d2
+  service:
+    port: 80
+    targetPort: 3001
+    type: "ClusterIP"
+  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+  # Apart from resource management goals, these are required for compliance checkl as well.
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  volumeMounts:
+  - mountPath: /opt/
+    name: nats-creds-volume
+  - mountPath: /tmp/kubiya_shared_tools
+    name: shared-volume
+  - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+    name: registry-certs
+  command:
+  - "/bin/bash"
+  - "-c"
+  - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
+  env:
+    KUBIYA_NATS_CREDS: "/opt/nats.creds"
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_AGENT_kubiyaAgentUUID: "{{ .Values.kubiyaAgentUUID }}"
+    KUBIYA_SERVICE_ACCOUNT: kubiya-service-account
+    GIT_SHA: git-sha-placeholder
+    KUBIYA_TOOL_TIMEOUT: 168h
+    KUBIYA_SDK_SERVER_URL: "http://127.0.0.1:8000"
+    KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    KUBIYA_IMAGE_REGISTRY_ADDRESS: "cache-registry-svc.kubiya"
 
   sdkServer:
-    name: "kubiya-sdk-server"
     image:
       repository: ghcr.io/kubiyabot/sdk-py
       pullPolicy: Always
-      tag: v0.2.0
-    # TODO replace with args or extraArgs or cmdOverride
-    command: 
-      - "python"
-      - "-m"
-      - "kubiya_sdk"
-      - "server"
-      - "--host"
-      - "0.0.0.0"
-      - "--port"
-      - "8000"
+      tag: v0.45.1
+    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+    # Apart from resource management goals, these are required for compliance checkl as well.
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    command:
+    - "python"
+    - "-m"
+    - "kubiya_sdk"
+    - "server"
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8000"
     containerPort: 8000
     defaultMode: 420
+    env:
+      KUBIYA_NATS_CREDS: "/opt/nats.creds"
+      KUBIYA_USER_ORG: "{{ .Values.organization }}"
+      KUBIYA_AGENT_kubiyaAgentUUID: "{{ .Values.kubiyaAgentUUID }}"
+      GIT_SHA: git-sha-placeholder
+      KUBIYA_SERVICE_ACCOUNT: kubiya-service-account
+      KUBIYA_TOOL_TIMEOUT: 168h
+      KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    volumeMounts:
+    - mountPath: /opt/
+      name: nats-creds-volume
+    - mountPath: /tmp/kubiya_shared_tools
+      name: shared-volume

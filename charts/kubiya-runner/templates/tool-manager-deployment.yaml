@@ -1,54 +1,62 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent-manager
+  name: tool-manager
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "tool-manager.labels" . | nindent 4 }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.toolManager.replicas }}
   selector:
     matchLabels:
-      {{- include "tool-manager.selectorLabels" . | indent 6 }}
+      {{- include "tool-manager.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "tool-manager.labels" . | indent 8 }}
+        {{- include "tool-manager.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "kubiya-runner.serviceAccountName" . | indent 8}}
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName" . }}
       containers:
         - name: tool-manager
           image: "{{ .Values.toolManager.image.repository }}:{{ .Values.toolManager.image.tag }}"
           imagePullPolicy: {{ .Values.toolManager.image.pullPolicy | quote }}
+          {{- with .Values.toolManager.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command: {{ .Values.toolManager.command | toYaml | nindent 10 }}
           env:
-            - name: "KUBIYA_NATS_CREDS"
-              value: "/opt/nats.creds"
-            - name: "KUBIYA_USER_ORG"
-              value: "{{ .Values.kubiyaRunnerMeta.organization }}"
-            - name: "KUBIYA_AGENT_kubiyaAgentUUID"
-              value: "{{ .Values.kubiyaRunnerMeta.kubiyaAgentUUID }}"
+          {{- with .Values.toolManager.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.containerPort }}
-        {{- with .Values.toolManager.volumeMounts }}
+          {{- with .Values.toolManager.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-              readOnly: true
+
         - name: sdk-server
           image: "{{ .Values.toolManager.sdkServer.image.repository }}:{{ .Values.toolManager.sdkServer.image.tag }}"
           imagePullPolicy: {{ .Values.toolManager.sdkServer.image.pullPolicy | quote }}
+          {{- with .Values.toolManager.sdkServer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           command: {{ .Values.toolManager.sdkServer.command | toYaml | nindent 10 }}
+          {{- with .Values.toolManager.sdkServer.env }}
           env:
-            - name: "KUBIYA_NATS_CREDS"
-              value: "/opt/nats.creds"
-            - name: "KUBIYA_USER_ORG"
-              value: "{{ .Values.kubiyaRunnerMeta.organization }}"
-            - name: "KUBIYA_AGENT_kubiyaAgentUUID"
-              value: "{{ .Values.kubiyaRunnerMeta.kubiyaAgentUUID }}"
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.sdkServer.containerPort }}
-        {{- with .Values.toolManager.volumeMounts }}
+          {{- with .Values.toolManager.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -56,4 +64,3 @@ spec:
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-          defaultMode: {{ .Values.toolManager.sdkServer.defaultMode }}

@@ -130,3 +130,19 @@ Kubiya Operator Selector labels
 {{ include "kubiya-runner-common.selectorLabels" . }}
 app.kubernetes.io/component: kubiya-operator
 {{- end }}
+
+{{/*
+Kubiya Operator labels
+*/}}
+{{- define "image-updater.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: image-updater
+{{- end }}
+
+{{/*
+Kubiya Operator Selector labels
+*/}}
+{{- define "image-updater.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
+app.kubernetes.io/component: image-updater
+{{- end }}
