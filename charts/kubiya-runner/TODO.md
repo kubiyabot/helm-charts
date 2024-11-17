@@ -62,23 +62,3 @@
 2. Ask devs about `tool-manager` existing helm char; consider it as a subchart?
 3. Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
 
-# - Out of Runner into Helm scope -
-
-## General improvements and further development
-
-1. !!! NATS intermediate for metrics delivery to managed Prometheus via otel-collector with custom made plugin -> Prometheus (Azure native, envoy). Remove NATS: our own custom otel-collector exporter to NATS, NATS and its multiple cfg entities, connector from NATS to Prometheus. Win everywhere with zero coding required: more streamlined delivery, well-known stable components, cost cuts, single points of failure cuts, scalability from the box, no bus factor.
-2.  Image Updater / Continous Delivery: `Argo CD`, Flux https://fluxcd.io/flux/concepts/
-3.  `cert-manager`, `istio`, `vault` - service mesh + secuirty + secret and conbf vars storage per client
-
-## Points of further improvements (quick notes; to be reviewed and prioritized):
-
-1.  Monitor spikes in observability data; cut unnecessary metrics collection
-4.  Consider necessity and effort for optional extension:  `node-exporter`, more `kube-state-metrics` metric, `kubelet` / k8s API wider metrics.
-5.  Ensure all kubiya services has `/health` and `/metrics`.
-6.  Alerting on limits reached / throtling / OOM
-8.  scaling - think for tomorrow and today if already needed 
-9.  Granularity increase - extract subchart `tool-manager`, `agent-manager`, `operator`, `jobs` and etc
-10. Custom image Updater replacement. Why: no tracability and visibility of image we have in all prod runners. Custom code. Replacement: `Argo CD Image Updater`, `kubectl rollout restart `, 
-11. Secrets storage and population per runner environment - vault - can be combined with env-specific  plain text config storage as well
-12. Tune metrics gathering: measure total count, volume, cardinality, scrape success, performance. Enable/disable default exporters optimization. No duplicates from diff metrics sources, no high cardinality, no spikes. Reasonable retention periods, long term storage, aggregations. Daily cost alerts/monthly cost reports. $ of infra per client metrics (and infra in general)
-13. Traces, logs, metrics, alerts are cross-correlated.
