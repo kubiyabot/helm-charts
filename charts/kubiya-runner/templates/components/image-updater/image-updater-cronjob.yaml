@@ -1,3 +1,4 @@
+{{- if .Values.imageUpdater.cronJob.create }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -74,3 +75,4 @@ spec:
               echo "Image updater job completed successfully"
           serviceAccountName: {{ include "kubiya-runner.serviceAccountName.imageUpdater" . }}
           restartPolicy: OnFailure
+{{- end }}

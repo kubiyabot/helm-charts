@@ -136,7 +136,7 @@ app.kubernetes.io/component: image-updater
 
 # Service Accounts names for all kubiya runner components.
 # If create is set to true, name of the service account is value of .name, or, if .name not provided will be set to component name.
-{{- define "kubiya-runner.serviceAccountName.kubiyaOperator" -}}
+{{- define "kubiya-runner.serviceAccountName.operator" -}}
 {{- if .Values.kubiyaOperator.serviceAccount.create }}
 {{- default (printf "%s-operator" (include "kubiya-runner.name" .)) .Values.kubiyaOperator.serviceAccount.name }}
 {{- else }}

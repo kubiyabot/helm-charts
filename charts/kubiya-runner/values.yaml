@@ -17,15 +17,6 @@ runnerNameOverride: ""
 
 imagePullSecrets: []
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-  # Whether to automatically mount a service account token
-  automountServiceAccountToken: true
-
 opentelemetry-collector:
   enabled: false
 
@@ -77,7 +68,6 @@ opentelemetry-collector:
   # or add Role and RoleBinding from original runner template, to avoid ClusterRole
   serviceAccount:
     create: true
-    name: "otel-collector-sa-token"
   # clusterRole:
   # create: false
   # name: ""
@@ -171,7 +161,7 @@ kubiyaOperator:
   replicas: 1
   serviceAccount:
     create: true
-    name: "kubiya-operator"
+    name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
   image:
     repository: ghcr.io/kubiyabot/kubiya-operator
@@ -203,7 +193,7 @@ agentManager:
     serviceType: "ClusterIP"
   serviceAccount:
     create: true
-    name: "agent-manager"
+    name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
   # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
   # Apart from resource management goals, these are required for compliance checkl as well.
@@ -231,7 +221,7 @@ toolManager:
   replicas: 3
   serviceAccount:
     create: true
-    name: "tool-manager"
+    name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
   volumes:
   - name: nats-creds-volume
@@ -324,3 +314,11 @@ toolManager:
       name: nats-creds-volume
     - mountPath: /tmp/kubiya_shared_tools
       name: shared-volume
+
+imageUpdater:
+  cronJob:
+    create: true
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
