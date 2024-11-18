@@ -24,13 +24,13 @@ data:
           - {{ .Release.Namespace }};
 
       # Kubelet metrics via otel-collector receiver
-      # TODO remove hardcoded namespace
       prometheus:
         config:
           scrape_configs:
-          # Kube-state-metrics exporter metrics receiver
-          - job_name: 'kube-state-metrics'
-            scrape_interval: 30s
+
+            # Kube-state-metrics exporter metrics receiver
+            - job_name: 'kube-state-metrics'
+              scrape_interval: 30s
             static_configs:
               - targets: ['kube-state-metrics:8080']
             kubernetes_sd_configs:
@@ -63,7 +63,6 @@ data:
               - source_labels: [__meta_kubernetes_service_port_number]
                 target_label: __metrics_port__
 
-    #TODO: remove hardcoded namespace
     processors:
       k8sattributes:
         auth_type: serviceAccount
@@ -74,7 +73,6 @@ data:
       
       resource:
         attributes:
-        # TODO: instance and cluster drop
           - key: "organization"
             value: {{ .Values.Organization }}
             action: upsert

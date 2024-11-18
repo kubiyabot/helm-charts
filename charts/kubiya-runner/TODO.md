@@ -1,6 +1,6 @@
 ## Runner Helm Chart
 
-## - TODO - The Must
+## TODO - The Must
 
 - [x] Setup local dev environment, get all cloud tokens and access needed for complete testing.
 - [x] Move all runner components to single namespace, remove cluster wide roles, minimize permissions for all resources across all runner components.
@@ -18,16 +18,10 @@
 - [x] Once dev fixes `tool-manager` - update image and add `dagger` discovery service to the chart.
 - [x] Verify all configurables from `runner_v2_singleNamespace.tmpl.yaml` preserved.
 - [x] Add what was missing in base chart draft: at least CronJob `image-updater`.
-- [ ] Update README to meaningful state (add compatibility table if needed).
+- [?] Update README to meaningful state (add compatibility table if needed).
 - [x] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded. tune permission for least privileges while keeping it functional
-- [ ] Go through TODOs
+- [?] Go through TODOs
 - [x] Add dagger headless service for tool-manager discovery/balancing to runner the chart as vendor's subchart has no services templates.
-
-## Nice to have
-
-- [ ] Detailed chart README.
-- [ ] Align `Chart.yaml` as per helm guidelines.
-- [ ] Actual Limits/Requests for all containers, including subcharts (get from `Grafana` pod dashboards)
 
 ## Testing
 
@@ -66,3 +60,8 @@
 - [x] ~Ask devs about `tool-manager` existing helm char; consider it as a subchart?~ ---> abandoned chart
 - [ ] Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
 
+## Nice to have
+
+- [ ] Detailed chart README.
+- [ ] Align `Chart.yaml` as per helm guidelines.
+- [ ] Actual Limits/Requests for all containers, including subcharts (get from `Grafana` pod dashboards)
