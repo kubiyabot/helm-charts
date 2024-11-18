@@ -1,15 +1,15 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "kubiya-runner.name" . }}-image-updater-rolebinding
+  name: {{ include "kubiya-runner.name" . }}-image-updater-binding
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "image-updater.labels" . | indent 4 }}
+    {{- include "image-updater.labels" . | nindent 4 }}
 subjects:
-- kind: ServiceAccount
-  name: image-updater-sa
-  namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: {{ include "kubiya-runner.serviceAccountName.imageUpdater" . }}
+    namespace: {{ .Release.Namespace }}
 roleRef:
-  kind: Role
-  name: {{ include "kubiya-runner.name" . }}-deployment-updater
   apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "kubiya-runner.name" . }}-image-updater

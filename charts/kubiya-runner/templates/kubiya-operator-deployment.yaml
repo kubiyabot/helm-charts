@@ -16,7 +16,7 @@ spec:
       labels:
         {{- include "kubiya-operator.labels" . | indent 8 }}
     spec:
-      serviceAccountName: {{ include "kubiya-runner.serviceAccountName" . | indent 8}}
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.operator" . | indent 8}}
       containers:
         - name: kubiya-operator
           image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"

@@ -15,7 +15,7 @@ spec:
       labels:
         {{- include "tool-manager.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "kubiya-runner.serviceAccountName" . }}
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.toolManager" . }}
       containers:
         - name: tool-manager
           image: "{{ .Values.toolManager.image.repository }}:{{ .Values.toolManager.image.tag }}"

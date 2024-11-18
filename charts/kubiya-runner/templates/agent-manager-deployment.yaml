@@ -16,6 +16,7 @@ spec:
       labels:
         {{- include "agent-manager.labels" . | indent 8 }}
     spec:
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.agentManager" . }}
       containers:
         - name: agent-manager
           image: "{{ .Values.agentManager.image.repository }}:{{ .Values.agentManager.image.tag }}"

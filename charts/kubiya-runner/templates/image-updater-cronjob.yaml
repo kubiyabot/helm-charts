@@ -72,5 +72,5 @@ spec:
               sdk_py_image=$(jq -r '."sdk-py"' /tmp/kubiya_versions.json)
               update_deployment "tool-manager" "kubiya-sdk-server" "$sdk_py_image"
               echo "Image updater job completed successfully"
-          serviceAccountName: image-updater-sa
+          serviceAccountName: {{ include "kubiya-runner.serviceAccountName.imageUpdater" . }}
           restartPolicy: OnFailure

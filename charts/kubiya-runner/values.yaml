@@ -167,8 +167,12 @@ kubeStateMetrics:
     telemetryPort: 8081
 
 kubiyaOperator:
-  name: "kubiya-operator"
+  create: true
   replicas: 1
+  serviceAccount:
+    create: true
+    name: "kubiya-operator"
+    automountServiceAccountToken: true
   image:
     repository: ghcr.io/kubiyabot/kubiya-operator
     pullPolicy: Always
@@ -197,7 +201,10 @@ agentManager:
     port: 80
     targetPort: 8080
     serviceType: "ClusterIP"
-
+  serviceAccount:
+    create: true
+    name: "agent-manager"
+    automountServiceAccountToken: true
   # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
   # Apart from resource management goals, these are required for compliance checkl as well.
   resources:
@@ -222,17 +229,21 @@ agentManager:
 
 toolManager:
   replicas: 3
+  serviceAccount:
+    create: true
+    name: "tool-manager"
+    automountServiceAccountToken: true
   volumes:
   - name: nats-creds-volume
     secret:
-      secretName: nats-creds # pragma: allowlist secret
+      defaultMode: 420
       items:
       - key: nats.creds
         path: nats.creds
+      secretName: nats-creds-customer
   - name: shared-volume
     emptyDir: {}
-  - name:
-
+  - name: registry-certs
     secret:
       secretName: registry-tls-secret
       defaultMode: 420

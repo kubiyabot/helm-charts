@@ -1,11 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "kubiya-runner.name" . }}-deployment-updater
+  name: {{ include "kubiya-runner.name" . }}-image-updater
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "image-updater.labels" . | indent 4 }}
+    {{- include "image-updater.labels" . | nindent 4 }}
 rules:
-- apiGroups: ["apps"]
-  resources: ["deployments"]
-  verbs: ["get", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "patch"]

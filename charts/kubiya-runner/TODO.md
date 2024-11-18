@@ -16,11 +16,11 @@
 - [x] Add `otel-collector` to the chart as dependency, translate its config from `runner_v2_singleNamespace.tmpl.yaml` to subchart values
 - [?] Make sure no diffs are left between chart and `runner_v2_singleNamespace.tmpl.yaml` (consider recent refactor).
 - [ ] Once dev fixes `tool-manager` - update image and add `dagger` discovery service to the chart.
-- [ ] Verify all resources from runner installation rendered yaml are present in the chart.
 - [?] Verify all configurables from `runner_v2_singleNamespace.tmpl.yaml` preserved.
 - [x] Add what was missing in base chart draft: at least CronJob `image-updater`.
 - [ ] Update README to meaningful state (add compatibility table if needed).
-- [ ] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded.
+- [ ] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded. tune permission for least privileges while keeping it functional
+- [ ] Go through TODOs
 
 ## Nice to have
 
@@ -31,6 +31,7 @@
 ## Testing
 
 - [x] Render chart with prod vars.
+- [ ] Verify all resources from runner installation rendered yaml are present in the chart.
 - [ ] Deploy locally with runner connected to cloud,
 - [ ] Test chart locally:
     - [ ] No failed pods, jobs, restarts, not ready pods. 
@@ -46,7 +47,7 @@
 
 ## Before going to prod
 
-- [ ] Current `image-updater` should be replaced. Discuss with Costa.
+- [ ] Current `image-updater` should be replaced. Discuss with Costa. `runAsUser: 0`
 - [ ] NO SECRETS in chart and it's git commit history (create new repo or use `push -f`). Dissccuss existing tls keys with Costa
 - [ ] PR / Code review.
 - [ ] Prepare packaged, versioned helm chart `.gz` release. Upload it and default containers to artifact storage.
