@@ -21,7 +21,7 @@
 - [ ] Update README to meaningful state (add compatibility table if needed).
 - [x] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded. tune permission for least privileges while keeping it functional
 - [ ] Go through TODOs
-- [ ] Add dagger headless service for tool-manager discovery/balancing to runner the chart as vendor's subchart has no services templates.
+- [x] Add dagger headless service for tool-manager discovery/balancing to runner the chart as vendor's subchart has no services templates.
 
 ## Nice to have
 
@@ -58,11 +58,11 @@
 
 ## Fixes and Improvements
 
-1. Clarify: `registry-tls-secret` hardcoded? Improve?
-2. Clarify: `ImagePullPolicy` not set to `IfNotPresent` for some containers, fix if no objection. 
-3. `tool-manager` remove `image: latest` and make sure other templates are aligned; put fixed and tested tag as default
-4. `tool-manager` fix: repos / `initContainers` / `init-certs` -> `busybox` remove latest or replace with `ImagePullSecrets`, `ServiceAccountTokenMount` or ConfigMap -> ENV_VAR or ...
-5. Where `automountServiceAccountToken=true` remove manual duplicate `volume` & `volumeMounts` (check path of mount match automounted)
-2. Ask devs about `tool-manager` existing helm char; consider it as a subchart?
-3. Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
+- [ ] Carify: `registry-tls-secret` hardcoded? Improve?
+- [ ] Clarify: `ImagePullPolicy` not set to `IfNotPresent` for some containers, fix if no objection. 
+- [ ] `tool-manager` remove `image: latest` and make sure other templates are aligned; put fixed and tested tag as default
+- [ ] `tool-manager` fix: repos / `initContainers` / `init-certs` -> `busybox` remove latest or replace with `ImagePullSecrets`, `ServiceAccountTokenMount` or ConfigMap -> ENV_VAR or ...
+- [ ] Where `automountServiceAccountToken=true` remove manual duplicate `volume` & `volumeMounts` (check path of mount match automounted)
+- [x] ~Ask devs about `tool-manager` existing helm char; consider it as a subchart?~ ---> abandoned chart
+- [ ] Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
 
