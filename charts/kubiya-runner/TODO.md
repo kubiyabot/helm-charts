@@ -14,13 +14,14 @@
 - [x] Add `dagger` to the chart as dependency, translate config from `runner_v2_singleNamespace`.tmpl.yaml to subchart values.
 - [x] Investigate runner cannot be installed on bynder environment. Propose quick fix to unlock POC, fix permanently in chart (see below)
 - [x] Add `otel-collector` to the chart as dependency, translate its config from `runner_v2_singleNamespace.tmpl.yaml` to subchart values
-- [?] Make sure no diffs are left between chart and `runner_v2_singleNamespace.tmpl.yaml` (consider recent refactor).
-- [ ] Once dev fixes `tool-manager` - update image and add `dagger` discovery service to the chart.
-- [?] Verify all configurables from `runner_v2_singleNamespace.tmpl.yaml` preserved.
+- [x] Make sure no diffs are left between chart and `runner_v2_singleNamespace.tmpl.yaml` (consider recent refactor).
+- [x] Once dev fixes `tool-manager` - update image and add `dagger` discovery service to the chart.
+- [x] Verify all configurables from `runner_v2_singleNamespace.tmpl.yaml` preserved.
 - [x] Add what was missing in base chart draft: at least CronJob `image-updater`.
 - [ ] Update README to meaningful state (add compatibility table if needed).
-- [ ] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded. tune permission for least privileges while keeping it functional
+- [x] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded. tune permission for least privileges while keeping it functional
 - [ ] Go through TODOs
+- [ ] Add dagger headless service for tool-manager discovery/balancing to runner the chart as vendor's subchart has no services templates.
 
 ## Nice to have
 
@@ -39,6 +40,8 @@
     - [ ] Metrics, logs, telemetry made it to the centralized storage (Prometheus, etc).
     - [ ] Image updater works.
     - [ ] Chart: packaging, upgrade, rollback, delete, reinstall - all works.
+    - [ ] Tool manager -> dagger discovery
+    - [ ] Service account permissions
 
 ## OTA
 

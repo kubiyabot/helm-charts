@@ -2,8 +2,15 @@
 # Namespace: "kubiya"
 organization: "kubiya-test-sniff"
 kubiyaAgentUUID: "679adc53-7068-4454-aa9f-16df30b14a50"
+
+# Dagger additional headless service port for dagger pods discovery and load balancing
+# At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
+#TODO: make sure port matches dagger container
+daggerDiscoveryServicePort: 8080
+
 # RunnerName: "sergey-metrics-test"
 # Subject: "kubiya-test-sniff.sergey-metrics-test.incoming"
+
 nats:
   jwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSk5TVXhXUkVvME0wWktURUkzTWtOWVExcEpVRnBHTWtsRk0wdENURkZFVDBwSE56VldSbFV5VGswMFRWZFZNbE5YVmpKUklpd2lhV0YwSWpveE56TXdOak0xTXpVMkxDSnBjM01pT2lKQlExUkJVVm8yVFZkU1YwdE9SRWxLUlVaTFRFSkpSakpNUkZCVlJrdFdTMU5PTlVkTVUwdEhVa1l6TjFKSU1rVlVWVmxOVTAxQ1ZDSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppNXpaWEpuWlhrdGJXVjBjbWxqY3kxMFpYTjBJaXdpYzNWaUlqb2lWVUpKVEVWRldrUk5SVE5RVVU0elRWRlBURnBCV0VaUE0xSlNUekl5VUVGT1QxVkdWRlpNVlVOVFFWZEVSa05UUXpaWk5GWldOek1pTENKdVlYUnpJanA3SW5CMVlpSTZlMzBzSW5OMVlpSTZlMzBzSW1semMzVmxjbDloWTJOdmRXNTBJam9pUVVGWVQxQlVOVTFIU2t0VVN6WTJVRGROVnpKU1VrbE1VVmhJUXpaRVdrdFVWRTgyU0ZkRVdFOUxTbEZPUlVsSlNVOU5WVm8wUWxNaUxDSjBlWEJsSWpvaWRYTmxjaUlzSW5abGNuTnBiMjRpT2pKOWZRLmlsT21KcWx5c1ZwV2l1SDAtZVdwOXYzZFF5WE5zY0NaT1VwNW55LVYwd3hTWWVoTWlqcHdJX18xMUs0MUdHLVZYTXpCNUNtR3FOZlY1M1dMV1FtOEFnCi0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUpYWjNQQklSRVpMNE1VWjRVUFBBV1E0M0FPU1pGSUdITTJQSEczNU5XSUVHNjdWNkNMV0hMTkEKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
   secondJwt: "LS0tLS1CRUdJTiBOQVRTIFVTRVIgSldULS0tLS0KZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKbFpESTFOVEU1TFc1clpYa2lmUS5leUpxZEdraU9pSXpUMEZCUWtKWlNWTk1RemREVkRORlNGZFVWVlZhVWpkQlQxWkVUalZDUmt0T1UwWlFWMWRKVVVaRFVGbEhTbFF6VmxGUklpd2lhV0YwSWpveE56SXdNREF5TkRNekxDSnBjM01pT2lKQlJFMDJOMUphVmxwUk5FaFBVMGhPTWxORVNsQlVRbFpZTTAwM1dWaEpUVE15TkRkS1JVeFZVRFJRVHpWT1dVbEpORmRLUjB0VVZpSXNJbTVoYldVaU9pSnJkV0pwZVdFdGRHVnpkQzF6Ym1sbVppSXNJbk4xWWlJNklsVkVRa00xVkVwS1MwNVBTbFl6UVZWTldUZEpUbFJCUWpaYVYxVk1UbEJNTkV0VFdWWk9VemRMU2xjelJUZExSME5FU1ZwUVFVOUpJaXdpYm1GMGN5STZleUp3ZFdJaU9udDlMQ0p6ZFdJaU9udDlMQ0pwYzNOMVpYSmZZV05qYjNWdWRDSTZJa0ZCV0U5UVZEVk5SMHBMVkVzMk5sQTNUVmN5VWxKSlRGRllTRU0yUkZwTFZGUlBOa2hYUkZoUFMwcFJUa1ZKU1VsUFRWVmFORUpUSWl3aWRIbHdaU0k2SW5WelpYSWlMQ0oyWlhKemFXOXVJam95ZlgwLmdBbmo1Tnc4aXpvWjNTZXB2U1VzandEZ2xaSlVEQ0p2WGlPb3pXemRocGhGdG03TElud1JoclhTS05RcE9UeUpadm5XM2QyYWg0bmZIMzFBVkF1S0J3Ci0tLS0tLUVORCBOQVRTIFVTRVIgSldULS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqIElNUE9SVEFOVCAqKioqKioqKioqKioqKioqKioqKioqKioqCk5LRVkgU2VlZCBwcmludGVkIGJlbG93IGNhbiBiZSB1c2VkIHRvIHNpZ24gYW5kIHByb3ZlIGlkZW50aXR5LgpOS0VZcyBhcmUgc2Vuc2l0aXZlIGFuZCBzaG91bGQgYmUgdHJlYXRlZCBhcyBzZWNyZXRzLgoKLS0tLS1CRUdJTiBVU0VSIE5LRVkgU0VFRC0tLS0tClNVQUdCMzNYMkdFVEJOQldZU1ZNTDRDQVFQNUpJWFpKTzJKV0ZaUEpWRkczQTdJUDdFVFRTWk9VNDQKLS0tLS0tRU5EIFVTRVIgTktFWSBTRUVELS0tLS0tCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCg=="
@@ -15,8 +22,212 @@ registryTls:
 # will be propogated as a value to otel-collector configMap -> runner label
 runnerNameOverride: ""
 
+# For pulling images from private registries
 imagePullSecrets: []
 
+# kube-state-metrics subchart configuration
+kubeStateMetrics:
+  enabled: true
+
+  # Default values for kube-state-metrics.
+  image:
+    tag: "2.14.0"
+  updateStrategy: Recreate
+
+  revisionHistoryLimit: 2
+  # TODO keep if rbac role is not applied or metrics are not collected
+  # namespaces: "kubiya"
+  releaseNamespace: true
+  rbac:
+    useClusterRole: false
+    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+    # Apart from resource management goals, these are required for compliance checkl as well.
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+  selfMonitor:
+    enabled: true
+    telemetryHost: 0.0.0.0
+    telemetryPort: 8081
+
+# Kubiya operator runner component config
+kubiyaOperator:
+  create: true
+  replicas: 1
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
+  image:
+    repository: ghcr.io/kubiyabot/kubiya-operator
+    pullPolicy: Always
+    tag: latest
+  volumeMounts:
+  - name: runner-secret-volume
+    mountPath: "/etc/nats"
+    readOnly: true
+  volumes:
+  - name: runner-secret-volume
+    secret:
+      secretName: runner-secret # pragma: allowlist secret
+      items:
+      - key: nats.creds
+        path: nats.creds
+  ports:
+    containerPort: 80
+
+# Kubiya agent manager component config
+agentManager:
+  replicas: 2
+  image:
+    repository: ghcr.io/kubiyabot/agent-manager
+    pullPolicy: Always
+    tag: 0.0.15
+  service:
+    port: 80
+    targetPort: 8080
+    serviceType: "ClusterIP"
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
+  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+  # Apart from resource management goals, these are required for compliance checkl as well.
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  volumes:
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
+      secretName: nats-creds-customer
+  volumeMounts:
+  - mountPath: /nats/
+    name: nats-creds-volume
+    readOnly: true
+
+# Kubiya tool manager component config
+toolManager:
+  replicas: 3
+  serviceAccount:
+    create: true
+    name: "kubiya-runner-tool-manager" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
+  volumes:
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
+      secretName: nats-creds-customer
+  - name: shared-volume
+    emptyDir: {}
+  - name: registry-certs
+    secret:
+      secretName: registry-tls-secret
+      defaultMode: 420
+  image:
+    repository: ghcr.io/kubiyabot/tool-manager
+    pullPolicy: Always
+    tag: 2a689e758f0d4c9aeeb464c4847b8749409cf8d2
+  service:
+    port: 80
+    targetPort: 3001
+    type: "ClusterIP"
+  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+  # Apart from resource management goals, these are required for compliance checkl as well.
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  volumeMounts:
+  - mountPath: /opt/
+    name: nats-creds-volume
+  - mountPath: /tmp/kubiya_shared_tools
+    name: shared-volume
+  - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+    name: registry-certs
+  command:
+  - "/bin/bash"
+  - "-c"
+  - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
+  env:
+    KUBIYA_NATS_CREDS: "/opt/nats.creds"
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_AGENT_kubiyaAgentUUID: "{{ .Values.kubiyaAgentUUID }}"
+    KUBIYA_SERVICE_ACCOUNT: kubiya-runner-tool-manager
+    GIT_SHA: git-sha-placeholder
+    KUBIYA_TOOL_TIMEOUT: 168h
+    KUBIYA_SDK_SERVER_URL: "http://127.0.0.1:8000"
+    KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    KUBIYA_IMAGE_REGISTRY_ADDRESS: "cache-registry-svc.kubiya"
+
+  sdkServer:
+    image:
+      repository: ghcr.io/kubiyabot/sdk-py
+      pullPolicy: Always
+      tag: v0.45.1
+    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
+    # Apart from resource management goals, these are required for compliance checkl as well.
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    command:
+    - "python"
+    - "-m"
+    - "kubiya_sdk"
+    - "server"
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8000"
+    containerPort: 8000
+    defaultMode: 420
+    env:
+      KUBIYA_NATS_CREDS: "/opt/nats.creds"
+      KUBIYA_USER_ORG: "{{ .Values.organization }}"
+      KUBIYA_AGENT_kubiyaAgentUUID: "{{ .Values.kubiyaAgentUUID }}"
+      GIT_SHA: git-sha-placeholder
+      KUBIYA_SERVICE_ACCOUNT: kubiya-runner-tool-manager
+      KUBIYA_TOOL_TIMEOUT: 168h
+      KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    volumeMounts:
+    - mountPath: /opt/
+      name: nats-creds-volume
+    - mountPath: /tmp/kubiya_shared_tools
+      name: shared-volume
+
+# Kubiya image updater component config
+imageUpdater:
+  cronJob:
+    create: true
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
+
+# Open-teemetry collector subchart config
 opentelemetry-collector:
   enabled: false
 
@@ -124,201 +335,6 @@ dagger:
     # token: YOUR_DAGGER_CLOUD_TOKEN
     # secretName: EXISTING_SECRET_NAME
 
-
-    # kube-state-metrics subchart configuration
-kubeStateMetrics:
-  enabled: true
-
-  # Default values for kube-state-metrics.
-  image:
-    tag: "2.14.0"
-  updateStrategy: Recreate
-
-  revisionHistoryLimit: 2
-  # TODO keep if rbac role is not applied or metrics are not collected
-  # namespaces: "kubiya"
-  releaseNamespace: true
-  rbac:
-    useClusterRole: false
-    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
-    # Apart from resource management goals, these are required for compliance checkl as well.
-
-  resources:
-    limits:
-      cpu: 200m
-      memory: 256Mi
-    requests:
-      cpu: 10m
-      memory: 32Mi
-
-  selfMonitor:
-    enabled: true
-    telemetryHost: 0.0.0.0
-    telemetryPort: 8081
-
-kubiyaOperator:
-  create: true
-  replicas: 1
-  serviceAccount:
+  newServiceAccount:
+    name: "kubiya-runner-dagger-helm"
     create: true
-    name: "" # Leave empty when create is true to use the default generated name
-    automountServiceAccountToken: true
-  image:
-    repository: ghcr.io/kubiyabot/kubiya-operator
-    pullPolicy: Always
-    tag: latest
-  volumeMounts:
-  - name: runner-secret-volume
-    mountPath: "/etc/nats"
-    readOnly: true
-  volumes:
-  - name: runner-secret-volume
-    secret:
-      secretName: runner-secret # pragma: allowlist secret
-      items:
-      - key: nats.creds
-        path: nats.creds
-  ports:
-    containerPort: 80
-
-agentManager:
-  replicas: 2
-  image:
-    repository: ghcr.io/kubiyabot/agent-manager
-    pullPolicy: Always
-    tag: 0.0.15
-  service:
-    port: 80
-    targetPort: 8080
-    serviceType: "ClusterIP"
-  serviceAccount:
-    create: true
-    name: "" # Leave empty when create is true to use the default generated name
-    automountServiceAccountToken: true
-  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
-  # Apart from resource management goals, these are required for compliance checkl as well.
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-  volumes:
-  - name: nats-creds-volume
-    secret:
-      defaultMode: 420
-      items:
-      - key: nats.creds
-        path: nats.creds
-      secretName: nats-creds-customer
-  volumeMounts:
-  - mountPath: /nats/
-    name: nats-creds-volume
-    readOnly: true
-
-toolManager:
-  replicas: 3
-  serviceAccount:
-    create: true
-    name: "" # Leave empty when create is true to use the default generated name
-    automountServiceAccountToken: true
-  volumes:
-  - name: nats-creds-volume
-    secret:
-      defaultMode: 420
-      items:
-      - key: nats.creds
-        path: nats.creds
-      secretName: nats-creds-customer
-  - name: shared-volume
-    emptyDir: {}
-  - name: registry-certs
-    secret:
-      secretName: registry-tls-secret
-      defaultMode: 420
-  image:
-    repository: ghcr.io/kubiyabot/tool-manager
-    pullPolicy: Always
-    tag: 2a689e758f0d4c9aeeb464c4847b8749409cf8d2
-  service:
-    port: 80
-    targetPort: 3001
-    type: "ClusterIP"
-  # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
-  # Apart from resource management goals, these are required for compliance checkl as well.
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-  volumeMounts:
-  - mountPath: /opt/
-    name: nats-creds-volume
-  - mountPath: /tmp/kubiya_shared_tools
-    name: shared-volume
-  - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
-    name: registry-certs
-  command:
-  - "/bin/bash"
-  - "-c"
-  - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
-  env:
-    KUBIYA_NATS_CREDS: "/opt/nats.creds"
-    KUBIYA_USER_ORG: "{{ .Values.organization }}"
-    KUBIYA_AGENT_kubiyaAgentUUID: "{{ .Values.kubiyaAgentUUID }}"
-    KUBIYA_SERVICE_ACCOUNT: kubiya-service-account
-    GIT_SHA: git-sha-placeholder
-    KUBIYA_TOOL_TIMEOUT: 168h
-    KUBIYA_SDK_SERVER_URL: "http://127.0.0.1:8000"
-    KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
-    KUBIYA_IMAGE_REGISTRY_ADDRESS: "cache-registry-svc.kubiya"
-
-  sdkServer:
-    image:
-      repository: ghcr.io/kubiyabot/sdk-py
-      pullPolicy: Always
-      tag: v0.45.1
-    # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
-    # Apart from resource management goals, these are required for compliance checkl as well.
-    resources:
-      limits:
-        cpu: "500m"
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    command:
-    - "python"
-    - "-m"
-    - "kubiya_sdk"
-    - "server"
-    - "--host"
-    - "0.0.0.0"
-    - "--port"
-    - "8000"
-    containerPort: 8000
-    defaultMode: 420
-    env:
-      KUBIYA_NATS_CREDS: "/opt/nats.creds"
-      KUBIYA_USER_ORG: "{{ .Values.organization }}"
-      KUBIYA_AGENT_kubiyaAgentUUID: "{{ .Values.kubiyaAgentUUID }}"
-      GIT_SHA: git-sha-placeholder
-      KUBIYA_SERVICE_ACCOUNT: kubiya-service-account
-      KUBIYA_TOOL_TIMEOUT: 168h
-      KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
-    volumeMounts:
-    - mountPath: /opt/
-      name: nats-creds-volume
-    - mountPath: /tmp/kubiya_shared_tools
-      name: shared-volume
-
-imageUpdater:
-  cronJob:
-    create: true
-  serviceAccount:
-    create: true
-    name: "" # Leave empty when create is true to use the default generated name
-    automountServiceAccountToken: true
