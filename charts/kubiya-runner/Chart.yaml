@@ -1,32 +1,35 @@
 apiVersion: v2
 name: kubiya-runner
-description: A Helm chart for deploying the Kubiya operator and related services
+description: A Helm chart for deploying the Kubiya Runner
 type: application
-
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 0.3.0
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
-# appVersion: "1.0"
-
+appVersion: "0.3.0"
+kubeVersion: ">=1.19.0-0"
+home: https://kubiya.ai
+icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+sources:
+  - https://github.com/kubiyabot/helm-charts
+keywords:
+  - kubiya.ai
+  - runner
+maintainers:
+  - name: Costa
+    email: costa@kubiya.ai
+  - name: Sergey Demyachonok
+    email: sergey.demyachonok@kubiya.ai
 dependencies:
-- name: dagger-helm
-  version: 0.13.6
-  repository: oci://registry.dagger.io
-  alias: dagger
-  condition: dagger.enabled
-- name: kube-state-metrics
-  version: 5.27.0
-  repository: "https://prometheus-community.github.io/helm-charts"
-  # TODO remove if values propogated without alias
-  # alias: kubeStateMetrics
-  condition: kubeStateMetrics.enabled
-- name: opentelemetry-collector
-  version: 0.109.0
-  repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
-  condition: opentelemetryCollector.enabled
+  - name: dagger-helm
+    version: 0.13.6
+    repository: oci://registry.dagger.io
+    alias: dagger
+    condition: dagger.enabled
+  - name: kube-state-metrics
+    version: 5.27.0
+    repository: "https://prometheus-community.github.io/helm-charts"
+    # TODO remove if values propogated without alias
+    # alias: kubeStateMetrics
+    condition: kubeStateMetrics.enabled
+  - name: opentelemetry-collector
+    version: 0.109.0
+    repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
+    condition: opentelemetryCollector.enabled
