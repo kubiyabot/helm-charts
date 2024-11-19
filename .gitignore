@@ -36,3 +36,9 @@ node_modules/
 
 # Test coverage output
 coverage/
+
+# Old template files
+_old_template/
+
+# Rendered debug files
+render.yaml
