@@ -2,7 +2,6 @@
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/kubiya-helm-charts)](https://artifacthub.io/packages/search?repo=kubiya-helm-charts)
 
-
 A Helm chart for deploying the Kubiya Runner.
 
 ## Table of Contents
@@ -18,7 +17,9 @@ A Helm chart for deploying the Kubiya Runner.
     - [Kubiya Operator](#kubiya-operator)
     - [Tool Manager](#tool-manager)
     - [Image Updater](#image-updater)
-  - [Dependencies](#dependencies)
+  - [Dependencies \& Compatibility Matrix](#dependencies--compatibility-matrix)
+    - [Helm Dependencies](#helm-dependencies)
+    - [Container Images](#container-images)
   - [Monitoring \& Telemetry](#monitoring--telemetry)
   - [Security](#security)
   - [Configuration (values.yaml)](#configuration-valuesyaml)
@@ -97,19 +98,35 @@ Full documentation is available [in project repository](https://github.com/kubiy
 - Includes SDK server for tool execution
 
 ### Image Updater
+
 - Automatic updates for runner components
 - Runs as a CronJob (hourly by default)
 - Updates deployments with latest stable images
 
-## Dependencies
+## Dependencies & Compatibility Matrix
 
-The chart includes the following dependencies:
+This version of this chart as of version 0.3.0 is tested to be compatible with the following versions of container images and Helm dependencies.
 
-| Name | Version | Description |
-|------|---------|-------------|
-| dagger-helm | 0.13.6 | Container runtime for workflows |
-| kube-state-metrics | 5.27.0 | Kubernetes cluster metrics collection |
-| opentelemetry-collector | 0.109.0 | Telemetry and metrics collection |
+### Helm Dependencies
+
+| Chart | Version |
+|-------|---------|
+| dagger-helm | 0.13.6 |
+| kube-state-metrics | 5.27.0 |
+| opentelemetry-collector | 0.109.0 |
+
+### Container Images
+
+| Component | Image | Version/Tag |
+|-----------|-------|-------------|
+| Agent Manager | ghcr.io/kubiyabot/agent-manager | 0.0.17 |
+| Kubiya Operator | ghcr.io/kubiyabot/kubiya-operator | runner_v2 |
+| Tool Manager | ghcr.io/kubiyabot/tool-manager | 462d60470b8f8063bac9c11887dc3620a71b8c56 |
+| SDK Server | ghcr.io/kubiyabot/sdk-py | v0.47.1 |
+| Image Updater | bitnami/kubectl | 1.30.6 |
+| OpenTelemetry Collector | ghcr.io/kubiyabot/otel-connector | release-0.1.1 |
+| Dagger Engine | ghcr.io/kubiyabot/kubiya-registry | v0.1.1 |
+| Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | 2.14.0 |
 
 ## Monitoring & Telemetry
 
@@ -134,3 +151,4 @@ As of moment of writing this, default configuration set via `values.yaml` should
 - `nats.jwt` and `nats.secondJwt`: NATS credentials for sending metrics to NATS Cloud (Synadia)
 - `nats.subject`: NATS destination subject for metrics sending
 - `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (if used)
+

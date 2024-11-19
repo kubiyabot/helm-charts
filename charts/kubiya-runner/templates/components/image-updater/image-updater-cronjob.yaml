@@ -23,7 +23,8 @@ spec:
             runAsGroup: 0
           containers:
           - name: image-updater
-            image: bitnami/kubectl:latest
+            image: "{{ .Values.imageUpdater.image.repository }}:{{ .Values.imageUpdater.image.tag }}"
+            imagePullPolicy: {{ .Values.imageUpdater.image.pullPolicy | quote }}
             command: ["/bin/bash"]
             args:
             - -c

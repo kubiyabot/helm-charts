@@ -68,8 +68,8 @@ kubiyaOperator:
     automountServiceAccountToken: true
   image:
     repository: ghcr.io/kubiyabot/kubiya-operator
-    pullPolicy: Always
-    tag: latest
+    pullPolicy: IfNotPresent
+    tag: runner_v2
   volumeMounts:
   - name: runner-secret-volume
     mountPath: "/etc/nats"
@@ -89,8 +89,8 @@ agentManager:
   replicas: 2
   image:
     repository: ghcr.io/kubiyabot/agent-manager
-    pullPolicy: Always
-    tag: 0.0.15
+    pullPolicy: IfNotPresent
+    tag: 0.0.17
   service:
     port: 80
     targetPort: 8080
@@ -126,7 +126,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: Always
-    tag: 2a689e758f0d4c9aeeb464c4847b8749409cf8d2
+    tag: 462d60470b8f8063bac9c11887dc3620a71b8c56
   service:
     port: 80
     targetPort: 3001
@@ -185,8 +185,8 @@ toolManager:
   sdkServer:
     image:
       repository: ghcr.io/kubiyabot/sdk-py
-      pullPolicy: Always
-      tag: v0.45.1
+      pullPolicy: IfNotPresent
+      tag: v0.47.1
     # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
     # Apart from resource management goals, these are required for compliance checkl as well.
     resources:
@@ -225,6 +225,10 @@ toolManager:
 imageUpdater:
   cronJob:
     create: true
+  image:
+    repository: bitnami/kubectl
+    pullPolicy: IfNotPresent
+    tag: 1.30.6
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -303,13 +307,18 @@ dagger:
 
   engine:
     image:
-      # TODO: revert to 0.11.6 if latest is not stable/compatible with runner
+      # Previous used version: 0.11.6 (?)
       # ref: registry.dagger.io/engine:v0.11.6
-      # TODO: remove debug when tested - performance penalty
-      ref: registry.dagger.io/engine:v0.13.6
+
+      # Latest vendor provided version: 0.13.6
+      # ref: registry.dagger.io/engine:v0.13.6
+
+      # From update with headless svc template: v0.1.1
+      ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
 
     config: |
-      # debug = true
+      # TODO: remove debug when tested - performance penalty?
+      debug = true
       insecure-entitlements = ["security.insecure"]
       [registry."ghcr.io"]
         http = true
@@ -320,6 +329,8 @@ dagger:
       [registry."cache-registry-svc.kubiya"]
       [log]
         format = "json"
+      [grpc]
+        address = ["unix:///run/buildkit/buildkitd.sock", "tcp://0.0.0.0:8080"]
 
     # Resources defined here must be reviewed and set based on real usage statistics for particular runner deployment.
     # Apart from resource management goals, these are required for compliance checkl as well.
