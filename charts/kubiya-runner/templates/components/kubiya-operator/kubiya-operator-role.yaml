@@ -12,7 +12,8 @@ rules:
   - apiGroups: ["apps"]
     resources: ["deployments"]
     verbs: ["get", "list", "watch", "update", "patch"]
-# TODO: Original full access role. Remove if tested ok with less privileges above.
-#   - apiGroups: [ "*" ]
-#     resources: [ "*" ]
-#     verbs: [ "*" ]  
+{{- if .Values.kubiyaOperator.fullAccess }}
+  - apiGroups: [ "*" ]
+    resources: [ "*" ]
+    verbs: [ "*" ]
+{{- end }}

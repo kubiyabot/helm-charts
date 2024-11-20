@@ -1,0 +1,64 @@
+rules:
+  # Disable rules that are too strict for development
+  dependencies: warning
+  template-name: warning
+
+  # Enable important validation rules
+  resource-names: error
+  image-tag: error
+  image-pull-policy: warning
+  container-port: error
+  service-port: error
+  volume-name: error
+  volume-mount-path: error
+  secret-name: error
+  configmap-name: error
+
+  # Custom validations
+  custom:
+    container-resources:
+      description: "Container must have resource limits and requests"
+      rule: |
+        def check_resources(containers):
+          for c in containers:
+            if not c.get('resources'):
+              return False
+            if not c['resources'].get('limits') or not c['resources'].get('requests'):
+              return False
+          return True
+
+        containers = doc.get('spec', {}).get('template', {}).get('spec', {}).get('containers', [])
+        success = check_resources(containers)
+        return success, "Container resources must be specified"
+
+    service-account:
+      description: "ServiceAccount must be specified"
+      rule: |
+        sa = doc.get('spec', {}).get('template', {}).get('spec', {}).get('serviceAccountName')
+        success = sa is not None and sa != ""
+        return success, "ServiceAccount must be specified"
+
+values:
+  # Default values that should be present
+  required:
+    - organization
+    - kubiyaAgentUUID
+    - nats.jwt
+    - nats.secondJwt
+
+  # Value constraints
+  constraints:
+    organization:
+      type: string
+      minLength: 1
+    kubiyaAgentUUID:
+      type: string
+      pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    daggerDiscoveryServicePort:
+      type: integer
+      minimum: 1024
+      maximum: 65535
+    nats.jwt:
+      type: string
+    nats.secondJwt:
+      type: string

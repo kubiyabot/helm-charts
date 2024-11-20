@@ -26,12 +26,12 @@ spec:
           {{- end }}
           command: {{ .Values.toolManager.command | toYaml | nindent 10 }}
           env:
-          {{- with .Values.toolManager.env }}
+            {{- with .Values.toolManager.env }}
             {{- range $key, $value := . }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
             {{- end }}
-          {{- end }}
+            {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.containerPort }}
           {{- with .Values.toolManager.volumeMounts }}
@@ -47,16 +47,16 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           command: {{ .Values.toolManager.sdkServer.command | toYaml | nindent 10 }}
-          {{- with .Values.toolManager.sdkServer.env }}
           env:
+            {{- with .Values.toolManager.sdkServer.env }}
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
-              value: {{ $value | quote }}
+              value: {{ tpl $value $ | quote }}
             {{- end }}
-          {{- end }}
+            {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.sdkServer.containerPort }}
-          {{- with .Values.toolManager.volumeMounts }}
+          {{- with .Values.toolManager.sdkServer.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}

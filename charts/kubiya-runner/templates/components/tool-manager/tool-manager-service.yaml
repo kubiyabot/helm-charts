@@ -11,5 +11,5 @@ spec:
   ports:
     - name: http
       port: {{ .Values.toolManager.service.port }}
-      targetPort: {{ .Values.toolManager.service.targetPort }}
+      targetPort: {{ .Values.toolManager.containerPort }}
   type: {{ .Values.toolManager.service.type | quote }}

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: otel-collector-config
+  name: kubiya-runner-otel-collector-config
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kubiya-runner-common.labels" . | nindent 4 }}
@@ -15,13 +15,13 @@ data:
           grpc:
             endpoint: 0.0.0.0:4317
           http:
-            endpoint: 0.0.0.0:3000
+            endpoint: 0.0.0.0:3000  
 
       # Kubernetes API server (kube-apiserver) metrics via otel-collector receiver
       k8s_events:
         auth_type: serviceAccount
         namespaces:
-          - {{ .Release.Namespace }};
+          - {{ .Release.Namespace }}
 
       # Kubelet metrics via otel-collector receiver
       prometheus:

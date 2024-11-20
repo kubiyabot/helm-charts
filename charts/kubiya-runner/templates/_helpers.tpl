@@ -134,6 +134,14 @@ Kubiya Operator Selector labels
 app.kubernetes.io/component: image-updater
 {{- end }}
 
+{{/*
+Dagger extras labels
+*/}}
+{{- define "dagger-extras.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: dagger
+{{- end }}
+
 # Service Accounts names for all kubiya runner components.
 # If create is set to true, name of the service account is value of .name, or, if .name not provided will be set to component name.
 {{- define "kubiya-runner.serviceAccountName.operator" -}}
@@ -167,3 +175,4 @@ app.kubernetes.io/component: image-updater
 {{- default "default" .Values.imageUpdater.serviceAccount.name }}
 {{- end }}
 {{- end }}
+

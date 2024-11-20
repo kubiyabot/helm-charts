@@ -74,18 +74,15 @@ helm install my-release kubiya/kubiya-runner
 
 ### Agent Manager
 
-Handles the lifecycle of Kubiya agents, including:
+Repository: [kubiya-agent-manager](https://github.com/kubiyabot/kubiya-agent-manager)
 
-- Agent provisioning
-- Health monitoring
-- Resource management
+[#TODO: Needs documentation]
 
 ### Kubiya Operator
 
-- Controls operational aspects of the runner
-- Manages workflow orchestration
-- Handles state management
-- Single replica deployment
+Repository: [kubiya-operator](https://github.com/kubiyabot/kubiya-operator)
+
+[#TODO: Needs documentation]
 
 ### Tool Manager
 
@@ -99,9 +96,8 @@ Full documentation is available [in project repository](https://github.com/kubiy
 
 ### Image Updater
 
-- Automatic updates for runner components
-- Runs as a CronJob (hourly by default)
-- Updates deployments with latest stable images
+- Checks for updates of latest stable image versions via CronJob (hourly by default).
+- Automatic updates for runner components (agent-manager, tool-manager, sdk-server) from stable release JSON file hosted in [S3 bucket](https://kubiya-cli.s3.amazonaws.com/stable/kubiya_versions.json).
 
 ## Dependencies & Compatibility Matrix
 
@@ -150,5 +146,6 @@ As of moment of writing this, default configuration set via `values.yaml` should
 - `kubiyaAgentUUID`: "679adc53-7068-4454-aa9f-16df30b14a50" - UUID of the agent`
 - `nats.jwt` and `nats.secondJwt`: NATS credentials for sending metrics to NATS Cloud (Synadia)
 - `nats.subject`: NATS destination subject for metrics sending
+- `nats.serverUrl`: NATS server URL
 - `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (if used)
 

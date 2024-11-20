@@ -24,14 +24,12 @@ spec:
           ports:
             - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
           env:
-              - name: "NATS_SERVER"
-                value: "{{ .Values.nats.natsServerUrl }}"
-              - name: "NATS_SUBJECT"
-                value: "{{ .Values.nats.subject }}"
-              - name: "NATS_CREDENTIAL_FILE"
-                value: "/etc/nats/nats.creds"
-              - name: "NAMESPACE"
-                value: "{{ .Release.Namespace }}"
+            {{- with .Values.kubiyaOperator.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
         {{- with .Values.kubiyaOperator.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}

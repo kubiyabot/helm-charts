@@ -26,12 +26,12 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            - name: "TOOL_MANAGER_URL"
-              value: "tool-manager:{{ .Values.toolManager.service.targetPort }}"
-            - name: KUBIYA_NATS_CREDS
-              value: /nats/nats.creds
-            - name: ENVIRONMENT
-              value: production
+            {{- with .Values.agentManager.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
           ports:
             - containerPort: {{ .Values.agentManager.service.targetPort }}
         {{- with .Values.agentManager.volumeMounts }}

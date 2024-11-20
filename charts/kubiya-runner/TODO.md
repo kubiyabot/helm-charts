@@ -18,7 +18,7 @@
 - [x] Once dev fixes `tool-manager` - update image and add `dagger` discovery service to the chart.
 - [x] Verify all configurables from `runner_v2_singleNamespace.tmpl.yaml` preserved.
 - [x] Add what was missing in base chart draft: at least CronJob `image-updater`.
-- [?] Update README to meaningful state (add compatibility table if needed).
+- [x] Update README to meaningful state (add compatibility table if needed).
 - [x] Check all `serviceAccount` used present within all templates, including subcharts, and not hardcoded. tune permission for least privileges while keeping it functional
 - [?] Go through TODOs
 - [x] Add dagger headless service for tool-manager discovery/balancing to runner the chart as vendor's subchart has no services templates.
@@ -26,8 +26,8 @@
 ## Testing
 
 - [x] Render chart with prod vars.
-- [ ] Verify all resources from runner installation rendered yaml are present in the chart.
-- [ ] Deploy locally with runner connected to cloud,
+- [x] Verify all resources from runner installation rendered yaml are present in the chart.
+- [ ] Deploy locally with runner connected to cloud.
 - [ ] Test chart locally:
     - [ ] No failed pods, jobs, restarts, not ready pods. 
     - [ ] Basic functional/integrational test
@@ -52,16 +52,17 @@
 
 ## Fixes and Improvements
 
-- [ ] Carify: `registry-tls-secret` hardcoded? Improve?
-- [ ] Clarify: `ImagePullPolicy` not set to `IfNotPresent` for some containers, fix if no objection. 
-- [ ] `tool-manager` remove `image: latest` and make sure other templates are aligned; put fixed and tested tag as default
-- [ ] `tool-manager` fix: repos / `initContainers` / `init-certs` -> `busybox` remove latest or replace with `ImagePullSecrets`, `ServiceAccountTokenMount` or ConfigMap -> ENV_VAR or ...
+- [ ] Carify: `kubiya-runner-registry-tls-secret` hardcoded? Improve?
+- [x] Clarify: `ImagePullPolicy` not set to `IfNotPresent` for some containers, fix if no objection. 
+- [x] `tool-manager` remove `image: latest` and make sure other templates are aligned; put fixed and tested tag as default
+- [?] `tool-manager` fix: repos / `initContainers` / `init-certs` -> `busybox` remove latest or replace with `ImagePullSecrets`, `ServiceAccountTokenMount` or ConfigMap -> ENV_VAR or ...
 - [ ] Where `automountServiceAccountToken=true` remove manual duplicate `volume` & `volumeMounts` (check path of mount match automounted)
 - [x] ~Ask devs about `tool-manager` existing helm char; consider it as a subchart?~ ---> abandoned chart
-- [ ] Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
+- [x] Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
+- [x] Align `Chart.yaml` as per helm guidelines.
 
-## Nice to have
-
-- [ ] Detailed chart README.
-- [ ] Align `Chart.yaml` as per helm guidelines.
+# Fixes and Improvements - Stage Version
+- [ ] Metrics directly to Prometheus
+- [ ] `ImageUpdater - design & implement replacement
 - [ ] Actual Limits/Requests for all containers, including subcharts (get from `Grafana` pod dashboards)
+- [ ] Detailed chart README.

@@ -4,6 +4,7 @@
 # This expected to replace problematic custom .sh + go based implementation in tool-manager with native k8s capabilities for discovery and balancing.
 # Also, dagger pods have no ports defined, however it's container's exposed ports are still implicitly exposed as well on pod's IP (if binded to all virtual interfaces).
 
+{{- if .Values.daggerChartAddons.service.create }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,9 +15,10 @@ metadata:
 spec:
   clusterIP: None
   selector:
-    name: {{ include "dagger.fullname" . }}-engine
+    name: {{ include "dagger.fullname" . }}-dagger-engine
   ports:
     - name: dagger
       port: {{ default 8080 .Values.daggerDiscoveryServicePort }}
       targetPort: {{ default 8080 .Values.daggerDiscoveryServicePort }}
       protocol: TCP
+{{- end }}

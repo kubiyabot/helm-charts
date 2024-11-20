@@ -42,3 +42,6 @@ _old_template/
 
 # Rendered debug files
 render.yaml
+
+# Debug values
+_values-debug.yaml

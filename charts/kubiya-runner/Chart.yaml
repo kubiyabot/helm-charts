@@ -27,9 +27,9 @@ dependencies:
     version: 5.27.0
     repository: "https://prometheus-community.github.io/helm-charts"
     # TODO remove if values propogated without alias
-    # alias: kubeStateMetrics
-    condition: kubeStateMetrics.enabled
+    # alias: kube-StateMetrics
+    condition: kube-state-metrics.enabled
   - name: opentelemetry-collector
     version: 0.109.0
     repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
-    condition: opentelemetryCollector.enabled
+    condition: opentelemetry-collector.enabled
