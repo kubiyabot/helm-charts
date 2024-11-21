@@ -43,8 +43,6 @@ _old_template/
 # Rendered debug files
 render.yaml
 
-# Debug values
+# Debug values & templates
 _values-debug.yaml
-
-# Debug templates
-_debug*.yaml
+_debug/
