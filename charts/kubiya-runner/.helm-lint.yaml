@@ -41,11 +41,10 @@ rules:
 values:
   # Default values that should be present
   required:
-    - organization
-    - kubiyaAgentUUID
-    - nats.jwt
-    - nats.secondJwt
-
+  - organization
+  - kubiyaAgentUUID
+  - nats.jwt
+  - nats.secondJwt
   # Value constraints
   constraints:
     organization:
@@ -54,10 +53,10 @@ values:
     kubiyaAgentUUID:
       type: string
       pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-    daggerDiscoveryServicePort:
-      type: integer
-      minimum: 1024
-      maximum: 65535
+    # daggerAdditionalResources.port:
+    #   type: integer
+    #   minimum: 1024
+    #   maximum: 65535
     nats.jwt:
       type: string
     nats.secondJwt:

@@ -6,13 +6,6 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
-Expand the name of the chart.
-*/}}
-{{- define "runner.name" -}}
-{{- default .Release.Name .Values.runnerNameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
@@ -142,6 +135,14 @@ Dagger extras labels
 app.kubernetes.io/component: dagger
 {{- end }}
 
+{{/*
+Dagger extras labels
+*/}}
+{{- define "otel-collector-extras.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: otel-collector
+{{- end }}
+
 # Service Accounts names for all kubiya runner components.
 # If create is set to true, name of the service account is value of .name, or, if .name not provided will be set to component name.
 {{- define "kubiya-runner.serviceAccountName.operator" -}}
@@ -175,4 +176,3 @@ app.kubernetes.io/component: dagger
 {{- default "default" .Values.imageUpdater.serviceAccount.name }}
 {{- end }}
 {{- end }}
-

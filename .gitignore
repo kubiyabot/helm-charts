@@ -45,3 +45,6 @@ render.yaml
 
 # Debug values
 _values-debug.yaml
+
+# Debug templates
+_debug*.yaml

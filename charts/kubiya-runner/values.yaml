@@ -4,10 +4,8 @@ organization: "kubiya-test-sniff"
 # Runner UUID
 kubiyaAgentUUID: "679adc53-7068-4454-aa9f-16df30b14a50"
 
-# Dagger additional headless service port for dagger pods discovery and load balancing
-# At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
-#TODO: make sure port matches dagger container
-daggerDiscoveryServicePort: 8080
+# Use custom otel-collector Role with limited permissions instead of only ClusterRole from subchart
+otelCollectorCustomRole: true
 
 # NATS credentials and destination subject
 nats:
@@ -62,7 +60,7 @@ kubeStateMetrics:
 # Kubiya operator runner component config
 kubiyaOperator:
   create: true
-  fullAccess: false  # Controls whether operator has full access to all API groups and resources in runner's namespace
+  fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
   replicas: 1
   serviceAccount:
     create: true
@@ -137,8 +135,8 @@ toolManager:
   # tool-manager container config
   image:
     repository: ghcr.io/kubiyabot/tool-manager
-    pullPolicy: Always
-    tag: 462d60470b8f8063bac9c11887dc3620a71b8c56
+    pullPolicy: IfNotPresent
+    tag: siiiiiid
   service:
     port: 80
     targetPort: 3001
@@ -193,7 +191,6 @@ toolManager:
   - "/bin/bash"
   - "-c"
   - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
-
   # sdk-server container config
   sdkServer:
     image:
@@ -237,6 +234,7 @@ toolManager:
 # Kubiya image updater component config
 imageUpdater:
   cronJob:
+    # TODO: remove after testing
     create: true
   image:
     repository: bitnami/kubectl
@@ -248,7 +246,7 @@ imageUpdater:
     automountServiceAccountToken: true
 
 # Open-teemetry collector subchart config
-opentelemetry-collector:
+opentelemetryCollector:
   enabled: true
 
   ports:
@@ -257,7 +255,7 @@ opentelemetry-collector:
       containerPort: 13133
       servicePort: 13133
       hostPort: 13133
-      protocol: TCP 
+      protocol: TCP
 
   # Using image build with custom implementation of nats-exporter to be able to push
   # telemetry and metrics from NATS server.
@@ -274,22 +272,28 @@ opentelemetry-collector:
 
   command:
     name: "otelcol-kubiya"
-    extraArgs: ["--config=/conf/config.yaml"]
+    extraArgs: [ "--config=/etc/otel/config.yaml" ]
 
   extraVolumes:
-  # Otel-collector configmap
-  - name: custom-otelcol-configmap-volume
+  - name: otel-config
     configMap:
       name: kubiya-runner-otel-collector-config
-      items:  
-      - key: otel-collector-config.yaml
+      items:
+      - key: config.yaml
         path: config.yaml
-      mountPath: /conf/config.yaml
-  # NATS credentials secret
   - name: nats-creds-volume
-    mountPath: "/opt"
-    readOnly: true
+    secret:
+      secretName: kubiya-runner-nats-creds-runner
+      items:
+      - key: nats.creds
+        path: nats.creds
 
+  extraVolumeMounts:
+  - name: otel-config
+    mountPath: /etc/otel
+  - name: nats-creds-volume
+    mountPath: "/etc/nats"
+    readOnly: true
   configMap:
     create: false
 
@@ -303,10 +307,11 @@ opentelemetry-collector:
       cpu: 250m
       memory: 256Mi
 
-  # TODO: remove if permissions allow otel-collector collect defined data without clusterRole
-  # or add Role and RoleBinding from original runner template, to avoid ClusterRole
+  # Adding Role and RoleBinding with least permissions for limit access to clients cluster resources. 
   serviceAccount:
     create: true
+    name: "kubiya-runner-otel-collector"
+  # Enable if need to use clusterRole
   # clusterRole:
   # create: false
   # name: ""
@@ -327,7 +332,6 @@ dagger:
   enabled: true
 
   engine:
-    
     newServiceAccount:
       name: "kubiya-runner-dagger-helm"
       create: true
@@ -343,8 +347,8 @@ dagger:
       # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
 
       args:
-        - --oci-max-parallelism
-        - num-cpu
+      - --oci-max-parallelism
+      - num-cpu
 
     config: |
       # TODO: remove debug when tested - performance penalty?
@@ -379,15 +383,23 @@ dagger:
     # token: YOUR_DAGGER_CLOUD_TOKEN
     # secretName: EXISTING_SECRET_NAME
 
-# Extras for weak dagger subchart 
-daggerChartAddons:
+    # Extras for weak dagger subchart 
+daggerAdditionalResources:
   # Role & RoleBinding for dagger engine.
-  # Not created by default by dagger subchart, they may be required for some use cases.
-  # Transfered as-is from original runner template and if enabled will be attached to dagger.serviceAccount.name specified above.
+  # Not created by default via dagger subchart, they still may be required for some use cases.
+  # Transfered as-is from original runner template. If enabled will be attached to dagger.serviceAccount.name specified above.
   role:
     create: false
   roleBinding:
     create: false
   # headless service for dagger engine discovery and load balancing used by tool-manager
+  # Dagger additional headless service port for dagger pods discovery and load balancing
+  # At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
+  # TODO: make sure port matches dagger container
   service:
     create: true
+    # Name set to match currently hardcoded service name in tool-manager implementation.
+    # In future tool-manager expected to be refactored to get service name from container env_vars.
+    # TODO: If not set, will be auto generated as "<chart-name>-dagger-engine"
+    name: dagger-engine-service
+    port: 8080

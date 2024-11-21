@@ -39,7 +39,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
 
-        - name: sdk-server
+        - name: kubiya-sdk-server
           image: "{{ .Values.toolManager.sdkServer.image.repository }}:{{ .Values.toolManager.sdkServer.image.tag }}"
           imagePullPolicy: {{ .Values.toolManager.sdkServer.image.pullPolicy | quote }}
           {{- with .Values.toolManager.sdkServer.resources }}

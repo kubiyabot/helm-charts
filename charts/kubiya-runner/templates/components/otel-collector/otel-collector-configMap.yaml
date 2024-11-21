@@ -7,7 +7,7 @@ metadata:
     {{- include "kubiya-runner-common.labels" . | nindent 4 }}
     app.kubernetes.io/component: otel-collector
 data:
-  otel-collector-config.yaml: |
+  config.yaml: |
     # Otel-collector configuration file
     receivers:
       otlp:
@@ -15,7 +15,7 @@ data:
           grpc:
             endpoint: 0.0.0.0:4317
           http:
-            endpoint: 0.0.0.0:3000  
+            endpoint: 0.0.0.0:3000
 
       # Kubernetes API server (kube-apiserver) metrics via otel-collector receiver
       k8s_events:
@@ -27,59 +27,58 @@ data:
       prometheus:
         config:
           scrape_configs:
-
             # Kube-state-metrics exporter metrics receiver
             - job_name: 'kube-state-metrics'
               scrape_interval: 30s
-            static_configs:
-              - targets: ['kube-state-metrics:8080']
-            kubernetes_sd_configs:
-              - role: endpoints
-                namespaces:
-                  names:
-                    - {{ .Release.Namespace }}
-            relabel_configs:
-              - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
-                regex: kube-state-metrics
-                action: keep
-          
-          # Dynamic service discovery for Kubiya apps, for all metrics exposed by services on default /metrics endpoint
-          - job_name: "kubiya-apps"
-            scrape_interval: 10s
-            kubernetes_sd_configs:
-              - role: service
-                namespaces:
-                  names: ["{{ .Release.Namespace }}"]
-            relabel_configs:
-              # Keep only services we want to scrape
-              # TODO add more once exporters are ready
-              - source_labels: [__meta_kubernetes_service_name]
-                action: keep
-                regex: (tool-manager|agent-manager)
-              # Add app label
-              - source_labels: [__meta_kubernetes_service_name]
-                target_label: app
-              # Use the service port
-              - source_labels: [__meta_kubernetes_service_port_number]
-                target_label: __metrics_port__
+              static_configs:
+                - targets: ['kube-state-metrics:8080']
+              kubernetes_sd_configs:
+                - role: endpoints
+                  namespaces:
+                    names:
+                      - {{ .Release.Namespace }}
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
+                  regex: kube-state-metrics
+                  action: keep
+
+            # Dynamic service discovery for Kubiya apps, for all metrics exposed by services on default /metrics endpoint
+            - job_name: "kubiya-apps"
+              scrape_interval: 10s
+              kubernetes_sd_configs:
+                - role: service
+                  namespaces:
+                    names: ["{{ .Release.Namespace }}"]
+              relabel_configs:
+                # Keep only services we want to scrape
+                # TODO add more once exporters are ready
+                - source_labels: [__meta_kubernetes_service_name]
+                  action: keep
+                  regex: (tool-manager|agent-manager)
+                # Add app label
+                - source_labels: [__meta_kubernetes_service_name]
+                  target_label: app
+                # Use the service port
+                - source_labels: [__meta_kubernetes_service_port_number]
+                  target_label: __metrics_port__
 
     processors:
       k8sattributes:
         auth_type: serviceAccount
         filter:
             namespace: {{ .Release.Namespace }}
-      
+
       batch:
-      
+
       resource:
         attributes:
           - key: "organization"
-            value: {{ .Values.Organization }}
+            value: {{ .Values.organization }}
             action: upsert
           - key: "runner"
             value: {{ .Release.Name }}
             action: upsert
-            
+
       metricstransform:
         transforms:
           - include: '.*'
@@ -89,7 +88,7 @@ data:
               - action: update_label
                 label: "organization"
                 new_label: "organization"
-                new_value: {{ .Values.Organization }}
+                new_value: {{ .Values.organization }}
               - action: add_label
                 label: "kubiya_type"
                 new_label: "kubiya_type"
@@ -97,7 +96,7 @@ data:
               - action: add_label
                 label: "runner"
                 new_label: "runner"
-                new_value: {{ include "runner.name" . | indent 8}}
+                new_value: {{ include "kubiya-runner.name" . }}
 
     exporters:
       # Debug output for testing
@@ -106,7 +105,7 @@ data:
       #   sampling_initial: 5
       #   @sampling_thereafter: 200
       natsexporter:
-        org: {{ .Values.Organization }}
+        org: {{ .Values.organization }}
         endpoint: tls://connect.ngs.global
         creds_file: /etc/nats/nats.creds
 
