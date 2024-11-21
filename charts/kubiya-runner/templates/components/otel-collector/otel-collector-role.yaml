@@ -5,10 +5,10 @@ metadata:
   name: {{ include "kubiya-runner.name" . }}-otel-collector
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "otel-collector.labels" . | nindent 4 }}
+    {{- include "otel-collector-extras.labels" . | nindent 4 }}
 rules:
   - apiGroups: [""]
-    resources: ["services", "endpoints", "pods"]
+    resources: ["services", "endpoints", "pods", "events"]
     verbs: ["list", "watch"]
   - apiGroups: ["apps"]
     resources: ["replicasets"]

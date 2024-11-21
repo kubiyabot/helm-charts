@@ -1,11 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kubiya-runner-otel-collector-config
+  name:                                                                                                                                               z
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kubiya-runner-common.labels" . | nindent 4 }}
-    app.kubernetes.io/component: otel-collector
+    {{ include "otel-collector-extras.labels" . | nindent 4 }}
 data:
   config.yaml: |
     # Otel-collector configuration file

@@ -5,12 +5,13 @@ metadata:
   name: {{ include "kubiya-runner.name" . }}-otel-collector-binding
   namespace: {{ .Release.Namespace }}
   labels:
-    {{ include "otel-collector-extras.labels" . | nindent 4 }}
+    {{- include "otel-collector-extras.labels" . | nindent 4 }}
 subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.opentelemetryCollector.serviceAccount.name }}
+- kind: ServiceAccount
+  name: {{ .Values.opentelemetryCollector.serviceAccount.name }}
+  namespace: {{ .Release.Namespace }}
 roleRef:
+  apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: {{ include "kubiya-runner.name" . }}-otel-collector
-  apiGroup: rbac.authorization.k8s.io
 {{- end }}
