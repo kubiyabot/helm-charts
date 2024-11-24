@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name:                                                                                                                                               z
+  name:  {{ include "kubiya-runner.name" . }}-otel-collector-config
   namespace: {{ .Release.Namespace }}
   labels:
     {{ include "otel-collector-extras.labels" . | nindent 4 }}
@@ -75,7 +75,7 @@ data:
             value: {{ .Values.organization }}
             action: upsert
           - key: "runner"
-            value: {{ .Release.Name }}
+            value: {{ .Values.runnerNameOverride | default .Release.Name }}
             action: upsert
 
       metricstransform:
@@ -95,7 +95,7 @@ data:
               - action: add_label
                 label: "runner"
                 new_label: "runner"
-                new_value: {{ include "kubiya-runner.name" . }}
+                new_value: {{ .Values.runnerNameOverride | default .Release.Name }}
 
     exporters:
       # Debug output for testing
@@ -107,6 +107,13 @@ data:
         org: {{ .Values.organization }}
         endpoint: tls://connect.ngs.global
         creds_file: /etc/nats/nats.creds
+
+    extensions:
+      # The health_check extension is mandatory for this chart.
+      # Without the health_check extension the collector will fail the readiness and liveliness probes.
+      # The health_check extension can be modified, but should never be removed.
+      health_check:
+        endpoint: ${env:MY_POD_IP}:13133
 
     service:
       pipelines:

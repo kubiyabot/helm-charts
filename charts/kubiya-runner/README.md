@@ -12,6 +12,7 @@ A Helm chart for deploying the Kubiya Runner.
   - [Directory Structure](#directory-structure)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Permissions](#permissions)
   - [Components](#components)
     - [Agent Manager](#agent-manager)
     - [Kubiya Operator](#kubiya-operator)
@@ -21,7 +22,9 @@ A Helm chart for deploying the Kubiya Runner.
     - [Helm Dependencies](#helm-dependencies)
     - [Container Images](#container-images)
   - [Monitoring \& Telemetry](#monitoring--telemetry)
+  - [K8s Resources Definitions](#k8s-resources-definitions)
   - [Security](#security)
+  - [Optional Permissions Extensions:](#optional-permissions-extensions)
   - [Configuration (values.yaml)](#configuration-valuesyaml)
 
 ## Overview
@@ -69,6 +72,9 @@ helm repo update
 # Install the chart
 helm install my-release kubiya/kubiya-runner
 ```
+
+## Permissions
+
 
 ## Components
 
@@ -131,12 +137,28 @@ The chart includes comprehensive monitoring setup:
 - `kube-state-metrics` for Kubernetes metrics. Configured to be limited to collect metrics only for single namespace of Runner deployment due to security concerns for client side deployment scenarios.
 - Metrics are labeled with 'organization' and 'cluster' labels to allow deployment filtering and grouping; configured via `values.yaml` for particular deployment.
 
+## K8s Resources Definitions
+
+All resources defined in `values.yaml` are mandatory, but not yet set according to real consumption. All values must be reviewed and set based on average real usage statistics of from Grafana, with further tuning for particular deployments. Averages are expected as default values in next releases of this chart.
+
+Apart from resource management goals, explicit resources may be mandatory for some particular deployments.
+In such deployments pre-installed webhooks may deny installation of runner's k8s entities with unsatisfied requirements (restrictions) of particular target k8s cluster, and requests/limits are common example of such restrictions.
+
+
 ## Security
 
+*[Under Development]*
 - Namespace-scoped RBAC permissions
 - Service accounts for each component
-- TLS support for registry communication
-- Secure secrets management
+- TLS support for registry communication (used by `tool-manager`)
+
+## Optional Permissions Extensions:
+
+*[Under Development]*
+- Kubiya Operator full access toggle (controlled via values)
+- Custom OpenTelemetry roles
+- Optional Dagger permissions
+
 
 ## Configuration (values.yaml)
 
@@ -147,5 +169,5 @@ As of moment of writing this, default configuration set via `values.yaml` should
 - `nats.jwt` and `nats.secondJwt`: NATS credentials for sending metrics to NATS Cloud (Synadia)
 - `nats.subject`: NATS destination subject for metrics sending
 - `nats.serverUrl`: NATS server URL
-- `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (if used)
+- `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (used by `tool-manager`)
 

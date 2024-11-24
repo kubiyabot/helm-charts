@@ -8,28 +8,29 @@ kubeVersion: ">=1.19.0-0"
 home: https://kubiya.ai
 icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
 sources:
-  - https://github.com/kubiyabot/helm-charts
+- https://github.com/kubiyabot/helm-charts
 keywords:
-  - kubiya.ai
-  - runner
+- kubiya.ai
+- runner
 maintainers:
-  - name: Costa
-    email: costa@kubiya.ai
-  - name: Sergey Demyachonok
-    email: sergey.demyachonok@kubiya.ai
+- name: Costa
+  email: costa@kubiya.ai
+- name: Sergey Demyachonok
+  email: sergey.demyachonok@kubiya.ai
 dependencies:
-  - name: dagger-helm
-    version: 0.13.6
-    repository: oci://registry.dagger.io
-    alias: dagger
-    condition: dagger.enabled
-  - name: kube-state-metrics
-    version: 5.27.0
-    repository: "https://prometheus-community.github.io/helm-charts"
-    # TODO remove if values propogated without alias
-    # alias: kube-StateMetrics
-    condition: kube-state-metrics.enabled
-  - name: opentelemetry-collector
-    version: 0.109.0
-    repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
-    condition: opentelemetry-collector.enabled
+- name: dagger-helm
+  version: 0.13.6
+  repository: oci://registry.dagger.io
+  alias: dagger
+  condition: dagger.enabled
+- name: kube-state-metrics
+  version: 5.27.0
+  repository: "https://prometheus-community.github.io/helm-charts"
+  # TODO remove if values propogated without alias
+  # alias: kube-StateMetrics
+  condition: kube-state-metrics.enabled
+- name: opentelemetry-collector
+  alias: otelcollector
+  version: 0.109.0
+  repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  condition: opentelemetry-collector.enabled
