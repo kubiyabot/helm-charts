@@ -10,15 +10,15 @@ nats:
   secondJwt: "yyy"
   subject: "kubiya-test-sniff.sergey-metrics-test.incoming"
   serverUrl: "tls://connect.ngs.global"
+  org: "kubiya-test-sniff"
 
 # TLS certificates for private registry (used by `tool-manager`)
 registryTls:
   crt: "xxx"
   key: "yyy"
 
-# By default, runner name is generated from release name, override if needed
-# will be propogated as a value to otel-collector configMap -> runner label
-runnerNameOverride: "test-runner-chart"
+# By default, runner name is generated from release name, override if needed. Must match JWT encoded (see README.md for details)
+runnerNameOverride: ""
 
 # Optional secret for pulling images from private registries
 imagePullSecrets: []
@@ -135,8 +135,8 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    # TODO Point to merged branch release (with support for DAGGER_ENGINE_SERVICE_URL env var
-    tag: 8763bd230593067d0f4e27775128cfbf70c1b5d2
+    # TODO PROD_READY Point to merged branch release (with support for DAGGER_ENGINE_SERVICE_URL env var
+    tag: koss110
   service:
     port: 80
     targetPort: 3001
@@ -246,20 +246,20 @@ imageUpdater:
     name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
 
-# Use custom otel-collector Role with limited permissions instead of only ClusterRole from subchart
-otelcollectorCustomRole: true
-
-# Open-teemetry collector subchart config
-opentelemetryCollector:
+# Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
+otelCollectorCustomRole:
   enabled: true
-
-  ports:
-    metrics:
-      enabled: true
-      containerPort: 13133
-      servicePort: 13133
-      hostPort: 13133
-      protocol: TCP
+  # TODO PROD_READY: remove when tested
+  enableDebugRoles:
+  - apiGroups: [ "" ]
+    resources: [ "nodes/stats" ]
+    verbs: [ "get", "watch", "list" ]
+  - apiGroups: [ "events.k8s.io" ]
+    resources: [ "events" ]
+    verbs: [ "watch", "list" ]
+  # Open-teemetry collector subchart config
+otelcollector:
+  enabled: true
 
   image:
     # Using image build with custom implementation of nats-exporter to be able to push

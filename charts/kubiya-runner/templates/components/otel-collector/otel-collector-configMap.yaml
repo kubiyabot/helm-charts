@@ -71,23 +71,31 @@ data:
 
       resource:
         attributes:
-          - key: "organization"
-            value: {{ .Values.organization }}
+          # TODO: discuss with team, make sure this is not duplicated metricstransform.transforms.operations
+          - key: "instance"
+            value: {{ .Values.organization | quote }}
             action: upsert
           - key: "runner"
-            value: {{ .Values.runnerNameOverride | default .Release.Name }}
+            value: {{ .Values.runnerNameOverride | default .Release.Name | quote }}
             action: upsert
-
+          - key: "organization"
+            value: {{ .Values.organization | quote }}
+            action: upsert
+      
+      # TODO: discuss with team, make sure this is not duplicated resource.attributes
       metricstransform:
         transforms:
           - include: '.*'
             match_type: regexp
             action: update
             operations:
-              - action: update_label
-                label: "organization"
-                new_label: "organization"
-                new_value: {{ .Values.organization }}
+              
+              # TODO: discuss with team, make sure instance is needed as it's duplicated
+              - action: add_label
+                label: "instance"
+                new_label: "instance"
+                new_value: {{ .Values.organization | quote }}
+              
               - action: add_label
                 label: "kubiya_type"
                 new_label: "kubiya_type"
@@ -95,27 +103,32 @@ data:
               - action: add_label
                 label: "runner"
                 new_label: "runner"
-                new_value: {{ .Values.runnerNameOverride | default .Release.Name }}
+                new_value: {{ .Values.runnerNameOverride | default .Release.Name | quote }}
+              
+              - action: add_label
+                label: "organization"
+                new_label: "organization"
+                new_value: {{ .Values.organization | quote }}
 
     exporters:
-      # Debug output for testing
-      # debug:
-      #   verbosity: normal
-      #   sampling_initial: 5
-      #   @sampling_thereafter: 200
+      debug:
+        # Debug output for testing
+        # verbosity: detailed
+        verbosity: normal
+        # sampling_initial: 5
+        # sampling_thereafter: 200
       natsexporter:
-        org: {{ .Values.organization }}
-        endpoint: tls://connect.ngs.global
-        creds_file: /etc/nats/nats.creds
+        org: {{ .Values.organization | quote }}
+        endpoint: {{ .Values.nats.serverUrl | quote }}
+        creds_file: "/etc/nats/nats.creds"
 
     extensions:
-      # The health_check extension is mandatory for this chart.
-      # Without the health_check extension the collector will fail the readiness and liveliness probes.
-      # The health_check extension can be modified, but should never be removed.
       health_check:
         endpoint: ${env:MY_POD_IP}:13133
 
     service:
+      extensions:
+        - health_check
       pipelines:
         logs:
           receivers: [ k8s_events ]
