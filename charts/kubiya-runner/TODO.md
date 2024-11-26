@@ -27,12 +27,12 @@
 
 - [x] Render chart with prod vars.
 - [x] Verify all resources from runner installation rendered yaml are present in the chart.
-- [ ] Deploy locally with runner connected to cloud.
+- [x] Deploy locally with runner connected to cloud.
 - [ ] Test chart locally:
-    - [ ] No failed pods, jobs, restarts, not ready pods. 
+    - [x] No failed pods, jobs, restarts, not ready pods. 
     - [ ] Basic functional/integrational test
     - [ ] Metrics, logs, telemetry made it to the centralized storage (Prometheus, etc).
-    - [ ] Image updater works.
+    - [x] Image updater works.
     - [ ] Chart: packaging, upgrade, rollback, delete, reinstall - all works.
     - [ ] Tool manager -> dagger discovery
     - [ ] Service account permissions
@@ -52,7 +52,7 @@
 
 ## Fixes and Improvements
 
-- [ ] Carify: `kubiya-runner-registry-tls-secret` hardcoded? Improve?
+- [x] Carify: `kubiya-runner-registry-tls-secret` hardcoded? Improve?
 - [x] Clarify: `ImagePullPolicy` not set to `IfNotPresent` for some containers, fix if no objection. 
 - [x] `tool-manager` remove `image: latest` and make sure other templates are aligned; put fixed and tested tag as default
 - [?] `tool-manager` fix: repos / `initContainers` / `init-certs` -> `busybox` remove latest or replace with `ImagePullSecrets`, `ServiceAccountTokenMount` or ConfigMap -> ENV_VAR or ...
@@ -61,8 +61,3 @@
 - [x] Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
 - [x] Align `Chart.yaml` as per helm guidelines.
 
-# Fixes and Improvements - Stage Version
-- [ ] Metrics directly to Prometheus
-- [ ] `ImageUpdater - design & implement replacement
-- [ ] Actual Limits/Requests for all containers, including subcharts (get from `Grafana` pod dashboards)
-- [ ] Detailed chart README.
