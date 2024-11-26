@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name:  kubiya-runner-otel-collector-config
+  name: kubiya-runner-otel-collector-config
   namespace: {{ .Release.Namespace }}
   labels:
     {{ include "otel-collector-extras.labels" . | nindent 4 }}
