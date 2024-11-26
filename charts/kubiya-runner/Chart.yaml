@@ -2,8 +2,8 @@ apiVersion: v2
 name: kubiya-runner
 description: A Helm chart for deploying the Kubiya Runner
 type: application
-version: 0.3.0
-appVersion: "0.3.0"
+version: 0.4.0
+appVersion: "0.4.0"
 kubeVersion: ">=1.19.0-0"
 home: https://kubiya.ai
 icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png

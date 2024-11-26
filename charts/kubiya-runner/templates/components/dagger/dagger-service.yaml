@@ -15,11 +15,12 @@ metadata:
   {{- end }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kubiya-runner-common.labels" . | nindent 4 }}
+    {{- include "dagger-extras.labels" . | nindent 4 }}
 spec:
   clusterIP: None
   selector:
-    name: {{ include "dagger.fullname" . }}-dagger-engine
+    app.kubernetes.io/name: dagger
+    app.kubernetes.io/component: engine   
   ports:
     - name: dagger
       port: {{ default 8080 .Values.daggerAdditionalResources.service.port }}

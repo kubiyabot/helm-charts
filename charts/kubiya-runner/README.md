@@ -25,7 +25,9 @@ A Helm chart for deploying the Kubiya Runner.
   - [K8s Resources Definitions](#k8s-resources-definitions)
   - [Security](#security)
   - [Optional Permissions Extensions:](#optional-permissions-extensions)
-  - [Configuration (values.yaml)](#configuration-valuesyaml)
+  - [Installation](#installation-1)
+  - [Minimum Required Configuration](#minimum-required-configuration)
+  - [Using Name Overrides](#using-name-overrides)
 
 ## Overview
 
@@ -160,9 +162,11 @@ In such deployments pre-installed webhooks may deny installation of runner's k8s
 - Optional Dagger permissions
 
 
-## Configuration (values.yaml)
+## Installation
 
-As of moment of writing this, default configuration set via `values.yaml` should support most of the regular deployments. However, there are list of variables specific to each particular deployment, as well as list of secrets which must be configured before installing this chart:
+As of moment of writing this, default configuration set via `values.yaml` should support most of the regular deployments. However, there are list of variables specific to each particular deployment, as well as list of secrets which must be configured before installing this chart.
+
+## Minimum Required Configuration
 
 - `runnerNameOverride`: This can be used to override default runner name generated from release name. 
   *IMPORTANT* Runner name must match one encoded in JWT token configured in `nats.*` values. Propagated via config map of `otel-collector` name will be used for labeling metrics which will be send by custom `nats-exporter` plugin to NATS/Synadia. Name mismatch between one set here (or generated from release name if not set) and the one encoded in JWT token will break communication causing NATS rejects.
@@ -172,3 +176,28 @@ As of moment of writing this, default configuration set via `values.yaml` should
 - `nats.subject`: NATS destination subject for metrics sending
 - `nats.serverUrl`: NATS server URL
 - `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (used by `tool-manager`) 
+
+
+## Using Name Overrides
+
+The current implementation has a specific purpose: `runnerNameOverride` is critical because it must match the JWT token for NATS communication.
+
+Example of naming variable overrides available when installing chart release. 
+
+If `helm install my-release ./kubiya-runner:` used for installation, then:
+- If `runnerNameOverride`: "sergey-metrics-test":
+  - name = *sergey-metrics-test*
+  - fullname = *sergey-metrics-test*
+  - All resources will use this name
+
+- If no `runnerNameOverride` but `nameOverride`: "custom":
+  - name = *custom*
+  - fullname = *my-release-custom*
+
+- If no `runnerNameOverride` but `fullnameOverride`: "full-custom":
+  - name = Chart.Name or `nameOverride`
+  - fullname = *full-custom*
+
+- If no overrides:
+  - name = Chart.Name
+  - fullname = *my-release-kubiya-runner*

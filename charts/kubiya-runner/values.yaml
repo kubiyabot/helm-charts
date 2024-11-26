@@ -17,8 +17,10 @@ registryTls:
   crt: "xxx"
   key: "yyy"
 
-# By default, runner name is generated from release name, override if needed. Must match JWT encoded (see README.md for details)
-runnerNameOverride: ""
+# By default, runner name = release name, override if needed. Must match JWT encoded (see README.md for details)
+runnerNameOverride: "sergey-metrics-test"
+nameOverride: ""
+fullnameOverride: ""
 
 # Optional secret for pulling images from private registries
 imagePullSecrets: []
@@ -136,7 +138,7 @@ toolManager:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
     # TODO PROD_READY Point to merged branch release (with support for DAGGER_ENGINE_SERVICE_URL env var
-    tag: koss110
+    tag: 901aa18d04e01e2a48cd8eddf281e2ea5ffbf220
   service:
     port: 80
     targetPort: 3001
@@ -335,6 +337,12 @@ dagger:
   enabled: true
 
   engine:
+    # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
+    # which is used by tool-manager.
+    labels:
+      app.kubernetes.io/name: dagger
+      app.kubernetes.io/component: engine
+
     newServiceAccount:
       name: "kubiya-runner-dagger-helm"
       create: true
@@ -398,11 +406,14 @@ daggerAdditionalResources:
   # headless service for dagger engine discovery and load balancing used by tool-manager
   # Dagger additional headless service port for dagger pods discovery and load balancing
   # At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
-  # TODO: make sure port matches dagger container
+  # Port defined must match dagger container port in dagger.engine.config section.
   service:
     create: true
-    # Name set to match currently hardcoded service name in tool-manager implementation.
-    # In future tool-manager expected to be refactored to get service name from container env_vars.
-    # TODO: If not set, will be auto generated as "<chart-name>-dagger-engine"
+    # These values are need to match tool-manager's dagger config and therefore referenced in tool-manager configuration as environment variables in this file.
+    # ---------------------------------------------------------------------------------------------------------------------
+    # If not set, will be auto generated as name: {{ include "kubiya-runner.fullname" . }}-dagger-engine but in this case,
+    # which, to be used, needs to be set in tool-manager deployment via tpl function call, which is currently done in values.yaml.
+    # Should be refactored to move all required env_vars to component deployments with ability to override from values.yaml.
+    # ---------------------------------------------------------------------------------------------------------------------
     name: dagger-engine-service
     port: 8080
