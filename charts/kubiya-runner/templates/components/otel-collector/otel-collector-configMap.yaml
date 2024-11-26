@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name:  {{ include "kubiya-runner.name" . }}-otel-collector-config
+  name:  kubiya-runner-otel-collector-config
   namespace: {{ .Release.Namespace }}
   labels:
     {{ include "otel-collector-extras.labels" . | nindent 4 }}
@@ -91,7 +91,7 @@ data:
             operations:
               
               # TODO: discuss with team, make sure instance is needed as it's duplicated
-              - action: add_label
+              - action: update_label
                 label: "instance"
                 new_label: "instance"
                 new_value: {{ .Values.organization | quote }}
@@ -127,8 +127,8 @@ data:
         endpoint: ${env:MY_POD_IP}:13133
 
     service:
-      extensions:
-        - health_check
+      # extensions:
+      #   - health_check
       pipelines:
         logs:
           receivers: [ k8s_events ]
