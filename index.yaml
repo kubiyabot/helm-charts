@@ -2,6 +2,44 @@ apiVersion: v1
 entries:
   kubiya-runner:
   - apiVersion: v2
+    appVersion: 0.4.4
+    created: "2024-11-27T19:08:15.934305141Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: oci://registry.dagger.io
+      version: 0.13.6
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.27.0
+    - alias: otelcollector
+      condition: opentelemetry-collector.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.109.0
+    description: A Helm chart for deploying the Kubiya Runner
+    digest: f825ccfbd16871b1d789ae924a7351438f6f9ec6ca8fa303239c48656c06662b
+    home: https://kubiya.ai
+    icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+    keywords:
+    - kubiya.ai
+    - runner
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: costa@kubiya.ai
+      name: Costa
+    - email: sergey.demyachonok@kubiya.ai
+      name: Sergey Demyachonok
+    name: kubiya-runner
+    sources:
+    - https://github.com/kubiyabot/helm-charts
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.4/kubiya-runner-0.4.4.tgz
+    version: 0.4.4
+  - apiVersion: v2
     appVersion: 0.4.3
     created: "2024-11-27T17:36:05.558639114Z"
     dependencies:
@@ -115,4 +153,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.1/kubiya-runner-0.4.1.tgz
     version: 0.4.1
-generated: "2024-11-27T17:36:05.558656978Z"
+generated: "2024-11-27T19:08:15.934330478Z"
