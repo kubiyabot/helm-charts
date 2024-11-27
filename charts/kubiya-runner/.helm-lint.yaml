@@ -57,7 +57,7 @@ values:
     #   type: integer
     #   minimum: 1024
     #   maximum: 65535
-    nats.jwt:
+    jwt:
       type: string
     secondJwt:
       type: string
