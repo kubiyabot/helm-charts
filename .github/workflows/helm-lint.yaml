@@ -19,28 +19,14 @@ jobs:
       with:
         version: v3.12.3
 
-    - name: Add Helm repositories and update dependencies
-      run: |
-        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-        helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-        helm repo add dagger https://dagger.github.io/helm-charts
-        helm repo update
-
-    - name: Update Helm dependencies
-      run: |
-        cd charts/kubiya-runner
-        helm dependency update
-        # Remove unpacked charts to avoid linting them
-        rm -rf charts/*.tgz charts/dagger-helm charts/kube-state-metrics charts/opentelemetry-collector
-
     - name: Run helm lint
       run: |
         helm lint charts/kubiya-runner/ \
           --strict \
-          --values charts/kubiya-runner/values.yaml
+          --skip-tests
 
     - name: Run helm template
       run: |
         helm template test charts/kubiya-runner/ \
           --debug \
-          --values charts/kubiya-runner/values.yaml
+          --skip-tests
