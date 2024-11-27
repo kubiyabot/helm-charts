@@ -1,0 +1,29 @@
+# Service discovery of Dagger engine daemonset pods via headless service, used for DNS SRV lookups required for round-robin load balancing.
+
+# Service resource is not available in vendor's dagger subchart, so this additional service allows tool-manager to discover dagger engine pods by service name and do balancing.
+# This expected to replace problematic custom .sh + go based implementation in tool-manager with native k8s capabilities for discovery and balancing.
+# Also, dagger pods have no ports defined, however it's container's exposed ports are still implicitly exposed as well on pod's IP (if binded to all virtual interfaces).
+
+{{- if .Values.daggerAdditionalResources.service.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if .Values.daggerAdditionalResources.service.name }}
+  name: {{ .Values.daggerAdditionalResources.service.name }}
+  {{- else }}
+  name: {{ include "kubiya-runner.fullname" . }}-dagger-engine
+  {{- end }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dagger-extras.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: dagger
+    app.kubernetes.io/component: engine   
+  ports:
+    - name: dagger
+      port: {{ default 8080 .Values.daggerAdditionalResources.service.port }}
+      targetPort: {{ default 8080 .Values.daggerAdditionalResources.service.port }}
+      protocol: TCP
+{{- end }}

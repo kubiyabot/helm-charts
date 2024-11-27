@@ -1,121 +1,368 @@
-namespace: kubiya
-jwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
-secondJwt: "bWVnYV9zZWNyZXRfa2V5Cg=="
-subject: "jghfjgf"
-terminationGracePeriodSeconds: 300
-organization: "your_organization_name"
-uuid: "unique_identifier"
-natsServerUrl: "tls://connect.ngs.global"
+# Runner organization
+organization: "kubiya-test-sniff"
 
+# Runner UUID
+kubiyaAgentUUID: "679adc53-7068-4454-aa9f-16df30b14a50"
+
+# NATS credentials and destination subject
+nats:
+  jwt: "xxx"
+  secondJwt: "yyy"
+  subject: "kubiya-test-sniff.sergey-metrics-test.incoming"
+  serverUrl: "tls://connect.ngs.global"
+  org: "kubiya-test-sniff"
+
+# TLS certificates for private registry (used by `tool-manager`)
+registryTls:
+  crt: "xxx"
+  key: "yyy"
+
+# By default, runner name = release name, override if needed. Must match JWT encoded (see README.md for details)
+runnerNameOverride: "sergey-metrics-test"
+nameOverride: ""
+fullnameOverride: ""
+
+# Optional secret for pulling images from private registries
+imagePullSecrets: []
+
+# kube-state-metrics subchart configuration
+kubeStateMetrics:
+  enabled: true
+
+  # Default values for kube-state-metrics.
+  image:
+    tag: "2.14.0"
+  updateStrategy: Recreate
+
+  revisionHistoryLimit: 2
+
+  # TODO keep if rbac role is not applied or metrics are not collected
+  # namespaces: "kubiya"
+  releaseNamespace: true
+  rbac:
+    useClusterRole: false
+
+  # Explicit resources are mandatory. See README.md or more info.
+  # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+  selfMonitor:
+    enabled: true
+    telemetryHost: 0.0.0.0
+    telemetryPort: 8081
+
+# Kubiya operator runner component config
 kubiyaOperator:
-  name: "kubiya-operator"
+  create: true
+  fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
   replicas: 1
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
   image:
     repository: ghcr.io/kubiyabot/kubiya-operator
-    pullPolicy: Always
-    tag: latest
-  volumeMounts: 
+    pullPolicy: IfNotPresent
+    tag: runner_v2
+  volumeMounts:
   - name: runner-secret-volume
     mountPath: "/etc/nats"
     readOnly: true
   volumes:
-    - name: runner-secret-volume
-      secret:
-        secretName: runner-secret # pragma: allowlist secret
-        items:
-          - key: nats.creds
-            path: nats.creds
+  - name: runner-secret-volume
+    secret:
+      secretName: kubiya-runner-nats-creds-runner
+      items:
+      - key: nats.creds
+        path: nats.creds
   ports:
     containerPort: 80
+  env:
+    NATS_SERVER: "{{ .Values.nats.serverUrl }}"
+    NATS_SUBJECT: "{{ .Values.nats.subject }}"
+    NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
+    NAMESPACE: "{{ .Release.Namespace }}"
 
+# Kubiya agent manager component config
 agentManager:
-  name: "agent-manager"
   replicas: 2
   image:
-    repository: ghcr.io/kubiyabot/agent-manager   
-    pullPolicy: Always
-    tag: v0.0.3  
+    repository: ghcr.io/kubiyabot/agent-manager
+    pullPolicy: IfNotPresent
+    tag: 0.0.17
   service:
     port: 80
     targetPort: 8080
     serviceType: "ClusterIP"
-  volumeMounts:
-  - name: creds-volume
-    mountPath: "/opt/"
-    readOnly: true
-  - name: shared-volume
-    mountPath: "/tmp/kubiya_shared_tools"
-    readOnly: false
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
+  # Explicit resources are mandatory. See README.md or more info.
+  # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
   volumes:
-    - name: creds-volume
-      secret:
-        secretName: runner-secret # pragma: allowlist secret
-        items:
-          - key: nats.creds
-            path: nats.creds
-
-kubiyaSuperRole:
-  name: "kubiya-super-role"
-  
-kubiyaSuperRoleBinding:
-  name: "kubiya-super-role-binding"
-
-toolManager:
-  name: "tool-manager"
-  deployedBy: kubiya
-  image:
-    repository: ghcr.io/kubiyabot/tool-manager
-    pullPolicy: Always
-    tag: latest
-  service:
-    port: 80
-  containerPort: 3001
-  serviceType: "ClusterIP"
-  volumes: 
   - name: nats-creds-volume
     secret:
-      secretName: nats-creds # pragma: allowlist secret
+      defaultMode: 420
       items:
-        - key: nats.creds
-          path: nats.creds
-  # Additional volumeMounts on the output Deployment definition.
-  volumeMounts: 
-  - name: nats-creds-volume
-    mountPath: "/opt"
+      - key: nats.creds
+        path: nats.creds
+      secretName: kubiya-runner-nats-creds-customer
+  volumeMounts:
+  - mountPath: /nats/
+    name: nats-creds-volume
+    readOnly: true
+  env:
+    TOOL_MANAGER_URL: "tool-manager:{{ .Values.toolManager.service.targetPort }}"
+    KUBIYA_NATS_CREDS: "/nats/nats.creds"
+    ENVIRONMENT: "production"
 
+# Kubiya tool manager component config
+toolManager:
+  # tool-manager container config
+  image:
+    repository: ghcr.io/kubiyabot/tool-manager
+    pullPolicy: IfNotPresent
+    # TODO PROD_READY Point to merged branch release (with support for DAGGER_ENGINE_SERVICE_URL env var
+    tag: 901aa18d04e01e2a48cd8eddf281e2ea5ffbf220
+  service:
+    port: 80
+    targetPort: 3001
+    type: "ClusterIP"
+  replicas: 3
+  serviceAccount:
+    create: true
+    name: "kubiya-runner-tool-manager" # Falling to hardcod here, as cannot call helper generative function for setting KUBIYA_SERVICE_ACCOUNT env vars below.
+    automountServiceAccountToken: true
+  volumes:
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
+      secretName: kubiya-runner-nats-creds-customer
+  - name: shared-volume
+    emptyDir: {}
+  - name: registry-certs
+    secret:
+      secretName: kubiya-runner-registry-tls-secret
+      defaultMode: 420
+  containerPort: 3001
+  env:
+    GIT_SHA: git-sha-placeholder
+    KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
+    KUBIYA_TOOL_TIMEOUT: 168h
+    KUBIYA_NATS_CREDS: "/opt/nats.creds"
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_AGENT_UUID: "{{ .Values.kubiyaAgentUUID }}"
+    KUBIYA_DAGGER_ENGINE_SERVICE_URL: "tcp://{{ .Values.daggerAdditionalResources.service.name }}:{{ .Values.daggerAdditionalResources.service.port }}"
+    KUBIYA_SDK_SERVER_URL: "http://127.0.0.1:8000"
+    KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    KUBIYA_IMAGE_REGISTRY_ADDRESS: "cache-registry-svc.kubiya"
+  # Explicit resources are mandatory. See README.md or more info.
+  # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  volumeMounts:
+  - mountPath: /opt/
+    name: nats-creds-volume
+  - mountPath: /tmp/kubiya_shared_tools
+    name: shared-volume
+  - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+    name: registry-certs
+  command:
+  - "/bin/bash"
+  - "-c"
+  - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
+  # sdk-server container config
   sdkServer:
-    name: "kubiya-sdk-server"
     image:
       repository: ghcr.io/kubiyabot/sdk-py
-      pullPolicy: Always
-      tag: v0.2.0
-    command: 
-      - "python"
-      - "-m"
-      - "kubiya_sdk"
-      - "server"
-      - "--host"
-      - "0.0.0.0"
-      - "--port"
-      - "8000"
+      pullPolicy: IfNotPresent
+      tag: v0.47.1
+    # Explicit resources are mandatory. See README.md or more info.
+    # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    command:
+    - "python"
+    - "-m"
+    - "kubiya_sdk"
+    - "server"
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8000"
     containerPort: 8000
     defaultMode: 420
- 
-daggerRole:
-  name: "dagger-super-role"
+    env:
+      KUBIYA_NATS_CREDS: "/opt/nats.creds"
+      KUBIYA_USER_ORG: "{{ .Values.organization }}"
+      KUBIYA_AGENT_UUID: "{{ .Values.kubiyaAgentUUID }}"
+      GIT_SHA: git-sha-placeholder
+      KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
+      KUBIYA_TOOL_TIMEOUT: 168h
+      KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    volumeMounts:
+    - mountPath: /opt/
+      name: nats-creds-volume
+    - mountPath: /tmp/kubiya_shared_tools
+      name: shared-volume
 
-daggerRoleBinding:
-  name: "dagger-super-role-binding"
+# Kubiya image updater component config
+imageUpdater:
+  cronJob:
+    # TODO: remove after testing
+    create: true
+  image:
+    repository: bitnami/kubectl
+    pullPolicy: IfNotPresent
+    tag: 1.30.6
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
 
-kubiyaSuperAccount:
-  name: "kubiya-super-account"
+# Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
+otelCollectorCustomRole:
+  enabled: true
+  # TODO PROD_READY: remove when tested
+  enableDebugRoles:
+  - apiGroups: [ "" ]
+    resources: [ "nodes/stats" ]
+    verbs: [ "get", "watch", "list" ]
+  - apiGroups: [ "events.k8s.io" ]
+    resources: [ "events" ]
+    verbs: [ "watch", "list" ]
+  # Open-teemetry collector subchart config
+otelcollector:
+  enabled: true
+
+  image:
+    # Using image build with custom implementation of nats-exporter to be able to push
+    # telemetry and metrics from NATS server.
+    # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
+    repository: ghcr.io/kubiyabot/otel-connector
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: release-0.1.1
+
+  mode: deployment
+
+  replicaCount: 1
+
+  command:
+    name: "otelcol-kubiya"
+    extraArgs: [ "--config=/etc/otel/config.yaml" ]
+
+  extraVolumes:
+  - name: otel-config
+    configMap:
+      name: kubiya-runner-otel-collector-config
+      items:
+      - key: config.yaml
+        path: config.yaml
+  - name: nats-creds-volume
+    secret:
+      secretName: kubiya-runner-nats-creds-runner
+      items:
+      - key: nats.creds
+        path: nats.creds
+
+  extraVolumeMounts:
+  - name: otel-config
+    mountPath: /etc/otel
+  - name: nats-creds-volume
+    mountPath: "/etc/nats"
+    readOnly: true
+  configMap:
+    create: false
+  # Explicit resources are mandatory. See README.md or more info.
+  # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  # Adding Role and RoleBinding with least permissions for limit access to clients cluster resources. 
+  serviceAccount:
+    create: true
+    name: "kubiya-runner-otel-collector"
+  # Enable if need to use clusterRole
+  # clusterRole:
+  # create: false
+  # name: ""
+  # rules: []
+  # # - apiGroups:
+  # #   - ''
+  # #   resources:
+  # #   - 'pods'
+  # #   - 'nodes'
+  # #   verbs:
+  # #   - 'get'
+  # #   - 'list'
+  # #   - 'watch'
+  # clusterRoleBinding:
+  # name: ""
 
 dagger:
   enabled: true
+
   engine:
+    # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
+    # which is used by tool-manager.
+    labels:
+      app.kubernetes.io/name: dagger
+      app.kubernetes.io/component: engine
+
+    newServiceAccount:
+      name: "kubiya-runner-dagger-helm"
+      create: true
+
     image:
-      ref: registry.dagger.io/engine:v0.11.6
+      # Previous used version: 0.11.6 (?)
+      # ref: registry.dagger.io/engine:v0.11.6
+
+      # Latest vendor provided version: 0.13.6
+      ref: registry.dagger.io/engine:v0.13.6
+
+      # From update with headless svc template: v0.1.1
+      # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
+
+      args:
+      - --oci-max-parallelism
+      - num-cpu
+
     config: |
+      # TODO: remove debug when tested - performance penalty?
       debug = true
       insecure-entitlements = ["security.insecure"]
       [registry."ghcr.io"]
@@ -127,13 +374,46 @@ dagger:
       [registry."cache-registry-svc.kubiya"]
       [log]
         format = "json"
-      
-  magicache:
-    enabled: false
-    ### Create your token via https://docs.dagger.io/manuals/user/cloud-get-started/#step-2-connect-to-dagger-cloud
-    #
-    # token: YOUR_DAGGER_CLOUD_TOKEN
+      [grpc]
+        address = ["unix:///run/buildkit/buildkitd.sock", "tcp://0.0.0.0:8080"]
 
-    ### If secretName is set, a new secret will NOT be created
-    #
+    # Explicit resources are mandatory. See README.md or more info.
+    # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+    resources:
+      limits:
+        cpu: "4"
+        memory: 4Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+  magicache:
+    # Secret must be created manually in the runner namespace per each client side runner.
+    enabled: false
+    # url: https://api.dagger.cloud/magicache
+    # token: YOUR_DAGGER_CLOUD_TOKEN
     # secretName: EXISTING_SECRET_NAME
+
+    # Extras for weak dagger subchart 
+daggerAdditionalResources:
+  # Role & RoleBinding for dagger engine.
+  # Not created by default via dagger subchart, they still may be required for some use cases.
+  # Transfered as-is from original runner template. If enabled will be attached to dagger.serviceAccount.name specified above.
+  role:
+    create: false
+  roleBinding:
+    create: false
+  # headless service for dagger engine discovery and load balancing used by tool-manager
+  # Dagger additional headless service port for dagger pods discovery and load balancing
+  # At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
+  # Port defined must match dagger container port in dagger.engine.config section.
+  service:
+    create: true
+    # These values are need to match tool-manager's dagger config and therefore referenced in tool-manager configuration as environment variables in this file.
+    # ---------------------------------------------------------------------------------------------------------------------
+    # If not set, will be auto generated as name: {{ include "kubiya-runner.fullname" . }}-dagger-engine but in this case,
+    # which, to be used, needs to be set in tool-manager deployment via tpl function call, which is currently done in values.yaml.
+    # Should be refactored to move all required env_vars to component deployments with ability to override from values.yaml.
+    # ---------------------------------------------------------------------------------------------------------------------
+    name: dagger-engine-service
+    port: 8080

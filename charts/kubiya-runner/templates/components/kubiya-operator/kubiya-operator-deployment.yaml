@@ -2,36 +2,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.kubiyaOperator.name | quote }}
-  namespace: {{ .Values.namespace | quote }}
+  name: kubiya-operator
+  namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ .Values.kubiyaOperator.name | quote }}
+    {{- include "kubiya-operator.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.kubiyaOperator.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.kubiyaOperator.name | quote }}
+      {{- include "kubiya-operator.selectorLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: {{ .Values.kubiyaOperator.name | quote }}
+        {{- include "kubiya-operator.labels" . | indent 8 }}
     spec:
-      serviceAccountName: {{ .Values.kubiyaSuperAccount.name | quote }}
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.operator" . | indent 8}}
       containers:
-        - name: {{ .Values.kubiyaOperator.name | quote }}
+        - name: kubiya-operator
           image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
           imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
           ports:
             - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
           env:
-              - name: "NATS_SERVER"
-                value: "{{ .Values.natsServerUrl }}"
-              - name: "NATS_SUBJECT"
-                value: "{{ .Values.subject }}"
-              - name: "NATS_CREDENTIAL_FILE"
-                value: "/etc/nats/nats.creds"
-              - name: "NAMESPACE"
-                value: "{{ .Values.namespace }}"
+            {{- with .Values.kubiyaOperator.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
         {{- with .Values.kubiyaOperator.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
