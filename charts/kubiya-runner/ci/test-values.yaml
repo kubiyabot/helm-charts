@@ -1,0 +1,32 @@
+organization: "test-org"
+kubiyaAgentUUID: "test-uuid"
+
+# Minimal configuration for CI testing
+dagger:
+  enabled: false
+
+opentelemetry-collector:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: false
+
+agentManager:
+  replicas: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+toolManager:
+  replicas: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi 

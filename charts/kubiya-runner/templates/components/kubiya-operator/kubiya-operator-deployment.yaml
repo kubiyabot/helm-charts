@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubiya-operator
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubiya-operator.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.kubiyaOperator.replicas }}
+  selector:
+    matchLabels:
+      {{- include "kubiya-operator.selectorLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kubiya-operator.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.operator" . | indent 8}}
+      containers:
+        - name: kubiya-operator
+          image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
+          imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
+          env:
+            {{- with .Values.kubiyaOperator.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+        {{- with .Values.kubiyaOperator.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.kubiyaOperator.volumes }}
+      volumes:
+         {{- toYaml . | nindent 8 }}
+      {{- end }}

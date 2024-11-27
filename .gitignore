@@ -1,0 +1,48 @@
+# Helm chart dependencies
+charts/**/charts
+charts/**/Chart.lock
+
+# Helm package files
+*.tgz
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Helm generated files
+.helm/
+
+# Node.js dependencies (if using Node.js for chart testing or other purposes)
+node_modules/
+
+# Test coverage output
+coverage/
+
+# Old template files
+_old_template/
+
+# Rendered debug files
+render.yaml
+
+# Debug values & templates
+_values-debug.yaml
+_debug/

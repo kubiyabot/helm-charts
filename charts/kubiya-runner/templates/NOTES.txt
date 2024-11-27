@@ -1,0 +1,25 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To verify the deployment status:
+
+  kubectl get pods -l "app.kubernetes.io/name={{ include "kubiya-runner.name" . }}"
+
+The following components have been deployed:
+{{- if .Values.agentManager.enabled }}
+1. Agent Manager
+   - Service: {{ include "kubiya-runner.fullname" . }}-agent-manager:{{ .Values.agentManager.service.port }}
+{{- end }}
+{{- if .Values.toolManager.enabled }}
+2. Tool Manager
+   - Service: {{ include "kubiya-runner.fullname" . }}-tool-manager:{{ .Values.toolManager.service.port }}
+{{- end }}
+{{- if .Values.dagger.enabled }}
+3. Dagger Engine
+{{- end }}
+
+For troubleshooting, please check:
+  kubectl logs -l "app.kubernetes.io/name={{ include "kubiya-runner.name" . }}"
+
+Visit our documentation at https://docs.kubiya.ai/ for more information. 

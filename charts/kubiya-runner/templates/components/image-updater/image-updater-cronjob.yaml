@@ -1,0 +1,79 @@
+{{- if .Values.imageUpdater.cronJob.create }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "kubiya-runner.fullname" . }}-image-updater
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "image-updater.labels" . | indent 4 }}
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "image-updater.labels" . | indent 8 }}
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "image-updater.selectorLabels" . | indent 12 }}
+        spec:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          containers:
+          - name: image-updater
+            image: "{{ .Values.imageUpdater.image.repository }}:{{ .Values.imageUpdater.image.tag }}"
+            imagePullPolicy: {{ .Values.imageUpdater.image.pullPolicy | quote }}
+            command: ["/bin/bash"]
+            args:
+            - -c
+            - |
+              set -e
+              echo "Starting image updater job"
+              echo "Installing curl and jq..."
+              install_packages curl jq
+              echo "Downloading JSON file from S3..."
+              MAX_RETRIES=3
+              RETRY_DELAY=5
+              for i in $(seq 1 $MAX_RETRIES); do
+                if curl -s -f https://kubiya-cli.s3.amazonaws.com/stable/kubiya_versions.json > /tmp/kubiya_versions.json; then
+                  break
+                fi
+                echo "Attempt $i failed. Retrying in $RETRY_DELAY seconds..."
+                sleep $RETRY_DELAY
+              done
+              if [ $i -eq $MAX_RETRIES ]; then
+                echo "Error: Failed to download JSON file after $MAX_RETRIES attempts"
+                exit 1
+              fi
+              if ! jq empty /tmp/kubiya_versions.json; then
+                echo "Error: Invalid JSON file downloaded from S3"
+                echo "File contents:"
+                cat /tmp/kubiya_versions.json
+                exit 1
+              fi
+              update_deployment() {
+                local deployment=$1
+                local container=$2
+                local new_image=$3
+                echo "Checking deployment $deployment, container $container"
+                current_image=$(kubectl get deployment $deployment -n kubiya -o jsonpath="{.spec.template.spec.containers[?(@.name=='$container')].image}")
+                if [ "$current_image" != "$new_image" ]; then
+                  echo "Updating $deployment deployment, container $container with new image: $new_image"
+                  kubectl set image deployment/$deployment -n kubiya $container=$new_image
+                else
+                  echo "Deployment $deployment, container $container is already up to date"
+                fi
+              }
+              echo "Updating deployments..."
+              tool_manager_image=$(jq -r '."tool-manager"' /tmp/kubiya_versions.json)
+              update_deployment "tool-manager" "tool-manager" "$tool_manager_image"
+              agent_manager_image=$(jq -r '."agent-manager"' /tmp/kubiya_versions.json)
+              update_deployment "agent-manager" "agent-manager" "$agent_manager_image"
+              sdk_py_image=$(jq -r '."sdk-py"' /tmp/kubiya_versions.json)
+              update_deployment "tool-manager" "kubiya-sdk-server" "$sdk_py_image"
+              echo "Image updater job completed successfully"
+          serviceAccountName: {{ include "kubiya-runner.serviceAccountName.imageUpdater" . }}
+          restartPolicy: OnFailure
+{{- end }}

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tool-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tool-manager.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.toolManager.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tool-manager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tool-manager.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.toolManager" . }}
+      containers:
+        - name: tool-manager
+          image: "{{ .Values.toolManager.image.repository }}:{{ .Values.toolManager.image.tag }}"
+          imagePullPolicy: {{ .Values.toolManager.image.pullPolicy | quote }}
+          {{- with .Values.toolManager.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command: {{ .Values.toolManager.command | toYaml | nindent 10 }}
+          env:
+            {{- with .Values.toolManager.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.toolManager.containerPort }}
+          {{- with .Values.toolManager.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+        - name: kubiya-sdk-server
+          image: "{{ .Values.toolManager.sdkServer.image.repository }}:{{ .Values.toolManager.sdkServer.image.tag }}"
+          imagePullPolicy: {{ .Values.toolManager.sdkServer.image.pullPolicy | quote }}
+          {{- with .Values.toolManager.sdkServer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command: {{ .Values.toolManager.sdkServer.command | toYaml | nindent 10 }}
+          env:
+            {{- with .Values.toolManager.sdkServer.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.toolManager.sdkServer.containerPort }}
+          {{- with .Values.toolManager.sdkServer.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.toolManager.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
