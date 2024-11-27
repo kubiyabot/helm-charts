@@ -60,3 +60,4 @@
 - [x] ~Ask devs about `tool-manager` existing helm char; consider it as a subchart?~ ---> abandoned chart
 - [x] Check repos `agent-manager` and `kubiya-operator` for helm chart (permission required)
 - [x] Align `Chart.yaml` as per helm guidelines.
+
