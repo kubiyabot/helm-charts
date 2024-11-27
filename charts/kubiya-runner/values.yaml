@@ -4,10 +4,11 @@ organization: ""
 # Runner UUID
 kubiyaAgentUUID: ""
 
+
 # NATS credentials and destination subject
+jwt: ""
+secondJwt: ""
 nats:
-  jwt: ""
-  secondJwt: ""
   subject: ""
   serverUrl: "tls://connect.ngs.global"
 
