@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "kubiya-runner.fullname" . }}-agent-manager:{{ .Values.agentManager.service.port }}']
+      args: ['agent-manager:{{ .Values.agentManager.service.port }}']
   restartPolicy: Never 

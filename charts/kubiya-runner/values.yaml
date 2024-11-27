@@ -4,10 +4,11 @@ organization: ""
 # Runner UUID
 kubiyaAgentUUID: ""
 
+
 # NATS credentials and destination subject
+jwt: ""
+secondJwt: ""
 nats:
-  jwt: ""
-  secondJwt: ""
   subject: ""
   serverUrl: "tls://connect.ngs.global"
 
@@ -95,7 +96,7 @@ agentManager:
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
-    tag: 0.0.17
+    tag: 0.0.18
   service:
     port: 80
     targetPort: 8080
