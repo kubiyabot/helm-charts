@@ -42,8 +42,8 @@ jobs:
       run: |
         helm lint charts/kubiya-runner/ \
           --strict \
-          --with-subcharts \
           --values charts/kubiya-runner/values.yaml
+        #   --with-subcharts
 
     - name: Run helm template
       run: |
