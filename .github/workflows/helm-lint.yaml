@@ -24,26 +24,17 @@ jobs:
         helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
         helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
         helm repo update
-          
 
     - name: Update Helm dependencies
       run: |
         cd charts/kubiya-runner
-        # Download and untar dependencies
-        helm dependency update
-        cd charts
-        # Untar all .tgz files
-        for f in *.tgz; do
-        tar xzf "$f"
-        done
-        ls -la 
+        helm dependency build
 
     - name: Run helm lint
       run: |
         helm lint charts/kubiya-runner/ \
           --strict \
           --values charts/kubiya-runner/values.yaml
-        #   --with-subcharts
 
     - name: Run helm template
       run: |
