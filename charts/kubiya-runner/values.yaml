@@ -1,5 +1,6 @@
 # Runner organization
 organization: ""
+subject: "" #TODO: Replace with nats.subject
 
 # Runner UUID
 kubiyaAgentUUID: ""
