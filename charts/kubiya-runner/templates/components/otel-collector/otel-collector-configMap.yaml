@@ -7,140 +7,154 @@ metadata:
     {{ include "otel-collector-extras.labels" . | nindent 4 }}
 data:
   config.yaml: |
-    # Otel-collector configuration file
     receivers:
-      otlp:
-        protocols:
-          grpc:
-            endpoint: 0.0.0.0:4317
-          http:
-            endpoint: 0.0.0.0:3000
-
-      # Kubernetes API server (kube-apiserver) metrics via otel-collector receiver
-      k8s_events:
-        auth_type: serviceAccount
-        namespaces:
-          - {{ .Release.Namespace }}
-
-      # Kubelet metrics via otel-collector receiver
+     # Kubelet metrics via otel-collector receiver
       prometheus:
         config:
           scrape_configs:
-            # Kube-state-metrics exporter metrics receiver
+            # Kube-state-metrics with service discovery
             - job_name: 'kube-state-metrics'
-              scrape_interval: 30s
-              static_configs:
-                - targets: ['kube-state-metrics:8080']
+              scrape_interval: 60s
               kubernetes_sd_configs:
                 - role: endpoints
                   namespaces:
-                    names:
-                      - {{ .Release.Namespace }}
+                    names: ["{{ .Release.Namespace }}"]
               relabel_configs:
+                # Keep only kube-state-metrics endpoints
                 - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
                   regex: kube-state-metrics
                   action: keep
 
-            # Dynamic service discovery for Kubiya apps, for all metrics exposed by services on default /metrics endpoint
+            # Add prometheus receiver for self-monitoring
+            - job_name: 'otel-collector'
+              scrape_interval: 60s
+              static_configs:
+                - targets: ['0.0.0.0:8888']
+
+            # Dynamic endpoint discovery for Kubiya apps
             - job_name: "kubiya-apps"
-              scrape_interval: 10s
+              scrape_interval: 15s
               kubernetes_sd_configs:
-                - role: service
+                - role: endpoints
                   namespaces:
                     names: ["{{ .Release.Namespace }}"]
               relabel_configs:
-                # Keep only services we want to scrape
-                # TODO add more once exporters are ready
-                - source_labels: [__meta_kubernetes_service_name]
+                # Keep only endpoints with kubiya.io/metrics-name label
+                - source_labels: [__meta_kubernetes_service_label_kubiya_io_metrics_name]
                   action: keep
-                  regex: (tool-manager|agent-manager)
-                # Add app label
-                - source_labels: [__meta_kubernetes_service_name]
+                  regex: (.+)
+                # Add app name from the label
+                - source_labels: [__meta_kubernetes_service_label_kubiya_io_metrics_name]
                   target_label: app
-                # Use the service port
-                - source_labels: [__meta_kubernetes_service_port_number]
-                  target_label: __metrics_port__
+
 
     processors:
+      {{- if .Values.otelCollectorConfig.k8sAttributes.enabled }}
+      # Processor for Kubernetes attributes, enriching metrics with Kubernetes metadata.
       k8sattributes:
         auth_type: serviceAccount
         filter:
-            namespace: {{ .Release.Namespace }}
+          namespace: {{ .Release.Namespace }}
+      {{- end }}
 
-      batch:
+      # Processor for batching metrics. Optimized for NATS/Synadia.
+      batch/metrics:
+        # Aims for ~100KB batches; default is 8192 messages
+        send_batch_size: 512
+        # Prevents exceeding NATS limits; default is 0 (unlimited messages)
+        send_batch_max_size: 1024
+        # For latency/throughput expected to be better with 128KB batches; default is 8192 bytes
+        # TODO: IMAGE REBUILD REQUIRED
+        # send_batch_max_bytes: 128000
+        # Batch sending interval. Default is "200ms"
+        timeout: "10s"
+        # TODO: IMAGE REBUILD REQUIRED
+        # Disable batch timeout. Default is "0s" (disabled)
+        # send_batch_timeout: "5s"
 
+      # Adding additional runner's metadata via attributes
       resource:
         attributes:
-          # TODO: discuss with team, make sure this is not duplicated metricstransform.transforms.operations
+          # TODO: Waiting for Mevrat response to making sure this is not duplicated metricstransform.transforms.operations
           - key: "instance"
             value: {{ .Values.organization | quote }}
             action: upsert
+
           - key: "runner"
             value: {{ .Values.runnerNameOverride | default .Release.Name | quote }}
             action: upsert
+
           - key: "organization"
             value: {{ .Values.organization | quote }}
             action: upsert
-      
-      # TODO: discuss with team, make sure this is not duplicated resource.attributes
+
+          - key: "kubiya_type"
+            value: "customers-runners"
+            action: upsert
+
+      # TODO: Waiting for Mevrat response to making sure this is not duplicated resource.attributes
+      {{- if .Values.otelCollectorConfig.metricstransformAttributes.enabled }}
       metricstransform:
         transforms:
           - include: '.*'
             match_type: regexp
             action: update
             operations:
-              
-              # TODO: discuss with team, make sure instance is needed as it's duplicated
               - action: update_label
                 label: "instance"
                 new_label: "instance"
                 new_value: {{ .Values.organization | quote }}
-              
+
               - action: add_label
                 label: "kubiya_type"
                 new_label: "kubiya_type"
                 new_value: "customers-runners"
+
               - action: add_label
                 label: "runner"
                 new_label: "runner"
                 new_value: {{ .Values.runnerNameOverride | default .Release.Name | quote }}
-              
+
               - action: add_label
                 label: "organization"
                 new_label: "organization"
                 new_value: {{ .Values.organization | quote }}
+      {{- end }}
 
+    # Extension for exposing health checks endpoint. Provides liveness and readiness probes (required for Gatekeeper as well).
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    # Exporter for debugging output
     exporters:
+
+      {{- if .Values.otelCollectorConfig.debugExporter.enabled }}
       debug:
-        # Debug output for testing
-        # verbosity: detailed
         verbosity: normal
         # sampling_initial: 5
         # sampling_thereafter: 200
+      {{- end }}
+
       natsexporter:
         org: {{ .Values.organization | quote }}
         endpoint: {{ .Values.nats.serverUrl | quote }}
         creds_file: "/etc/nats/nats.creds"
 
-    extensions:
-      health_check:
-        endpoint: ${env:MY_POD_IP}:13133
-
     service:
-      # extensions:
-      #   - health_check
+      extensions:
+        - health_check
+
       pipelines:
-        logs:
-          receivers: [ k8s_events ]
-          processors: [ batch, resource ]
-          exporters: [ natsexporter ]
         metrics:
           receivers: [ prometheus ]
-          processors: [ metricstransform, k8sattributes, batch, resource ]
+          processors: [ k8sattributes, batch/metrics, resource ]
+          {{- if .Values.otelCollectorConfig.debugExporter.enabled }}
+          exporters: [ debug, natsexporter ]
+          {{- else }}
           exporters: [ natsexporter ]
-        traces:
-          receivers: [ otlp ]
-          processors: [ batch ]
-          exporters: [ natsexporter ]
+          {{- end }}
       telemetry:
-        logs:
+        metrics:
+          level: basic
+          address: 0.0.0.0:8888
