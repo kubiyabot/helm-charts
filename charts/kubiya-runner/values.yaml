@@ -9,6 +9,8 @@ kubiyaAgentUUID: ""
 jwt: ""
 secondJwt: ""
 nats:
+  jwt: ""
+  secondJwt: ""
   subject: ""
   serverUrl: "tls://connect.ngs.global"
 
@@ -63,6 +65,8 @@ kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
   replicas: 1
+  # Enable once kubiya-operator exporter is ready
+  # otelCollectorMetricsScrapeAppName: kubiya-operator
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -101,6 +105,7 @@ agentManager:
     port: 80
     targetPort: 8080
     serviceType: "ClusterIP"
+  otelCollectorMetricsScrapeAppName: agent-manager
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -251,6 +256,7 @@ imageUpdater:
 # Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
 otelCollectorCustomRole:
   enabled: true
+
   # TODO PROD_READY: remove when tested
   enableDebugRoles:
   - apiGroups: [ "" ]
@@ -259,7 +265,17 @@ otelCollectorCustomRole:
   - apiGroups: [ "events.k8s.io" ]
     resources: [ "events" ]
     verbs: [ "watch", "list" ]
-  # Open-teemetry collector subchart config
+
+otelCollectorConfig:
+  metricstransformAttributes:
+    enabled: false
+  # TODO: PROD_READY - enough data from kube-state-metrics?
+  k8sAttributes:
+    enabled: true
+  debugExporter:
+    enabled: false
+
+# Open-teemetry collector subchart config
 otelcollector:
   enabled: true
 
@@ -302,6 +318,7 @@ otelcollector:
     readOnly: true
   configMap:
     create: false
+
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
   resources:
