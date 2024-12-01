@@ -7,8 +7,6 @@ kubiyaAgentUUID: ""
 
 
 # NATS credentials and destination subject
-jwt: ""
-secondJwt: ""
 nats:
   jwt: ""
   secondJwt: ""

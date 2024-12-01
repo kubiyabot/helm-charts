@@ -44,7 +44,7 @@ values:
   - organization
   - kubiyaAgentUUID
   - nats.jwt
-  - secondJwt
+  - nats.secondJwt
   # Value constraints
   constraints:
     organization:
@@ -57,7 +57,8 @@ values:
     #   type: integer
     #   minimum: 1024
     #   maximum: 65535
-    jwt:
-      type: string
-    secondJwt:
-      type: string
+    nats:
+      jwt:
+        type: string
+      secondJwt:
+        type: string
