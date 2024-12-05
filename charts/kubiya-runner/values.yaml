@@ -1,6 +1,6 @@
 # Runner organization
 organization: ""
-subject: "" #TODO: Replace with nats.subject
+subject: "" #TODO: Remove. Replace with nats.subject
 
 # Runner UUID
 kubiyaAgentUUID: ""
@@ -89,7 +89,7 @@ kubiyaOperator:
     containerPort: 80
   env:
     NATS_SERVER: "{{ .Values.nats.serverUrl }}"
-    NATS_SUBJECT: "{{ .Values.nats.subject }}"
+    NATS_SUBJECT: "{{ .Values.subject }}" #TODO: Replace with nats.subject
     NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
     NAMESPACE: "{{ .Release.Namespace }}"
 

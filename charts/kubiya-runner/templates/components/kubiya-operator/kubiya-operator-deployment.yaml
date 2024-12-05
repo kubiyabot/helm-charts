@@ -24,8 +24,6 @@ spec:
           ports:
             - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
           env:
-            - name: NATS_SUBJECT
-              value: {{ .Values.subject }}
             {{- with .Values.kubiyaOperator.env }}
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
