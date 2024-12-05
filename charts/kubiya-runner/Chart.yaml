@@ -2,8 +2,8 @@ apiVersion: v2
 name: kubiya-runner
 description: A Helm chart for deploying the Kubiya Runner
 type: application
-version: 0.4.9
-appVersion: "0.4.9"
+version: 0.5.0
+appVersion: "0.5.0"
 kubeVersion: ">=1.19.0-0"
 home: https://kubiya.ai
 icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
@@ -26,11 +26,14 @@ dependencies:
 - name: kube-state-metrics
   version: 5.27.0
   repository: "https://prometheus-community.github.io/helm-charts"
-  # TODO remove if values propogated without alias
-  # alias: kube-StateMetrics
+  alias: kubestatemetrics
   condition: kube-state-metrics.enabled
 - name: opentelemetry-collector
   alias: otelcollector
   version: 0.109.0
   repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
   condition: opentelemetry-collector.enabled
+- name: prometheus-blackbox-exporter
+  version: 8.5.0
+  repository: https://prometheus-community.github.io/helm-charts
+  condition: blackboxExporter.enabled

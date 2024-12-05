@@ -7,6 +7,8 @@ metadata:
   labels:
     {{- include "image-updater.labels" . | indent 4 }}
 spec:
+  successfulJobsHistoryLimit: {{ .Values.imageUpdater.cronJob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.imageUpdater.cronJob.failedJobsHistoryLimit }}
   schedule: "0 * * * *"
   jobTemplate:
     metadata:
