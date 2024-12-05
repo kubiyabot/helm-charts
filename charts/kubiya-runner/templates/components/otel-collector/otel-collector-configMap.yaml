@@ -46,18 +46,48 @@ data:
                 - source_labels: [__meta_kubernetes_service_label_kubiya_io_metrics_name]
                   target_label: app
 
-            # Add blackbox-exporter metrics scraping
-            - job_name: 'blackbox'
-              scrape_interval: 30s
-              metrics_path: /metrics
-              kubernetes_sd_configs:
-                - role: service
-                  namespaces:
-                    names: ["{{ .Release.Namespace }}"]
+            # Add blackbox-exporter probes metrics scraping
+            - job_name: 'blackbox-http'
+              metrics_path: /probe
+              params:
+                module: [http_2xx]
+              static_configs:
+                - targets: {{ .Values.blackboxexporter.targets.http | toJson }}
               relabel_configs:
-                - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
-                  regex: prometheus-blackbox-exporter
-                  action: keep
+                - source_labels: [__address__]
+                  target_label: __param_target
+                - source_labels: [__param_target]
+                  target_label: instance
+                - target_label: __address__
+                  replacement: prometheus-blackbox-exporter:9115
+
+            - job_name: 'blackbox-grpc'
+              metrics_path: /probe
+              params:
+                module: [grpc]
+              static_configs:
+                - targets: {{ .Values.blackboxexporter.targets.grpc | toJson }}
+              relabel_configs:
+                - source_labels: [__address__]
+                  target_label: __param_target
+                - source_labels: [__param_target]
+                  target_label: instance
+                - target_label: __address__
+                  replacement: prometheus-blackbox-exporter:9115
+
+            - job_name: 'blackbox-tcp'
+              metrics_path: /probe
+              params:
+                module: [tcp_connect]
+              static_configs:
+                - targets: {{ .Values.blackboxexporter.targets.tcp | toJson }}
+              relabel_configs:
+                - source_labels: [__address__]
+                  target_label: __param_target
+                - source_labels: [__param_target]
+                  target_label: instance
+                - target_label: __address__
+                  replacement: prometheus-blackbox-exporter:9115
 
     # Extension for exposing health checks endpoint. Provides liveness and readiness probes (required for Gatekeeper as well).
     extensions:

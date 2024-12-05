@@ -475,7 +475,7 @@ daggerAdditionalResources:
     name: dagger-engine-service
     port: 8080
 
-blackboxExporter:
+blackboxexporter:
   enabled: true
   config:
     modules:
@@ -494,38 +494,17 @@ blackboxExporter:
         timeout: 5s
         tcp:
           preferred_ip_protocol: ip4
-
-  # Use serviceMonitor to configure scraping
   serviceMonitor:
-    enabled: true
-    defaults:
-      interval: 30s
-      scrapeTimeout: 10s
-      labels:
-        kubiya.io/metrics-name: blackbox-exporter
-    targets:
-    - name: http-services
-      module: http_2xx
-      interval: 30s
-      path: /probe
-      params:
-        target:
-        - agent-manager:80
-        - kubiya-operator:80
-        - tool-manager:80
-    - name: grpc-services
-      module: grpc
-      interval: 30s
-      path: /probe
-      params:
-        target:
-        - sdk-server:50051
-        - dagger-engine:8080
-    - name: tcp-services
-      module: tcp_connect
-      interval: 30s
-      path: /probe
-      params:
-        target:
-        - otel-collector:4317 # OTLP gRPC
-        - otel-collector:13133 # Health check
+    enabled: false # Disable ServiceMonitor
+  # Direct configuration for targets
+  targets:
+    http:
+    - agent-manager:80
+    - kubiya-operator:80
+    - tool-manager:80
+    grpc:
+    - sdk-server:50051
+    - dagger-engine:8080
+    tcp:
+    - otel-collector:4317
+    - otel-collector:13133
