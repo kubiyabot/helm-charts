@@ -1,24 +1,25 @@
 # Runner organization
-organization: "kubiya-test-sniff"
+organization: ""
+subject: "" #TODO: Remove. Replace with nats.subject
 
 # Runner UUID
-kubiyaAgentUUID: "679adc53-7068-4454-aa9f-16df30b14a50"
+kubiyaAgentUUID: ""
+
 
 # NATS credentials and destination subject
 nats:
-  jwt: "xxx"
-  secondJwt: "yyy"
-  subject: "kubiya-test-sniff.sergey-metrics-test.incoming"
+  jwt: ""
+  secondJwt: ""
+  subject: ""
   serverUrl: "tls://connect.ngs.global"
-  org: "kubiya-test-sniff"
 
 # TLS certificates for private registry (used by `tool-manager`)
 registryTls:
-  crt: "xxx"
-  key: "yyy"
+  crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ4VENDQXRtZ0F3SUJBZ0lVTVBIY1RMN1FGNmMrYlhtNElxTEUzeXVhK1lrd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2NURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWtOQk1SSXdFQVlEVlFRSERBbFRkVzV1ZVhaaApiR1V4RHpBTkJnTlZCQW9NQmt0MVltbDVZVEVNTUFvR0ExVUVDd3dEVWs1RU1TSXdJQVlEVlFRRERCbGpZV05vClpTMXlaV2RwYzNSeWVTMXpkbU11YTNWaWFYbGhNQjRYRFRJME1UQXdNakV5TkRZeU4xb1hEVEkzTURrd01qRXkKTkRZeU4xb3djVEVMTUFrR0ExVUVCaE1DVlZNeEN6QUpCZ05WQkFnTUFrTkJNUkl3RUFZRFZRUUhEQWxUZFc1dQplWFpoYkdVeER6QU5CZ05WQkFvTUJrdDFZbWw1WVRFTU1Bb0dBMVVFQ3d3RFVrNUVNU0l3SUFZRFZRUUREQmxqCllXTm9aUzF5WldkcGMzUnllUzF6ZG1NdWEzVmlhWGxoTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEEKTUlJQkNnS0NBUUVBM3c5b2dVUGptaVNaMDR1OU4vR3hKRmhCT01QYzQ3MXJLR1ozZVc2bW43NW1FTjNzV2R1cwpzVStkK1lNSE9HYjBUT3FlcHhMUUtvMWNRYjVRUmlRTGxOVTJWRGgrTjVhZVVmdVJUU1MwczNRWTAxd1k1Z3ozCnIvaFc3ZllEOVVpTUpTeFhYK01DU2hsQ0NTUm52N2hncmloQWlGdXcyZUs3bjQyWjByYms2MUJmaGNBRWxZbmEKdExoRjBwcWxvNGlsSHZaUGEwdzRFMzJBdkJJTzZ5YjlKb1V0N1JRMVNta3VLRDJsY2dqMVlKSjQ2SmxKUGtFWgowL21Zc3ZwZUZBOVBmQnZGdkZ6K0VyMitMd09JKzcxNFRtTnNITXVERjRyNzVNeFF5ekpaYTNxT3Rud3paTEVYCjlHYThHZ1AxVG9jVGtlRnVMUmhjVWQ4M3M5eWJIS0o1bHdJREFRQUJvNEdBTUg0d0RnWURWUjBQQVFIL0JBUUQKQWdXZ01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNRGdHQTFVZEVRUXhNQytDR1dOaFkyaGxMWEpsWjJsegpkSEo1TFhOMll5NXJkV0pwZVdHQ0VtTmhZMmhsTFhKbFoybHpkSEo1TFhOMll6QWRCZ05WSFE0RUZnUVVxQlpGCkZKZEZLQ1M0SGtSYWxtNmM1WFFORlJVd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHYXlraDhhV3QwaTdpNnMKOGZZRHlZVE8wMjZOYjQ5dWNUZDRpKzgySGFCdm01ZFJxbVQ5U0V4eFJYL3RTanMraGpHRnpYTWVtY0lva3FKLwpFNWtSYlcrbFNveWUwQkdkTVBPcVJNZW1tcEI4WG9DZmo0ZWg0WkxtbDRrbGVSZEEzRU96OHJSRExxb0MxdmJiClluU2RwTjFHbUFJOUtpdjJ0N3hjVVl0Nm1SM2FqYVBLZHVWOXNkakRrZDBDQm1EckhNRXJ4a3AzdDVXOHc5aW8KN2IxRjE3MFBSRldJNVY3c3JtQlFwK0t6UTJsZEdyODdxZFI1eE1wZlU4Z0IvKzgyRXlZcjA1WTJsNmhrY1BGbgpzMnBPTUV4UFVVN05xQlMxeURoR3lXZVVJTE9ydmFuWjh3L1UyVDFScjd1bTBGK0Y0a3hTMHZNMDhyYmRIMzNPCjVyUDV1OEk9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K" # pragma: allowlist secret
+  key: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRGZEMmlCUStPYUpKblQKaTcwMzhiRWtXRUU0dzl6anZXc29abmQ1YnFhZnZtWVEzZXhaMjZ5eFQ1MzVnd2M0WnZSTTZwNm5FdEFxalZ4Qgp2bEJHSkF1VTFUWlVPSDQzbHA1Uis1Rk5KTFN6ZEJqVFhCam1EUGV2K0ZidDlnUDFTSXdsTEZkZjR3SktHVUlKCkpHZS91R0N1S0VDSVc3RFo0cnVmalpuU3R1VHJVRitGd0FTVmlkcTB1RVhTbXFXamlLVWU5azlyVERnVGZZQzgKRWc3ckp2MG1oUzN0RkRWS2FTNG9QYVZ5Q1BWZ2tuam9tVWsrUVJuVCtaaXkrbDRVRDA5OEc4VzhYUDRTdmI0dgpBNGo3dlhoT1kyd2N5NE1YaXZ2a3pGRExNbGxyZW82MmZETmtzUmYwWnJ3YUEvVk9oeE9SNFc0dEdGeFIzemV6CjNKc2Nvbm1YQWdNQkFBRUNnZ0VBSktHSXBYWExLbFNwYUZxeDY3Nkd1ek85SGovWUJoUmt4U0V5ckovMXdCVUoKK09vZzlzN0RDT2xNeFoxMWNaZEN0bUR2UmZ1cWNOcC9GSkxXNXZYamF3RXFwMkVScFRwWWJKazJEdWVndnptcApIQWlyVkJnOEVzdGpKemY0Qlc5eENHZkVQNHh0bzFLTGpDbk0yZWpEQThhN2Rra3NmVk9sUVRvRlVWdlVzeW5VCjBYSTNtY01pM1pzMWdodDNuRXdWSjBMbGVwT2FvQi9iOUhjY2Q0TGN2M2dGWnlOdkVpckgyeDdWMmYremRKQ3QKcXpQLzlXMVR5aE42VWRlMENuVjFTLzh0QTFYQW56MW05VmIyK2h4ZkM5MDlZREJLV3RqVjVQT01aZU5xUVFqVwpqaXpTNnE1dE1UZWpzd1RYRkRMRThKYk4yU3Zld0s2OVZIUkdtdXU3dVFLQmdRRHZtNzNHYStYNy9nVFR3bFJjCk4vSTJ1Q1hSOE5HNW90ZGZjbkFPU2lnc2hpc0tPaHpoSnJlVHVnQm9HeXQyWHU3N2FWQ3EzWHJtdDNVOUhxZVUKSzB1TDdONm1zNzdUWUp4ZHd3RkpOaWJBbWpXRVlDbnR4eldaWjd5Um1zcGg1YnZEL2x0WXpEdFVBZ0QybHZXbwpVTm1YL3VZQ3NZcXZpSmhzdFMxWkF4WklLUUtCZ1FEdVVkdmYyYmx6OTRkYTNVb0tNNjlyZ044QmgxaEwybUVmCnhQeXFZSHFtOGVXaklWL0U4WXM4UTFZSm1KOEZ3dVlyWnREQmMrRTBMeCtaK2FEdy9IdksyZUY3K25Wc0FGUEcKYkhacDhYRkFITlVMdWlwVVlzWjRqaTFYTDEwdEtXZVozN0FVdEpFM3drZ28yZ1NDcHVLVkU1Q2xDTDVoRXIyZAorWVU5QVQzcnZ3S0JnUUMva1Vmb0ZTb2FENXh5WllNbSs3L1dpZUlLK0x2azdGRy9TUEpZS21mMk9RcStNWG9YCmRPbiszUTRvTGRqUTJkTytCQlJ2bDRZRVloY0UxN1pwbXpmYVZuWW8xN3F3cXlRNVBvaVByUkRNbWo1QmFOVDgKKzNGYUJmdFllbVptWU5OL1BxUnYyVkZ4dCt4bk9vaUxtcUJ0aW1rQkxFdFNUaVozZTE4WE5JV2pDUUtCZ1FDcgppSW5zNWlaZ3ZPSlUyWUJJTllsbXBGeGZHazdJVWdla09VSHZWQUFVRjNwRTMybXlOSFVXVEJVcVZRcm90NjY1CndJZ3pKYmdMdW50UmRXYU03ZjRnTkpEaWpwUmp4eHlGYmw0UXhUTFJoYThtZ0xtbEFXOS9LRDZrU1RnVW9IK3MKTmwvamwxQUt4VER4RG5NK291WGxqUzZJU3ZIVXB3dUtJQ1h4a2VwQ3V3S0JnUUM2MEZlbGkwU29aSzUvWlpWagorRHp3WW5ZaXdVZ3ZyRXhUWkxtMXhsanoveFRkRzc4OWZ5c3p4T0UrdzFQUHNOTFROYW05L0RYeXNMaUJKdDJUCjMvc1dZVk5Qc3BWR1FsMVUxOEpCSzZVZlFBOVB1QmF3ZnhMSWRiaTluc1lXYnQyK1pzcW9NOGtPUThSMlVJS3oKSlFidFcrTUVZZ2k0L0wrZ0MxSkNaZ1BvUFE9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==" # pragma: allowlist secret
 
 # By default, runner name = release name, override if needed. Must match JWT encoded (see README.md for details)
-runnerNameOverride: "sergey-metrics-test"
+runnerNameOverride: ""
 nameOverride: ""
 fullnameOverride: ""
 
@@ -26,12 +27,12 @@ fullnameOverride: ""
 imagePullSecrets: []
 
 # kube-state-metrics subchart configuration
-kubestatemetrics:
+kubeStateMetrics:
   enabled: true
 
   # Default values for kube-state-metrics.
   image:
-    tag: "v2.14.0"
+    tag: "2.14.0"
   updateStrategy: Recreate
 
   revisionHistoryLimit: 2
@@ -88,7 +89,7 @@ kubiyaOperator:
     containerPort: 80
   env:
     NATS_SERVER: "{{ .Values.nats.serverUrl }}"
-    NATS_SUBJECT: "{{ .Values.nats.subject }}"
+    NATS_SUBJECT: "{{ .Values.subject }}" #TODO: Replace with nats.subject
     NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
     NAMESPACE: "{{ .Release.Namespace }}"
 
@@ -98,7 +99,7 @@ agentManager:
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
-    tag: 0.0.17
+    tag: 0.0.18
   service:
     port: 80
     targetPort: 8080
@@ -140,8 +141,8 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: cb299cb19f7e88daa103b3227660568b1e8f9c74
-  otelCollectorMetricsScrapeAppName: tool-manager
+    # TODO PROD_READY Point to merged branch release (with support for DAGGER_ENGINE_SERVICE_URL env var
+    tag: 901aa18d04e01e2a48cd8eddf281e2ea5ffbf220
   service:
     port: 80
     targetPort: 3001
@@ -240,9 +241,8 @@ toolManager:
 # Kubiya image updater component config
 imageUpdater:
   cronJob:
+    # TODO: remove after testing
     create: true
-    successfulJobsHistoryLimit: 1
-    failedJobsHistoryLimit: 1
   image:
     repository: bitnami/kubectl
     pullPolicy: IfNotPresent
@@ -252,53 +252,31 @@ imageUpdater:
     name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
 
-# Open-teemetry collector subchart config
-otelcollector:
+# Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
+otelCollectorCustomRole:
   enabled: true
 
-  # Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
-  customRole:
-    enabled: true
+  # TODO PROD_READY: remove when tested
+  enableDebugRoles:
+  - apiGroups: [ "" ]
+    resources: [ "nodes/stats" ]
+    verbs: [ "get", "watch", "list" ]
+  - apiGroups: [ "events.k8s.io" ]
+    resources: [ "events" ]
+    verbs: [ "watch", "list" ]
 
-    # TODO / PROD_READY: Unneccessary wide permissions for production, should be removed after testing
-    enableDebugRoles:
-    - apiGroups: [ "" ]
-      resources: [ "nodes/stats" ]
-      verbs: [ "get", "watch", "list" ]
-    - apiGroups: [ "events.k8s.io" ]
-      resources: [ "events" ]
-      verbs: [ "watch", "list" ]
-
-  # Rendering of predefined blocks collector (see otel-collector-configMap.yaml)
-  # To be actually used, must be enabled in otelCollectorConfig.metrics.pipelines.metrics.processors
+otelCollectorConfig:
   metricstransformAttributes:
-    enabled: true
-  resourceAttributes:
     enabled: false
+  # TODO: PROD_READY - enough data from kube-state-metrics?
   k8sAttributes:
     enabled: true
   debugExporter:
-    enabled: true
-  # Experimental Azure Managed Prometheus exporter config. Enable if needed.
-  prometheusExporter:
     enabled: false
-    # remoteWrite:
-    #   # Azure Managed Prometheus endpoint URL (e.g., https://your-workspace.prometheus.monitor.azure.com/api/v1/write)
-    #   url: ""
-    # managedPrometheusAuth:
-    #   enabled: true
-    #   secretName: "azure-managed-prometheus-auth"
-    #   secretKey: "token"
-    #   token: "" # Azure Managed Prometheus authentication token
 
-    # Enabled pipelines configuration
-  pipelines:
-    metrics:
-      receivers: [ prometheus ]
-      processors: [ metricstransform, k8sattributes, batch/metrics ]
-      # Azure Managed Prometheus exporter is experimental. Add to exporters if needed. Debug exporter can be also added if needed.
-      # exporters: [ debug, natsexporter, prometheus ]
-      exporters: [ natsexporter ]
+# Open-teemetry collector subchart config
+otelcollector:
+  enabled: true
 
   image:
     # Using image build with custom implementation of nats-exporter to be able to push
@@ -317,14 +295,6 @@ otelcollector:
     name: "otelcol-kubiya"
     extraArgs: [ "--config=/etc/otel/config.yaml" ]
 
-  # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
-  # extraEnvs:
-  # - name: AZURE_PROMETHEUS_AUTH_TOKEN
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: kubiya-runner-azure-prometheus-auth
-  #       key: token
-
   extraVolumes:
   - name: otel-config
     configMap:
@@ -338,11 +308,6 @@ otelcollector:
       items:
       - key: nats.creds
         path: nats.creds
-  # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
-  # - name: azure-prometheus-auth
-  #   secret:
-  #     secretName: kubiya-runner-azure-prometheus-auth
-  #     cpu: 250m
 
   extraVolumeMounts:
   - name: otel-config
@@ -350,11 +315,6 @@ otelcollector:
   - name: nats-creds-volume
     mountPath: "/etc/nats"
     readOnly: true
-  # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
-  # - name: azure-prometheus-auth
-  #   mountPath: "/etc/azure"
-  #   readOnly: true
-
   configMap:
     create: false
 
@@ -394,7 +354,6 @@ dagger:
 
   engine:
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
-    # which is used by tool-manager.
     # which is used by tool-manager.
     labels:
       app.kubernetes.io/name: dagger
