@@ -24,11 +24,21 @@ spec:
           ports:
             - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
           env:
-            {{- with .Values.kubiyaOperator.env }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
+            {{- range $key, $value := .Values.kubiyaOperator.env.defaults }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              {{- toYaml $value | nindent 14 }}
+              {{- else }}
               value: {{ tpl $value $ | quote }}
+              {{- end }}
             {{- end }}
+            {{- range $key, $value := .Values.kubiyaOperator.env.custom }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              {{- toYaml $value | nindent 14 }}
+              {{- else }}
+              value: {{ tpl $value $ | quote }}
+              {{- end }}
             {{- end }}
         {{- with .Values.kubiyaOperator.volumeMounts }}
           volumeMounts:
