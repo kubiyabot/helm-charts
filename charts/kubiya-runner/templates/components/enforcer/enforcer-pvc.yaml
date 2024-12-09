@@ -1,0 +1,18 @@
+{{- if and .Values.enforcer.enabled .Values.enforcer.postgres.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: enforcer-postgres-data
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "enforcer.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.enforcer.postgres.persistence.storageClass }}
+  storageClassName: {{ .Values.enforcer.postgres.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.enforcer.postgres.persistence.size }}
+{{- end }} 
