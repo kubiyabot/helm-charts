@@ -124,7 +124,6 @@ agentManager:
       items:
       - key: nats.creds
         path: nats.creds
-      secretName: kubiya-runner-nats-creds-customer
   volumeMounts:
   - mountPath: /nats/
     name: nats-creds-volume
@@ -508,3 +507,154 @@ blackboxexporter:
     tcp:
     - otel-collector:4317
     - otel-collector:13133
+
+enforcer:
+  enabled: true
+  
+  # Enforcer component configuration
+  replicas: 1
+  
+  serviceAccount:
+    create: true
+    name: "" # Leave empty to use generated name
+    automountServiceAccountToken: true
+
+  image:
+    repository: ghcr.io/kubiyabot/opawatchdog
+    tag: latest
+    pullPolicy: Always
+
+  service:
+    port: 5001
+    targetPort: 5001
+    type: ClusterIP
+    
+  # Resources for enforcer container
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Environment variables for enforcer container
+  env:
+    # Default required env vars
+    defaults:
+      OKTA_PRIVATE_KEY: /etc/okta/private.pem
+      IDP_PROVIDER_NAME: okta
+    # Custom additional env vars
+    custom: {}
+
+  # PostgreSQL configuration  
+  postgres:
+    image:
+      repository: postgres
+      tag: alpine
+      pullPolicy: IfNotPresent
+    database: postgres
+    username: postgres
+    password: postgres
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: ""
+    env:
+      # Default required env vars  
+      defaults:
+        POSTGRES_DB:
+          valueFrom:
+            secretKeyRef:
+              name: opawatchdog-secrets
+              key: POSTGRES_DB
+        POSTGRES_USER:
+          valueFrom:
+            secretKeyRef:
+              name: opawatchdog-secrets
+              key: POSTGRES_USER
+        POSTGRES_PASSWORD:
+          valueFrom:
+            secretKeyRef:
+              name: opawatchdog-secrets
+              key: POSTGRES_PASSWORD
+      # Custom additional env vars
+      custom: {}
+
+  # OPAL Server configuration
+  opalServer:
+    image:
+      repository: permitio/opal-server
+      tag: latest
+      pullPolicy: IfNotPresent
+    workers: 4
+    policyRepoPollingInterval: "30"
+    healthCheckEnabled: "true"
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    env:
+      defaults:
+        OPAL_BROADCAST_URI: "postgres://{{ .Values.enforcer.postgres.username }}:{{ .Values.enforcer.postgres.password }}@localhost:5432/{{ .Values.enforcer.postgres.database }}"
+        UVICORN_NUM_WORKERS: "4"
+        OPAL_OPA_HEALTH_CHECK_POLICY_ENABLED: "true"
+        OPAL_POLICY_REPO_SSH_KEY:
+          valueFrom:
+            secretKeyRef:
+              name: opawatchdog-secrets
+              key: GIT_DEPLOY_KEY
+        OPAL_POLICY_REPO_URL:
+          valueFrom:
+            secretKeyRef:
+              name: opawatchdog-secrets
+              key: OPAL_POLICY_REPO_URL
+        OPAL_POLICY_REPO_MAIN_BRANCH:
+          valueFrom:
+            secretKeyRef:
+              name: opawatchdog-secrets
+              key: OPAL_POLICY_REPO_MAIN_BRANCH
+        OPAL_POLICY_REPO_POLLING_INTERVAL: "30"
+        OPAL_DATA_CONFIG_SOURCES: '{"config":{"entries":[{"url":"http://localhost:7002/policy-data","topics":["policy_data"],"dst_path":"/static"}]}}'
+        OPAL_LOG_FORMAT_INCLUDE_PID: "true"
+      custom: {}
+
+  # OPAL Client configuration  
+  opalClient:
+    image:
+      repository: permitio/opal-client
+      tag: latest
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    env:
+      defaults:
+        OPAL_SERVER_URL: http://localhost:7002
+        OPAL_LOG_FORMAT_INCLUDE_PID: "true"
+        OPAL_INLINE_OPA_LOG_FORMAT: http
+      custom: {}
+
+  # These should be provided by the user
+  secrets:
+    gitDeployKey: ""
+    opalPolicyRepoUrl: ""
+    opalPolicyRepoMainBranch: ""
+    oktaBaseUrl: ""
+    oktaTokenEndpoint: ""
+    oktaClientId: ""
+    privatePemKey: ""
