@@ -27,17 +27,19 @@ spec:
             {{- range $key, $value := .Values.kubiyaOperator.env.defaults }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
-              value: {{ tpl $value $ | quote }}
+              value: {{ $value | quote }}
               {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.kubiyaOperator.env.custom }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
-              value: {{ tpl $value $ | quote }}
+              value: {{ $value | quote }}
               {{- end }}
             {{- end }}
         {{- with .Values.kubiyaOperator.volumeMounts }}

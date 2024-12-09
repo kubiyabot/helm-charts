@@ -31,21 +31,27 @@ spec:
           image: "{{ .Values.enforcer.postgres.image.repository }}:{{ .Values.enforcer.postgres.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.postgres.image.pullPolicy }}
           env:
-            {{- range $key, $value := .Values.enforcer.postgres.env.defaults }}
-            - name: {{ $key }}
+            {{- with .Values.enforcer.postgres.env.defaults }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
               {{- end }}
             {{- end }}
-            {{- range $key, $value := .Values.enforcer.postgres.env.custom }}
-            - name: {{ $key }}
+            {{- end }}
+            {{- with .Values.enforcer.postgres.env.custom }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
-              value: {{ tpl $value $ | quote }}
+              value: {{ tpl (toString $value) $ | quote }}
               {{- end }}
+            {{- end }}
             {{- end }}
           ports:
             - containerPort: 5432
@@ -63,13 +69,27 @@ spec:
           image: "{{ .Values.enforcer.opalServer.image.repository }}:{{ .Values.enforcer.opalServer.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.opalServer.image.pullPolicy }}
           env:
-            {{- range $key, $value := .Values.enforcer.opalServer.env }}
-            - name: {{ $key }}
+            {{- with .Values.enforcer.opalServer.env.defaults }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
               {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.enforcer.opalServer.env.custom }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
+            {{- end }}
             {{- end }}
           ports:
             - containerPort: 7002
@@ -82,13 +102,27 @@ spec:
           image: "{{ .Values.enforcer.opalClient.image.repository }}:{{ .Values.enforcer.opalClient.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.opalClient.image.pullPolicy }}
           env:
-            {{- range $key, $value := .Values.enforcer.opalClient.env }}
-            - name: {{ $key }}
+            {{- with .Values.enforcer.opalClient.env.defaults }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
               {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.enforcer.opalClient.env.custom }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
+            {{- end }}
             {{- end }}
           ports:
             - containerPort: 7000
@@ -103,13 +137,27 @@ spec:
           image: "{{ .Values.enforcer.image.repository }}:{{ .Values.enforcer.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.image.pullPolicy }}
           env:
-            {{- range $key, $value := .Values.enforcer.env }}
-            - name: {{ $key }}
+            {{- with .Values.enforcer.env.defaults }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
               {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.enforcer.env.custom }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 14 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
+            {{- end }}
             {{- end }}
             - name: OKTA_BASE_URL
               valueFrom:

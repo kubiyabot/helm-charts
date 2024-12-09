@@ -29,17 +29,19 @@ spec:
             {{- range $key, $value := .Values.toolManager.env.defaults }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
               {{- else }}
-              value: {{ tpl $value $ | quote }}
+              value: {{ tpl (toString $value) $ | quote }}
               {{- end }}
             {{- end }}
             {{- range $key, $value := .Values.toolManager.env.custom }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
-              {{- toYaml $value | nindent 14 }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
               {{- else }}
-              value: {{ tpl $value $ | quote }}
+              value: {{ tpl (toString $value) $ | quote }}
               {{- end }}
             {{- end }}
             {{- if .Values.enforcer.enabled }}
@@ -64,8 +66,13 @@ spec:
           env:
             {{- with .Values.toolManager.sdkServer.env }}
             {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              value: {{ tpl $value $ | quote }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
             {{- end }}
             {{- end }}
           ports:
