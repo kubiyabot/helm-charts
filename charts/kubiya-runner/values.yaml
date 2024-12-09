@@ -334,7 +334,7 @@ otelcollector:
         path: config.yaml
   - name: nats-creds-volume
     secret:
-      secretName: kubiya-runner-nats-creds-runner
+      secretName: kubiya-runner-nats-creds-customer
       items:
       - key: nats.creds
         path: nats.creds
