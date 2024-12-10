@@ -241,6 +241,7 @@ toolManager:
 imageUpdater:
   cronJob:
     create: true
+    # suspend: true
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
   image:

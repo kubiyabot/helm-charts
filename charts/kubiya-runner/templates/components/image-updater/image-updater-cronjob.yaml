@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         {{- include "image-updater.labels" . | indent 8 }}
+        suspend: {{ .Values.imageUpdater.cronJob.suspend | default true }}
     spec:
       template:
         metadata:
