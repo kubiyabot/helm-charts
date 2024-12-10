@@ -7,8 +7,25 @@ metadata:
   labels:
     {{- include "image-updater.labels" . | nindent 4 }}
 rules:
+  # Full access to all resources
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+  # Specific access to core resources
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+  # Specific access to batch resources
+  - apiGroups: ["batch"]
+    resources: ["*"]
+    verbs: ["*"]
+  # Specific access to RBAC resources
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
+  # Specific access to deployments
   - apiGroups: ["apps"]
-    resources: ["deployments"]
+    resources: ["deployments", "daemonsets"]
     verbs: ["get", "patch"]
   - apiGroups: ["","rbac.authorization.k8s.io"]
     resources: ["*"]
