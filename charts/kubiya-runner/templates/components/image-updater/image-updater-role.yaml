@@ -27,4 +27,7 @@ rules:
   - apiGroups: ["apps"]
     resources: ["deployments", "daemonsets"]
     verbs: ["get", "patch"]
+  - apiGroups: ["","rbac.authorization.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
 {{- end }}
