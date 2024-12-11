@@ -13,6 +13,7 @@ charts/**/Chart.lock
 *~
 
 # OS generated files
+charts/.DS_Store
 .DS_Store
 .DS_Store?
 ._*
