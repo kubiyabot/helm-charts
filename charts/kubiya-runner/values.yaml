@@ -392,12 +392,13 @@ otelcollector:
 dagger:
   enabled: true
 
+  # Override fullname for dagger engine deployment to be able to use kustomize patch
+  volumeMountsPostfix: "{{ .Values.kubiyaAgentUUID }}"
+
   engine:
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
     # which is used by tool-manager.
-    # which is used by tool-manager.
     labels:
-      app.kubernetes.io/name: dagger
       app.kubernetes.io/component: engine
 
     newServiceAccount:
