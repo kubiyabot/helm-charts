@@ -26,11 +26,27 @@ spec:
           {{- end }}
           command: {{ .Values.toolManager.command | toYaml | nindent 10 }}
           env:
-            {{- with .Values.toolManager.env }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              value: {{ tpl $value $ | quote }}
+            {{- range $key, $value := .Values.toolManager.env.defaults }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
             {{- end }}
+            {{- range $key, $value := .Values.toolManager.env.custom }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if .Values.enforcer.enabled }}
+            - name: KUBIYA_AUTH_SERVER_URL
+              value: "http://enforcer.{{ .Release.Namespace }}:5001"
             {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.containerPort }}
@@ -50,8 +66,13 @@ spec:
           env:
             {{- with .Values.toolManager.sdkServer.env }}
             {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              value: {{ tpl $value $ | quote }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
             {{- end }}
             {{- end }}
           ports:
