@@ -2,6 +2,50 @@ apiVersion: v1
 entries:
   kubiya-runner:
   - apiVersion: v2
+    appVersion: 0.5.10
+    created: "2024-12-18T10:08:09.813963081Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: file://../dagger-helm
+      version: 0.2.0
+    - alias: kubestatemetrics
+      condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.27.0
+    - alias: otelcollector
+      condition: opentelemetry-collector.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.109.0
+    - alias: blackboxexporter
+      condition: blackboxexporter.enabled
+      name: prometheus-blackbox-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 8.5.0
+    description: A Helm chart for Kubiya Runner deployment
+    digest: 3cef4bcd8d4dded63a946862a88aa6f8dc07b40d8a86ac324fa9f2f3e6e0b7a2
+    home: https://kubiya.ai
+    icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+    keywords:
+    - kubiya.ai
+    - runner
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: costa@kubiya.ai
+      name: Costa
+    - email: sergey.demyachonok@kubiya.ai
+      name: Sergey Demyachonok
+    name: kubiya-runner
+    sources:
+    - https://github.com/kubiyabot/helm-charts
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.5.10/kubiya-runner-0.5.10.tgz
+    version: 0.5.10
+  - apiVersion: v2
     appVersion: 0.5.9
     created: "2024-12-17T15:29:22.738440714Z"
     dependencies:
@@ -694,4 +738,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.1/kubiya-runner-0.4.1.tgz
     version: 0.4.1
-generated: "2024-12-17T15:29:22.738580456Z"
+generated: "2024-12-18T10:08:09.814067607Z"
