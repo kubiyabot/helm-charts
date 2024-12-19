@@ -25,9 +25,10 @@ spec:
             runAsUser: 0
             runAsGroup: 0
           containers:
-          - name: helm-updater
-            image: "alpine/helm:3.13.2"
-            command: ["/bin/sh"]
+          - name: image-updater
+            image: "{{ .Values.imageUpdater.image.repository }}:{{ .Values.imageUpdater.image.tag }}"
+            imagePullPolicy: {{ .Values.imageUpdater.image.pullPolicy | quote }}
+            command: ["/bin/bash"]
             args:
             - -c
             - |
