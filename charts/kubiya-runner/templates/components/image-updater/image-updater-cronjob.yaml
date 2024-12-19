@@ -9,8 +9,8 @@ metadata:
 spec:
   successfulJobsHistoryLimit: {{ .Values.imageUpdater.cronJob.successfulJobsHistoryLimit }}
   failedJobsHistoryLimit: {{ .Values.imageUpdater.cronJob.failedJobsHistoryLimit }}
-  schedule: "0 * * * *"
-  suspend: {{ .Values.imageUpdater.cronJob.suspend | default true }}
+  schedule: {{ .Values.imageUpdater.cronJob.schedule | quote }}
+  suspend: {{ .Values.imageUpdater.cronJob.suspend | default false }}
   jobTemplate:
     metadata:
       labels:
