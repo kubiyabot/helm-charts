@@ -248,9 +248,9 @@ imageUpdater:
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
   image:
-    repository: bitnami/kubectl
+    repository: ghcr.io/kubiyabot/kubernetes
     pullPolicy: IfNotPresent
-    tag: 1.30.6
+    tag: 1.32.0
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
