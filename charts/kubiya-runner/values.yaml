@@ -124,6 +124,12 @@ agentManager:
       items:
       - key: nats.creds
         path: nats.creds
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
       secretName: kubiya-runner-nats-creds-customer
   volumeMounts:
   - mountPath: /nats/
@@ -152,7 +158,9 @@ toolManager:
     name: "kubiya-runner-tool-manager" # Falling to hardcod here, as cannot call helper generative function for setting KUBIYA_SERVICE_ACCOUNT env vars below.
     automountServiceAccountToken: true
   adminClusterRole:
-    create: false  # Set to true to create the ClusterRole and ClusterRoleBinding
+    create: false
+  readOnlyClusterRole:
+    create: false
   volumes:
   - name: nats-creds-volume
     secret:
@@ -515,3 +523,7 @@ blackboxexporter:
     tcp:
     - otel-collector:4317
     - otel-collector:13133
+
+toolManager:
+  readOnlyClusterRole:
+    create: false  # Set to true to create the Read-Only ClusterRole and ClusterRoleBinding
