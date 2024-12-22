@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "organization",
+    "kubiyaAgentUUID",
+    "nats"
+  ],
+  "properties": {
+    "organization": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kubiyaAgentUUID": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "nats": {
+      "type": "object",
+      "required": ["jwt", "secondJwt", "subject"],
+      "properties": {
+        "jwt": {
+          "type": "string"
+        },
+        "secondJwt": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "serverUrl": {
+          "type": "string",
+          "default": "tls://connect.ngs.global"
+        },
+        "org": {
+          "type": "string"
+        }
+      }
+    },
+    "registryTls": {
+      "type": "object",
+      "properties": {
+        "crt": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        }
+      }
+    },
+    "toolManager": {
+      "type": "object",
+      "properties": {
+        "resources": {
+          "type": "object",
+          "required": ["limits", "requests"],
+          "properties": {
+            "limits": {
+              "type": "object",
+              "required": ["cpu", "memory"],
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^[0-9]+m?$|^[0-9]+\\.[0-9]+$"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Ki|Mi|Gi)$"
+                }
+              }
+            },
+            "requests": {
+              "type": "object",
+              "required": ["cpu", "memory"],
+              "properties": {
+                "cpu": {
+                  "type": "string",
+                  "pattern": "^[0-9]+m?$|^[0-9]+\\.[0-9]+$"
+                },
+                "memory": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(Ki|Mi|Gi)$"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

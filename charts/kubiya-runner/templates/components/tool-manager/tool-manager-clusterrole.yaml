@@ -1,0 +1,27 @@
+{{- if .Values.toolManager.adminClusterRole.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kubiya-runner.name" . }}-tool-manager-clusterrole
+  labels:
+    {{- include "tool-manager.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kubiya-runner.name" . }}-tool-manager-clusterrolebinding
+  labels:
+    {{- include "tool-manager.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kubiya-runner.serviceAccountName.toolManager" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kubiya-runner.name" . }}-tool-manager-clusterrole
+{{- end }} 
