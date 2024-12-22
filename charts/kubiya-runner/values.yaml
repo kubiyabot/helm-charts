@@ -151,6 +151,8 @@ toolManager:
     create: true
     name: "kubiya-runner-tool-manager" # Falling to hardcod here, as cannot call helper generative function for setting KUBIYA_SERVICE_ACCOUNT env vars below.
     automountServiceAccountToken: true
+  adminClusterRole:
+    create: false  # Set to true to create the ClusterRole and ClusterRoleBinding
   volumes:
   - name: nats-creds-volume
     secret:
