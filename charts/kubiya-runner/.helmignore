@@ -38,5 +38,5 @@ NOTES.txt
 values.schema.json
 
 # Debug
-_debug/
+_debug/*
 _debug*.yaml
