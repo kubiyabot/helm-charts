@@ -1,0 +1,345 @@
+{{- if .Values.alloy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubiya-runner-alloy-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubiya-runner-common.labels" . | nindent 4 }}
+data:
+  config.alloy: |-
+    
+    // --------- Alloy logging configuration ---------
+    
+    logging {
+      level  = "info"
+      format = "json"
+    }
+
+    // --------- Alloy live debugging configuration ---------
+    // livedebugging {
+    //   enabled = true
+    // }
+
+    discovery.file "blackbox_config" {
+      files = ["/etc/alloy/blackbox/blackbox-config.yaml"]
+    }
+ 
+    // ---------------------------- kube-state-metrics ----------------------------
+    
+    // Kube service discovery
+    discovery.kubernetes "kube_state_metrics" {
+      role = "service"
+
+      namespaces {
+        names = ["{{ .Release.Namespace }}"]
+      }
+    }
+    
+    // Relabel & filter discovered targets for kube-state-metrics
+    discovery.relabel "kube_state_metrics" {
+      targets = discovery.kubernetes.kube_state_metrics.targets
+
+      // Keep only kube-state-metrics service
+      rule {
+        source_labels = ["__meta_kubernetes_service_label_app_kubernetes_io_name"]
+        regex         = ".*kubestatemetrics.*"
+        action        = "keep"
+      }
+
+      // Preserve namespace metadata
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "kubernetes_namespace"
+        action        = "replace"
+      }
+
+      // Preserve service metadata
+      rule {
+        source_labels = ["__meta_kubernetes_service_name"]
+        target_label  = "kubernetes_service"
+        action        = "replace"
+      }
+
+      rule {
+        target_label = "exporter"
+        replacement  = "kube-state-metrics" 
+      }
+    }
+
+    // Scrape kube-state-metrics targets
+    prometheus.scrape "kube_state_metrics" {
+      targets         = discovery.relabel.kube_state_metrics.output
+      forward_to      = [prometheus.relabel.runner_meta.receiver]
+      job_name        = "kube-state-metrics"
+      scrape_interval = "{{ .Values.alloy.scrapeIntervals.kubeStateMetrics | default .Values.alloy.scrapeIntervals.default }}"
+    }
+
+
+    // ------------------------ Kubiya components ----------------------------------
+  
+    // Discover all pods in runner's namespace 
+    discovery.kubernetes "runner_namespace_pods" {
+      role = "pod"
+
+      namespaces {
+        names = ["{{ .Release.Namespace }}"]
+      }
+    }
+
+    // Relabel & filter discovered targets for kubiya components
+    // default rule action is 'replace' which adds/overwrites label from discovered target
+    // TODO: add extensove label collection of k8s metadata to reduze resource/traffic usage
+
+    discovery.relabel "runner_app_pods" {
+      targets = discovery.kubernetes.runner_namespace_pods.targets
+
+      // Keep only pods with prometheus.io/scrape=true annotation
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+        regex         = "true"
+        action        = "keep"
+      }
+
+      // Set metrics path from annotation if present
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+        regex         = "(.+)"
+        target_label  = "__metrics_path__"
+        replacement   = "${1}"
+      }
+
+      // Set metrics port from annotation if present
+      rule {
+        source_labels = ["__meta_kubernetes_pod_annotation_prometheus_io_port"]
+        regex         = "(.+)"
+        target_label  = "__metrics_port__"
+        replacement   = "${1}"
+      }
+
+      // Keep pods of runner components only (which have app.kubernetes.io kubiya.runner.component)
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_kubiya_runner_component"]
+        regex         = "(.+)"
+        action        = "keep"
+      }
+
+      // Keep the component name as app label
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_kubiya_runner_component"]
+        target_label  = "app"
+      }
+
+      // Preserve pod metadata
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "kubernetes_namespace"
+      }
+
+      // Preserve service metadata
+      rule {
+        source_labels = ["__meta_kubernetes_service_name"]
+        target_label  = "kubernetes_service"
+      }
+
+      // Keep important app labels
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+        target_label  = "app_name"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_instance"]
+        target_label  = "instance"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_version"]
+        target_label  = "version_app_via_helm"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_image"]
+        target_label  = "container_image"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container_name"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_host_ip"]
+        target_label  = "pod_host_ip"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_ip"]
+        target_label  = "pod_ip"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_helm_sh_chart"]
+        target_label  = "version_helm_chart"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_kubiya_runner_component"]
+        target_label  = "exporter"
+      }
+    }
+
+    // Kubiya components scrape
+    prometheus.scrape "runner_app_pods_exporters" {
+      job_name        = "runner_app_pods_exporters"
+      targets         = discovery.relabel.runner_app_pods.output
+      forward_to      = [prometheus.relabel.runner_meta.receiver]
+      scrape_interval = "{{ .Values.alloy.scrapeIntervals.runnerExporters | default .Values.alloy.scrapeIntervals.default }}"
+    }
+
+    // -------------------------- Alloy self-monitoring --------------------------
+
+    prometheus.exporter.self "alloy" { }
+
+    discovery.relabel "alloy" {
+      targets = prometheus.exporter.self.alloy.targets
+
+      rule {
+        target_label = "exporter"
+        replacement  = "alloy" 
+      }
+    }
+
+    // Alloy self-monitoring scrape
+    prometheus.scrape "alloy" {
+      scrape_interval = "{{ .Values.alloy.scrapeIntervals.alloyExporter | default .Values.alloy.scrapeIntervals.default }}"
+      targets         = discovery.relabel.alloy.output
+      forward_to      = [prometheus.relabel.runner_meta.receiver]
+    }
+   
+    // -------------- blackbox-exporter (embedded in alloy) ----------------------
+
+    // Configure a prometheus.exporter.blackbox component modules and targets for collecting metrics.
+    prometheus.exporter.blackbox "kubiya_runner" {
+
+      config = "{ modules: { http_2xx: { prober: http, timeout: 5s, http: { valid_status_codes: [200], preferred_ip_protocol: ip4 } }, grpc: { prober: grpc, timeout: 5s, grpc: { tls: false, preferred_ip_protocol: ip4 } }, tcp_connect: { prober: tcp, timeout: 5s, tcp: { preferred_ip_protocol: ip4 } } } }"
+
+      target {
+        name = "tool-manager"
+        address = "http://tool-manager.{{ .Release.Namespace }}.svc.cluster.local:80/health"
+        module = "http_2xx"
+        labels = {
+          app = "tool-manager",
+        }
+      }
+      target {
+        name = "agent-manager"
+        address = "http://agent-manager.{{ .Release.Namespace }}.svc.cluster.local:80/healthz"
+        module = "http_2xx"
+        labels = {
+          app = "agent-manager",
+        }
+      }
+      target {
+        name = "dagger-engine"
+        address = "http://dagger-engine-service.{{ .Release.Namespace }}.svc.cluster.local:8080"
+        module = "http"
+        labels = {
+          app = "dagger-engine",
+        }
+      }
+      target {
+        name = "kubiya-operator"
+        address = "http://kubiya-operator.{{ .Release.Namespace }}.svc.cluster.local:80"
+        module = "http"
+        labels = {
+          app = "kubiya-operator",
+        }
+      }
+    }
+
+    discovery.relabel "blackbox_targets" {
+      targets = prometheus.exporter.blackbox.kubiya_runner.targets
+
+      rule {
+        target_label = "exporter"
+        replacement  = "blackbox-exporter" 
+      }
+
+      rule {
+        source_labels = ["__param_target"]
+        target_label  = "target"
+      }
+      rule {
+        source_labels = ["app"]
+        target_label  = "app"
+      }
+    }
+
+    // Configure a prometheus.scrape component to scrape blackbox metrics as defined above.
+    prometheus.scrape "blackbox" {
+      targets         = discovery.relabel.blackbox_targets.output
+      forward_to      = [prometheus.relabel.runner_meta.receiver]
+      scrape_interval = "{{ .Values.alloy.scrapeIntervals.blackboxExporter | default .Values.alloy.scrapeIntervals.default }}"
+    }
+
+    // ------------------ Azure remote write ----------------------------------
+
+    prometheus.remote_write "azure" {
+      endpoint {
+        url = sys.env("AZURE_REMOTE_WRITE_URL")
+        follow_redirects = true
+        oauth2 {
+          client_id     = sys.env("AZURE_CLIENT_ID")
+          client_secret = sys.env("AZURE_CLIENT_SECRET")
+          token_url     = sys.env("AZURE_TOKEN_URL")
+          scopes        = ["https://monitor.azure.com/.default"]
+        }
+      }
+    }
+    
+    // ----------------------- Runner meta labels -----------------------------
+
+    prometheus.relabel "runner_meta" {
+      forward_to = [prometheus.remote_write.azure.receiver]
+      // Common labels for all metrics
+
+      // TODO: this imported from initial runner template, do we need relabeling for instance?
+      rule {
+        target_label = "instance"
+        replacement  = "{{ .Values.organization }}"
+      }
+
+      rule {
+        target_label = "kubiya_type"
+        replacement  = "customers-runners" 
+      }
+
+      rule {
+        target_label = "runner"
+        replacement  = "{{ .Release.Name }}"
+      }
+
+      rule {
+        target_label = "organization"
+        replacement  = "{{ .Values.organization }}"
+      }
+
+    rule {
+        target_label  = "namespace"
+        replacement = "{{ .Release.Namespace }}"
+      }
+    }
+{{- end }}
+
+

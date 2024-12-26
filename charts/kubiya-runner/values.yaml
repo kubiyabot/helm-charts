@@ -28,7 +28,12 @@ imagePullSecrets: []
 # kube-state-metrics subchart configuration
 kubestatemetrics:
   enabled: true
-
+  ## kube-state-metrics endpoint scrape interval
+  http:
+    interval: "{{ .Values.alloy.scrapeInterval.default }}"
+  ## kube-state-metrics metrics scrape interval
+  metrics:
+    interval: "{{ .Values.alloy.scrapeInterval.default }}"
   # Default values for kube-state-metrics.
   image:
     tag: "v2.14.0"
@@ -44,7 +49,6 @@ kubestatemetrics:
 
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
-
   resources:
     limits:
       cpu: 200m
@@ -63,8 +67,6 @@ kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
   replicas: 1
-  # Enable once kubiya-operator exporter is ready
-  # otelCollectorMetricsScrapeAppName: kubiya-operator
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -73,6 +75,23 @@ kubiyaOperator:
     repository: ghcr.io/kubiyabot/kubiya-operator
     pullPolicy: IfNotPresent
     tag: runner_v2
+
+  # TODO/PROD_READY: Enable when kubiya-operator will have it
+  livenessProbe:
+    enabled: false
+    # httpGet:
+    #   path: /health
+    # initialDelaySeconds: 30
+    # periodSeconds: 30
+    # timeoutSeconds: 5
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 64Mi
   volumeMounts:
   - name: runner-secret-volume
     mountPath: "/etc/nats"
@@ -103,20 +122,33 @@ agentManager:
     port: 80
     targetPort: 8080
     serviceType: "ClusterIP"
-  otelCollectorMetricsScrapeAppName: agent-manager
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
+    
+  # TODO/PROD_READY: Make sure tested on latest image with liveness probe
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /healthz
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 10 # Need to be reviewed and set by service owner
+
+  # Add annotations for prometheus/alloy to scrape metrics
+  extraPodsAnnotations:
+    prometheus.io/scrape: "true"
+
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
   resources:
     limits:
-      cpu: "1"
+      cpu: 1
       memory: 1Gi
     requests:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 100m
+      memory: 64Mi
   volumes:
   - name: nats-creds-volume
     secret:
@@ -141,7 +173,6 @@ toolManager:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
     tag: cb299cb19f7e88daa103b3227660568b1e8f9c74
-  otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
     targetPort: 3001
@@ -151,6 +182,20 @@ toolManager:
     create: true
     name: "kubiya-runner-tool-manager" # Falling to hardcod here, as cannot call helper generative function for setting KUBIYA_SERVICE_ACCOUNT env vars below.
     automountServiceAccountToken: true
+  
+  # Add annotations for prometheus to scrape metrics
+  extraPodsAnnotations:
+    prometheus.io/scrape: "true"
+
+  # TODO/PROD_READY: Enable once probe https://github.com/kubiyabot/tool-manager/pull/153 is merged and container version is updated in helm chart/values.yaml
+  livenessProbe:
+    enabled: false
+    httpGet:
+      path: /health # ask to rename to /healthz
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5 
+
   volumes:
   - name: nats-creds-volume
     secret:
@@ -173,7 +218,7 @@ toolManager:
     KUBIYA_NATS_CREDS: "/opt/nats.creds"
     KUBIYA_USER_ORG: "{{ .Values.organization }}"
     KUBIYA_AGENT_UUID: "{{ .Values.kubiyaAgentUUID }}"
-    KUBIYA_DAGGER_ENGINE_SERVICE_URL: "tcp://{{ .Values.daggerAdditionalResources.service.name }}:{{ .Values.daggerAdditionalResources.service.port }}"
+    KUBIYA_DAGGER_ENGINE_SERVICE_URL: "tcp://{{ .Values.dagger.additionalResources.service.name }}:{{ .Values.dagger.additionalResources.service.port }}"
     KUBIYA_SDK_SERVER_URL: "http://127.0.0.1:8000"
     KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
     KUBIYA_IMAGE_REGISTRY_ADDRESS: "cache-registry-svc.kubiya"
@@ -183,11 +228,11 @@ toolManager:
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
   resources:
     limits:
-      cpu: "1"
+      cpu: 1
       memory: 1Gi
     requests:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 100m
+      memory: 64Mi
   volumeMounts:
   - mountPath: /opt/
     name: nats-creds-volume
@@ -209,11 +254,11 @@ toolManager:
     # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
     resources:
       limits:
-        cpu: "500m"
-        memory: 512Mi
+        cpu: 1
+        memory: 1Gi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 64Mi
     command:
     - "python"
     - "-m"
@@ -225,6 +270,14 @@ toolManager:
     - "8000"
     containerPort: 8000
     defaultMode: 420
+    # TODO/PROD_READY: Enable once probe branch merged and released 
+    livenessProbe:
+      enabled: false
+      httpGet:
+        path: /health
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
     env:
       KUBIYA_NATS_CREDS: "/opt/nats.creds"
       KUBIYA_USER_ORG: "{{ .Values.organization }}"
@@ -255,143 +308,6 @@ imageUpdater:
     name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
 
-# Open-teemetry collector subchart config
-otelcollector:
-  enabled: true
-
-  # Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
-  customRole:
-    enabled: true
-
-    # TODO / PROD_READY: Unneccessary wide permissions for production, should be removed after testing
-    enableDebugRoles:
-    - apiGroups: [ "" ]
-      resources: [ "nodes/stats" ]
-      verbs: [ "get", "watch", "list" ]
-    - apiGroups: [ "events.k8s.io" ]
-      resources: [ "events" ]
-      verbs: [ "watch", "list" ]
-
-  # Rendering of predefined blocks collector (see otel-collector-configMap.yaml)
-  # To be actually used, must be enabled in otelCollectorConfig.metrics.pipelines.metrics.processors
-  metricstransformAttributes:
-    enabled: true
-  resourceAttributes:
-    enabled: false
-  k8sAttributes:
-    enabled: true
-  debugExporter:
-    enabled: true
-  # Experimental Azure Managed Prometheus exporter config. Enable if needed.
-  prometheusExporter:
-    enabled: false
-    # remoteWrite:
-    #   # Azure Managed Prometheus endpoint URL (e.g., https://your-workspace.prometheus.monitor.azure.com/api/v1/write)
-    #   url: ""
-    # managedPrometheusAuth:
-    #   enabled: true
-    #   secretName: "azure-managed-prometheus-auth"
-    #   secretKey: "token"
-    #   token: "" # Azure Managed Prometheus authentication token
-
-    # Enabled pipelines configuration
-  pipelines:
-    metrics:
-      receivers: [ prometheus ]
-      processors: [ metricstransform, k8sattributes, batch/metrics ]
-      # Azure Managed Prometheus exporter is experimental. Add to exporters if needed. Debug exporter can be also added if needed.
-      # exporters: [ debug, natsexporter, prometheus ]
-      exporters: [ natsexporter ]
-
-  image:
-    # Using image build with custom implementation of nats-exporter to be able to push
-    # telemetry and metrics from NATS server.
-    # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
-    repository: ghcr.io/kubiyabot/otel-connector
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: release-0.1.1
-
-  mode: deployment
-
-  replicaCount: 1
-
-  command:
-    name: "otelcol-kubiya"
-    extraArgs: [ "--config=/etc/otel/config.yaml" ]
-
-  # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
-  # extraEnvs:
-  # - name: AZURE_PROMETHEUS_AUTH_TOKEN
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: kubiya-runner-azure-prometheus-auth
-  #       key: token
-
-  extraVolumes:
-  - name: otel-config
-    configMap:
-      name: kubiya-runner-otel-collector-config
-      items:
-      - key: config.yaml
-        path: config.yaml
-  - name: nats-creds-volume
-    secret:
-      secretName: kubiya-runner-nats-creds-customer
-      items:
-      - key: nats.creds
-        path: nats.creds
-  # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
-  # - name: azure-prometheus-auth
-  #   secret:
-  #     secretName: kubiya-runner-azure-prometheus-auth
-  #     cpu: 250m
-
-  extraVolumeMounts:
-  - name: otel-config
-    mountPath: /etc/otel
-  - name: nats-creds-volume
-    mountPath: "/etc/nats"
-    readOnly: true
-  # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
-  # - name: azure-prometheus-auth
-  #   mountPath: "/etc/azure"
-  #   readOnly: true
-
-  configMap:
-    create: false
-
-  # Explicit resources are mandatory. See README.md or more info.
-  # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
-  resources:
-    limits:
-      cpu: "2"
-      memory: 4Gi
-    requests:
-      cpu: 250m
-      memory: 256Mi
-
-  # Adding Role and RoleBinding with least permissions for limit access to clients cluster resources. 
-  serviceAccount:
-    create: true
-    name: "kubiya-runner-otel-collector"
-  # Enable if need to use clusterRole
-  # clusterRole:
-  # create: false
-  # name: ""
-  # rules: []
-  # # - apiGroups:
-  # #   - ''
-  # #   resources:
-  # #   - 'pods'
-  # #   - 'nodes'
-  # #   verbs:
-  # #   - 'get'
-  # #   - 'list'
-  # #   - 'watch'
-  # clusterRoleBinding:
-  # name: ""
-
 dagger:
   enabled: true
 
@@ -402,29 +318,21 @@ dagger:
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
     # which is used by tool-manager.
     labels:
-      app.kubernetes.io/component: engine
+      app.kubernetes.io/kubiya-runner-component: dagger-engine
 
     newServiceAccount:
       name: "kubiya-runner-dagger-helm"
       create: true
 
     image:
-      # Previous used version: 0.11.6 (?)
-      # ref: registry.dagger.io/engine:v0.11.6
-
-      # Latest vendor provided version: 0.13.6
       ref: registry.dagger.io/engine:v0.13.6
-
-      # From update with headless svc template: v0.1.1
-      # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
 
       args:
       - --oci-max-parallelism
       - num-cpu
-
+      
+    # Add "debug = true" when needed
     config: |
-      # TODO: remove debug when tested - performance penalty?
-      debug = true
       insecure-entitlements = ["security.insecure"]
       [registry."ghcr.io"]
         http = true
@@ -442,73 +350,64 @@ dagger:
     # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
     resources:
       limits:
-        cpu: "4"
+        cpu: 4
         memory: 4Gi
       requests:
         cpu: 100m
         memory: 128Mi
 
   magicache:
-    # Secret must be created manually in the runner namespace per each client side runner.
     enabled: false
-    # url: https://api.dagger.cloud/magicache
-    # token: YOUR_DAGGER_CLOUD_TOKEN
-    # secretName: EXISTING_SECRET_NAME
 
-    # Extras for weak dagger subchart 
-daggerAdditionalResources:
-  # Role & RoleBinding for dagger engine.
-  # Not created by default via dagger subchart, they still may be required for some use cases.
-  # Transfered as-is from original runner template. If enabled will be attached to dagger.serviceAccount.name specified above.
-  role:
-    create: false
-  roleBinding:
-    create: false
-  # headless service for dagger engine discovery and load balancing used by tool-manager
-  # Dagger additional headless service port for dagger pods discovery and load balancing
-  # At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
-  # Port defined must match dagger container port in dagger.engine.config section.
-  service:
-    create: true
-    # These values are need to match tool-manager's dagger config and therefore referenced in tool-manager configuration as environment variables in this file.
-    # ---------------------------------------------------------------------------------------------------------------------
-    # If not set, will be auto generated as name: {{ include "kubiya-runner.fullname" . }}-dagger-engine but in this case,
-    # which, to be used, needs to be set in tool-manager deployment via tpl function call, which is currently done in values.yaml.
-    # Should be refactored to move all required env_vars to component deployments with ability to override from values.yaml.
-    # ---------------------------------------------------------------------------------------------------------------------
-    name: dagger-engine-service
-    port: 8080
+  additionalResources:
+    role:
+      create: false
+    roleBinding:
+      create: false
+    service:
+      create: true
+      name: dagger-engine-service
+      port: 8080
 
-blackboxexporter:
+
+alloy:
   enabled: true
-  config:
-    modules:
-      http_2xx:
-        prober: http
-        timeout: 5s
-        http:
-          preferred_ip_protocol: ip4
-      grpc:
-        prober: grpc
-        timeout: 5s
-        grpc:
-          preferred_ip_protocol: ip4
-      tcp_connect:
-        prober: tcp
-        timeout: 5s
-        tcp:
-          preferred_ip_protocol: ip4
-  serviceMonitor:
-    enabled: false # Disable ServiceMonitor
-  # Direct configuration for targets
-  targets:
-    http:
-    - agent-manager:80
-    - kubiya-operator:80
-    - tool-manager:80
-    grpc:
-    - sdk-server:50051
-    - dagger-engine:8080
-    tcp:
-    - otel-collector:4317
-    - otel-collector:13133
+  
+  scrapeIntervals:
+    default: 60s
+    runnerExporters: 60s
+    alloyExporter: 60s
+    blackboxExporter: 60s
+    kubeStateMetrics: 60s
+
+  # Alloy security context - running as non-root user
+  alloy:
+    securityContext:
+      runAsUser: 473
+      runAsGroup: 473
+    configMap:
+      create: false
+      key: config.alloy
+      name: kubiya-runner-alloy-config
+    extraEnv:
+      - name: AZURE_REMOTE_WRITE_URL
+        value: "xxx"
+      - name: AZURE_CLIENT_ID
+        value: "xxx"
+      - name: AZURE_CLIENT_SECRET
+        value: "xxx"
+      - name: AZURE_TOKEN_URL
+        value: "xxx"
+
+  controller:
+    type: deployment
+
+  # Explicit resources are mandatory. See README.md or more info.
+  # Particeular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi

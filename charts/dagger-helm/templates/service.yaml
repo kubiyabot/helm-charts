@@ -1,0 +1,21 @@
+{{- if .Values.additionalResources.service.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ default (printf "%s-engine" (include "dagger.fullname" .)) .Values.additionalResources.service.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dagger.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "dagger.name" . }}
+    {{- with .Values.engine.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  ports:
+    - name: dagger
+      port: {{ .Values.additionalResources.service.port }}
+      targetPort: {{ .Values.additionalResources.service.port }}
+      protocol: TCP
+{{- end }}
