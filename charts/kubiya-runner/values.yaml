@@ -40,6 +40,8 @@ kubestatemetrics:
   updateStrategy: Recreate
 
   revisionHistoryLimit: 2
+  metricLabelsAllowlist:
+    - pods=[*]
 
   # TODO keep if rbac role is not applied or metrics are not collected
   # namespaces: "kubiya"
@@ -117,7 +119,7 @@ agentManager:
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
-    tag: 0.0.17
+    tag: 0.0.22
   service:
     port: 80
     targetPort: 8080
@@ -172,7 +174,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: 63396906f1225c1f9ec9f36159d4f2f6749a16e3
+    tag: 53d7902438e1415e08740b147b828e62de4b1bec
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
@@ -253,7 +255,7 @@ toolManager:
     image:
       repository: ghcr.io/kubiyabot/sdk-py
       pullPolicy: IfNotPresent
-      tag: v0.47.1
+      tag: v1.5.0
     # Explicit resources are mandatory. See README.md or more info.
     # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
     resources:
@@ -274,9 +276,8 @@ toolManager:
     - "8000"
     containerPort: 8000
     defaultMode: 420
-    # TODO/PROD_READY: Enable once probe branch merged and released 
     livenessProbe:
-      enabled: false
+      enabled: true
       httpGet:
         path: /health
       initialDelaySeconds: 30
@@ -377,6 +378,15 @@ dagger:
 
 alloy:
   enabled: true
+
+  # Pipeline live debug via Alloy GUI (GUI needs port forward to alloy service, port 12345)
+  # livedebugging:
+    # enabled: true
+
+  # Stage II - extra exporters. Disabled by default as not needed and not tested for first chart update release.
+  extraExporters:
+    cadvisor:
+      enabled: false
   
   scrapeIntervals:
     default: 60s
@@ -384,9 +394,13 @@ alloy:
     alloyExporter: 60s
     blackboxExporter: 60s
     kubeStateMetrics: 60s
+    cadvisor: 60s # disabled by default
+
 
   # Alloy security context - running as non-root user
   alloy:
+    # Experimental level required for Alloy live debugging to work. DO NOT use in production. 
+    # stabilityLevel: "experimental"
     securityContext:
       runAsUser: 473
       runAsGroup: 473
@@ -405,6 +419,8 @@ alloy:
         value: "xxx"
 
   controller:
+    podLabels:
+      app.kubernetes.io/kubiya-runner-component: alloy
     type: deployment
 
   # Explicit resources are mandatory. See README.md or more info.

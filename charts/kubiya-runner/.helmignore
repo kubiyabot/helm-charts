@@ -40,3 +40,6 @@ values.schema.json
 # Debug
 _debug/*
 _debug*.yaml
+_docs/*
+_docs/
+_debug_values_overrides.yaml
