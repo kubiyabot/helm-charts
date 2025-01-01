@@ -206,7 +206,7 @@ toolManager:
     image:
       repository: ghcr.io/kubiyabot/sdk-py
       pullPolicy: IfNotPresent
-      tag: 1.7.1
+      tag: v1.7.1
     # Explicit resources are mandatory. See README.md or more info.
     # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
     resources:
