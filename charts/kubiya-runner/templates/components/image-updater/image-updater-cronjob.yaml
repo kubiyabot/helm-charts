@@ -35,9 +35,6 @@ spec:
               set -e
               echo "Starting Helm release updater job"
               
-              # Install required packages
-              apk add --no-cache curl jq
-              
               # Function to get current release values
               get_release_values() {
                 echo "Fetching current release values..."
