@@ -130,7 +130,7 @@ agentManager:
     name: nats-creds-volume
     readOnly: true
   env:
-    TOOL_MANAGER_URL: "tool-manager:{{ .Values.toolManager.service.targetPort }}"
+    TOOL_MANAGER_URL: "tool-manager:{{ .Values.toolManager.service.port }}"
     KUBIYA_NATS_CREDS: "/nats/nats.creds"
     ENVIRONMENT: "production"
 
@@ -140,10 +140,10 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: ee7d3e3f7454d918892882d848145f0c35c8c72b #0.1.0
+    tag: db40776024b3884eed4ad64cabf7912e7afd4175 #0.1.0
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
-    port: 8080
+    port: 80
     targetPort: 3001
     type: "ClusterIP"
   replicas: 3
