@@ -70,14 +70,8 @@ spec:
           resources: {{- toYaml .Values.engine.resources | nindent 12 }}
           readinessProbe:
             exec:
-              command:
-                - sh
-                - -exc
-                - |-
-                  dagger core version
-            {{- if .Values.engine.readinessProbeSettings }}
-            {{- toYaml .Values.engine.readinessProbeSettings | nindent 12 }}
-            {{- end }}
+              command: 
+                {{- toYaml .Values.engine.readinessProbeCommand | nindent 16 }}
           volumeMounts:
             - name: varlibdagger
               mountPath: /var/lib/dagger{{- if .Values.volumeMountsPostfix }}-{{- .Values.volumeMountsPostfix }}{{- end }}
