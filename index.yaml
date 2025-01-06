@@ -36,6 +36,50 @@ entries:
     version: 0.2.1
   kubiya-runner:
   - apiVersion: v2
+    appVersion: 0.5.21
+    created: "2025-01-06T10:29:11.826344978Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: file://../dagger-helm
+      version: 0.2.1
+    - alias: kubestatemetrics
+      condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.27.0
+    - alias: otelcollector
+      condition: opentelemetry-collector.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.109.0
+    - alias: blackboxexporter
+      condition: blackboxexporter.enabled
+      name: prometheus-blackbox-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 8.5.0
+    description: A Helm chart for Kubiya Runner deployment
+    digest: 777e549b2cb0afcfd23ed777bc8423c37702e6b917e9fc4da52b68a64ef82e31
+    home: https://kubiya.ai
+    icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+    keywords:
+    - kubiya.ai
+    - runner
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: costa@kubiya.ai
+      name: Costa
+    - email: sergey.demyachonok@kubiya.ai
+      name: Sergey Demyachonok
+    name: kubiya-runner
+    sources:
+    - https://github.com/kubiyabot/helm-charts
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.5.21/kubiya-runner-0.5.21.tgz
+    version: 0.5.21
+  - apiVersion: v2
     appVersion: 0.5.20
     created: "2025-01-06T09:38:47.955726173Z"
     dependencies:
@@ -1212,4 +1256,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.1/kubiya-runner-0.4.1.tgz
     version: 0.4.1
-generated: "2025-01-06T09:38:47.955963695Z"
+generated: "2025-01-06T10:29:11.826583573Z"
