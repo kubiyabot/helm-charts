@@ -417,9 +417,14 @@ dagger:
       # From update with headless svc template: v0.1.1
       # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
 
-      args:
+    args:
       - --oci-max-parallelism
       - num-cpu
+
+    readinessProbeCommand:
+      - buildctl
+      - debug
+      - workers
 
     config: |
       # TODO: remove debug when tested - performance penalty?
