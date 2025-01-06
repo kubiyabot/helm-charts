@@ -165,7 +165,7 @@ toolManager:
     emptyDir: {}
   - name: registry-certs
     secret:
-      secretName: kubiya-runner-registry-tls-secret
+      secretName: registry-tls-secret
       defaultMode: 420
   containerPort: 3001
   env:

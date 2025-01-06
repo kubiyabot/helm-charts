@@ -59,7 +59,7 @@
 
 ## Fixes and Improvements
 
-- [x] Clarify: Is `kubiya-runner-registry-tls-secret` hardcoded? Improve?
+- [x] Clarify: Is `registry-tls-secret` hardcoded? Improve?
 - [x] Clarify: `ImagePullPolicy` not set to `IfNotPresent` for some containers, fix if no objection.
 - [x] `tool-manager`: remove `image: latest` and ensure other templates are aligned; set fixed and tested tag as default.
 - [?] `tool-manager` fix: repos / `initContainers` / `init-certs` -> `busybox` remove latest or replace with `ImagePullSecrets`, `ServiceAccountTokenMount` or ConfigMap -> ENV_VAR or ...
