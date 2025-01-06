@@ -130,7 +130,7 @@ agentManager:
     name: nats-creds-volume
     readOnly: true
   env:
-    TOOL_MANAGER_URL: "tool-manager:{{ .Values.toolManager.service.port }}"
+    TOOL_MANAGER_URL: "http://tool-manager.{{ .Release.Namespace }}:{{ .Values.toolManager.service.port }}"
     KUBIYA_NATS_CREDS: "/nats/nats.creds"
     ENVIRONMENT: "production"
 
