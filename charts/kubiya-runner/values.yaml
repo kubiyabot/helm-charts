@@ -412,11 +412,7 @@ dagger:
       create: true
 
     image:
-      # Previous used version: 0.11.6 (?)
-      # ref: registry.dagger.io/engine:v0.11.6
-
-      # Latest vendor provided version: 0.13.6
-      ref: registry.dagger.io/engine:v0.13.6
+      ref: registry.dagger.io/engine:v0.11.6
 
       # From update with headless svc template: v0.1.1
       # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
