@@ -1,7 +1,9 @@
 # Runner organization
 organization: ""
+
 # Runner UUID
 kubiyaAgentUUID: ""
+
 # NATS credentials and destination subject
 nats:
   jwt: ""
@@ -9,31 +11,40 @@ nats:
   subject: ""
   serverUrl: "tls://connect.ngs.global"
   org: ""
+
 # TLS certificates for private registry (used by `tool-manager`)
 registryTls:
   crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ4VENDQXRtZ0F3SUJBZ0lVTVBIY1RMN1FGNmMrYlhtNElxTEUzeXVhK1lrd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2NURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWtOQk1SSXdFQVlEVlFRSERBbFRkVzV1ZVhaaApiR1V4RHpBTkJnTlZCQW9NQmt0MVltbDVZVEVNTUFvR0ExVUVDd3dEVWs1RU1TSXdJQVlEVlFRRERCbGpZV05vClpTMXlaV2RwYzNSeWVTMXpkbU11YTNWaWFYbGhNQjRYRFRJME1UQXdNakV5TkRZeU4xb1hEVEkzTURrd01qRXkKTkRZeU4xb3djVEVMTUFrR0ExVUVCaE1DVlZNeEN6QUpCZ05WQkFnTUFrTkJNUkl3RUFZRFZRUUhEQWxUZFc1dQplWFpoYkdVeER6QU5CZ05WQkFvTUJrdDFZbWw1WVRFTU1Bb0dBMVVFQ3d3RFVrNUVNU0l3SUFZRFZRUUREQmxqCllXTm9aUzF5WldkcGMzUnllUzF6ZG1NdWEzVmlhWGxoTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEEKTUlJQkNnS0NBUUVBM3c5b2dVUGptaVNaMDR1OU4vR3hKRmhCT01QYzQ3MXJLR1ozZVc2bW43NW1FTjNzV2R1cwpzVStkK1lNSE9HYjBUT3FlcHhMUUtvMWNRYjVRUmlRTGxOVTJWRGgrTjVhZVVmdVJUU1MwczNRWTAxd1k1Z3ozCnIvaFc3ZllEOVVpTUpTeFhYK01DU2hsQ0NTUm52N2hncmloQWlGdXcyZUs3bjQyWjByYms2MUJmaGNBRWxZbmEKdExoRjBwcWxvNGlsSHZaUGEwdzRFMzJBdkJJTzZ5YjlKb1V0N1JRMVNta3VLRDJsY2dqMVlKSjQ2SmxKUGtFWgowL21Zc3ZwZUZBOVBmQnZGdkZ6K0VyMitMd09JKzcxNFRtTnNITXVERjRyNzVNeFF5ekpaYTNxT3Rud3paTEVYCjlHYThHZ1AxVG9jVGtlRnVMUmhjVWQ4M3M5eWJIS0o1bHdJREFRQUJvNEdBTUg0d0RnWURWUjBQQVFIL0JBUUQKQWdXZ01CTUdBMVVkSlFRTU1Bb0dDQ3NHQVFVRkJ3TUJNRGdHQTFVZEVRUXhNQytDR1dOaFkyaGxMWEpsWjJsegpkSEo1TFhOMll5NXJkV0pwZVdHQ0VtTmhZMmhsTFhKbFoybHpkSEo1TFhOMll6QWRCZ05WSFE0RUZnUVVxQlpGCkZKZEZLQ1M0SGtSYWxtNmM1WFFORlJVd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHYXlraDhhV3QwaTdpNnMKOGZZRHlZVE8wMjZOYjQ5dWNUZDRpKzgySGFCdm01ZFJxbVQ5U0V4eFJYL3RTanMraGpHRnpYTWVtY0lva3FKLwpFNWtSYlcrbFNveWUwQkdkTVBPcVJNZW1tcEI4WG9DZmo0ZWg0WkxtbDRrbGVSZEEzRU96OHJSRExxb0MxdmJiClluU2RwTjFHbUFJOUtpdjJ0N3hjVVl0Nm1SM2FqYVBLZHVWOXNkakRrZDBDQm1EckhNRXJ4a3AzdDVXOHc5aW8KN2IxRjE3MFBSRldJNVY3c3JtQlFwK0t6UTJsZEdyODdxZFI1eE1wZlU4Z0IvKzgyRXlZcjA1WTJsNmhrY1BGbgpzMnBPTUV4UFVVN05xQlMxeURoR3lXZVVJTE9ydmFuWjh3L1UyVDFScjd1bTBGK0Y0a3hTMHZNMDhyYmRIMzNPCjVyUDV1OEk9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K" # pragma: allowlist secret
   key: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRGZEMmlCUStPYUpKblQKaTcwMzhiRWtXRUU0dzl6anZXc29abmQ1YnFhZnZtWVEzZXhaMjZ5eFQ1MzVnd2M0WnZSTTZwNm5FdEFxalZ4Qgp2bEJHSkF1VTFUWlVPSDQzbHA1Uis1Rk5KTFN6ZEJqVFhCam1EUGV2K0ZidDlnUDFTSXdsTEZkZjR3SktHVUlKCkpHZS91R0N1S0VDSVc3RFo0cnVmalpuU3R1VHJVRitGd0FTVmlkcTB1RVhTbXFXamlLVWU5azlyVERnVGZZQzgKRWc3ckp2MG1oUzN0RkRWS2FTNG9QYVZ5Q1BWZ2tuam9tVWsrUVJuVCtaaXkrbDRVRDA5OEc4VzhYUDRTdmI0dgpBNGo3dlhoT1kyd2N5NE1YaXZ2a3pGRExNbGxyZW82MmZETmtzUmYwWnJ3YUEvVk9oeE9SNFc0dEdGeFIzemV6CjNKc2Nvbm1YQWdNQkFBRUNnZ0VBSktHSXBYWExLbFNwYUZxeDY3Nkd1ek85SGovWUJoUmt4U0V5ckovMXdCVUoKK09vZzlzN0RDT2xNeFoxMWNaZEN0bUR2UmZ1cWNOcC9GSkxXNXZYamF3RXFwMkVScFRwWWJKazJEdWVndnptcApIQWlyVkJnOEVzdGpKemY0Qlc5eENHZkVQNHh0bzFLTGpDbk0yZWpEQThhN2Rra3NmVk9sUVRvRlVWdlVzeW5VCjBYSTNtY01pM1pzMWdodDNuRXdWSjBMbGVwT2FvQi9iOUhjY2Q0TGN2M2dGWnlOdkVpckgyeDdWMmYremRKQ3QKcXpQLzlXMVR5aE42VWRlMENuVjFTLzh0QTFYQW56MW05VmIyK2h4ZkM5MDlZREJLV3RqVjVQT01aZU5xUVFqVwpqaXpTNnE1dE1UZWpzd1RYRkRMRThKYk4yU3Zld0s2OVZIUkdtdXU3dVFLQmdRRHZtNzNHYStYNy9nVFR3bFJjCk4vSTJ1Q1hSOE5HNW90ZGZjbkFPU2lnc2hpc0tPaHpoSnJlVHVnQm9HeXQyWHU3N2FWQ3EzWHJtdDNVOUhxZVUKSzB1TDdONm1zNzdUWUp4ZHd3RkpOaWJBbWpXRVlDbnR4eldaWjd5Um1zcGg1YnZEL2x0WXpEdFVBZ0QybHZXbwpVTm1YL3VZQ3NZcXZpSmhzdFMxWkF4WklLUUtCZ1FEdVVkdmYyYmx6OTRkYTNVb0tNNjlyZ044QmgxaEwybUVmCnhQeXFZSHFtOGVXaklWL0U4WXM4UTFZSm1KOEZ3dVlyWnREQmMrRTBMeCtaK2FEdy9IdksyZUY3K25Wc0FGUEcKYkhacDhYRkFITlVMdWlwVVlzWjRqaTFYTDEwdEtXZVozN0FVdEpFM3drZ28yZ1NDcHVLVkU1Q2xDTDVoRXIyZAorWVU5QVQzcnZ3S0JnUUMva1Vmb0ZTb2FENXh5WllNbSs3L1dpZUlLK0x2azdGRy9TUEpZS21mMk9RcStNWG9YCmRPbiszUTRvTGRqUTJkTytCQlJ2bDRZRVloY0UxN1pwbXpmYVZuWW8xN3F3cXlRNVBvaVByUkRNbWo1QmFOVDgKKzNGYUJmdFllbVptWU5OL1BxUnYyVkZ4dCt4bk9vaUxtcUJ0aW1rQkxFdFNUaVozZTE4WE5JV2pDUUtCZ1FDcgppSW5zNWlaZ3ZPSlUyWUJJTllsbXBGeGZHazdJVWdla09VSHZWQUFVRjNwRTMybXlOSFVXVEJVcVZRcm90NjY1CndJZ3pKYmdMdW50UmRXYU03ZjRnTkpEaWpwUmp4eHlGYmw0UXhUTFJoYThtZ0xtbEFXOS9LRDZrU1RnVW9IK3MKTmwvamwxQUt4VER4RG5NK291WGxqUzZJU3ZIVXB3dUtJQ1h4a2VwQ3V3S0JnUUM2MEZlbGkwU29aSzUvWlpWagorRHp3WW5ZaXdVZ3ZyRXhUWkxtMXhsanoveFRkRzc4OWZ5c3p4T0UrdzFQUHNOTFROYW05L0RYeXNMaUJKdDJUCjMvc1dZVk5Qc3BWR1FsMVUxOEpCSzZVZlFBOVB1QmF3ZnhMSWRiaTluc1lXYnQyK1pzcW9NOGtPUThSMlVJS3oKSlFidFcrTUVZZ2k0L0wrZ0MxSkNaZ1BvUFE9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==" # pragma: allowlist secret
+
 # By default, runner name = release name, override if needed. Must match JWT encoded (see README.md for details)
 runnerNameOverride: ""
 nameOverride: ""
 fullnameOverride: ""
+
 # Optional secret for pulling images from private registries
 imagePullSecrets: []
+
 # kube-state-metrics subchart configuration
 kubestatemetrics:
   enabled: true
+
   # Default values for kube-state-metrics.
   image:
     tag: "v2.14.0"
   updateStrategy: Recreate
+
   revisionHistoryLimit: 2
+
   # TODO keep if rbac role is not applied or metrics are not collected
   # namespaces: "kubiya"
   releaseNamespace: true
   rbac:
     useClusterRole: false
+
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
+
   resources:
     limits:
       cpu: 200m
@@ -41,10 +52,12 @@ kubestatemetrics:
     requests:
       cpu: 10m
       memory: 32Mi
+
   selfMonitor:
     enabled: true
     telemetryHost: 0.0.0.0
     telemetryPort: 8081
+
 # Kubiya operator runner component config
 kubiyaOperator:
   create: true
@@ -61,16 +74,16 @@ kubiyaOperator:
     pullPolicy: IfNotPresent
     tag: runner_v2
   volumeMounts:
-    - name: runner-secret-volume
-      mountPath: "/etc/nats"
-      readOnly: true
+  - name: runner-secret-volume
+    mountPath: "/etc/nats"
+    readOnly: true
   volumes:
-    - name: runner-secret-volume
-      secret:
-        secretName: kubiya-runner-nats-creds-runner
-        items:
-          - key: nats.creds
-            path: nats.creds
+  - name: runner-secret-volume
+    secret:
+      secretName: kubiya-runner-nats-creds-runner
+      items:
+      - key: nats.creds
+        path: nats.creds
   ports:
     containerPort: 80
   env:
@@ -78,6 +91,7 @@ kubiyaOperator:
     NATS_SUBJECT: "{{ .Values.nats.subject }}"
     NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
     NAMESPACE: "{{ .Release.Namespace }}"
+
 # Kubiya agent manager component config
 agentManager:
   replicas: 2
@@ -104,28 +118,29 @@ agentManager:
       cpu: 200m
       memory: 256Mi
   volumes:
-    - name: nats-creds-volume
-      secret:
-        defaultMode: 420
-        items:
-          - key: nats.creds
-            path: nats.creds
-        secretName: kubiya-runner-nats-creds-customer
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
+      secretName: kubiya-runner-nats-creds-customer
   volumeMounts:
-    - mountPath: /nats/
-      name: nats-creds-volume
-      readOnly: true
+  - mountPath: /nats/
+    name: nats-creds-volume
+    readOnly: true
   env:
     TOOL_MANAGER_URL: "http://tool-manager.{{ .Release.Namespace }}:{{ .Values.toolManager.service.port }}"
     KUBIYA_NATS_CREDS: "/nats/nats.creds"
     ENVIRONMENT: "production"
+
 # Kubiya tool manager component config
 toolManager:
   # tool-manager container config
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: v0.2.5
+    tag: ec877b3b2f3c362a26a4d9fbb90a864e054aa7d9
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
@@ -137,21 +152,21 @@ toolManager:
     name: "kubiya-runner-tool-manager" # Falling to hardcod here, as cannot call helper generative function for setting KUBIYA_SERVICE_ACCOUNT env vars below.
     automountServiceAccountToken: true
   adminClusterRole:
-    create: false # Set to true to create the ClusterRole and ClusterRoleBinding
+    create: false  # Set to true to create the ClusterRole and ClusterRoleBinding
   volumes:
-    - name: nats-creds-volume
-      secret:
-        defaultMode: 420
-        items:
-          - key: nats.creds
-            path: nats.creds
-        secretName: kubiya-runner-nats-creds-customer
-    - name: shared-volume
-      emptyDir: {}
-    - name: registry-certs
-      secret:
-        secretName: registry-tls-secret
-        defaultMode: 420
+  - name: nats-creds-volume
+    secret:
+      defaultMode: 420
+      items:
+      - key: nats.creds
+        path: nats.creds
+      secretName: kubiya-runner-nats-creds-customer
+  - name: shared-volume
+    emptyDir: {}
+  - name: registry-certs
+    secret:
+      secretName: registry-tls-secret
+      defaultMode: 420
   containerPort: 3001
   env:
     GIT_SHA: git-sha-placeholder
@@ -177,16 +192,16 @@ toolManager:
       cpu: 200m
       memory: 256Mi
   volumeMounts:
-    - mountPath: /opt/
-      name: nats-creds-volume
-    - mountPath: /tmp/kubiya_shared_tools
-      name: shared-volume
-    - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
-      name: registry-certs
+  - mountPath: /opt/
+    name: nats-creds-volume
+  - mountPath: /tmp/kubiya_shared_tools
+    name: shared-volume
+  - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+    name: registry-certs
   command:
-    - "/bin/bash"
-    - "-c"
-    - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
+  - "/bin/bash"
+  - "-c"
+  - "mkdir -p /usr/local/share/ca-certificates && cp /etc/docker/certs.d/cache-registry-svc.kubiya/tls.crt /usr/local/share/ca-certificates/registry.crt && update-ca-certificates && /bin/bash /start_tools_server.sh"
   # sdk-server container config
   sdkServer:
     image:
@@ -203,14 +218,14 @@ toolManager:
         cpu: 100m
         memory: 128Mi
     command:
-      - "python"
-      - "-m"
-      - "kubiya_sdk"
-      - "server"
-      - "--host"
-      - "0.0.0.0"
-      - "--port"
-      - "8000"
+    - "python"
+    - "-m"
+    - "kubiya_sdk"
+    - "server"
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8000"
     containerPort: 8000
     defaultMode: 420
     env:
@@ -223,16 +238,17 @@ toolManager:
       KUBIYA_LONG_RUNNING_TOOL_TIMEOUT: 168h
       KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
     volumeMounts:
-      - mountPath: /opt/
-        name: nats-creds-volume
-      - mountPath: /tmp/kubiya_shared_tools
-        name: shared-volume
+    - mountPath: /opt/
+      name: nats-creds-volume
+    - mountPath: /tmp/kubiya_shared_tools
+      name: shared-volume
+
 # Kubiya image updater component config
 imageUpdater:
   cronJob:
     create: true
-    schedule: "0 0 * * *" # Default schedule
-    suspend: false # Default suspend value
+    schedule: "0 0 * * *"  # Default schedule
+    suspend: false         # Default suspend value
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
   image:
@@ -243,20 +259,24 @@ imageUpdater:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
+
 # Open-teemetry collector subchart config
 otelcollector:
   enabled: true
+
   # Use custom otel-collector Role with runner namespace limited permissions instead of only ClusterRole from subchart
   customRole:
     enabled: true
+
     # TODO / PROD_READY: Unneccessary wide permissions for production, should be removed after testing
     enableDebugRoles:
-      - apiGroups: [""]
-        resources: ["nodes/stats"]
-        verbs: ["get", "watch", "list"]
-      - apiGroups: ["events.k8s.io"]
-        resources: ["events"]
-        verbs: ["watch", "list"]
+    - apiGroups: [ "" ]
+      resources: [ "nodes/stats" ]
+      verbs: [ "get", "watch", "list" ]
+    - apiGroups: [ "events.k8s.io" ]
+      resources: [ "events" ]
+      verbs: [ "watch", "list" ]
+
   # Rendering of predefined blocks collector (see otel-collector-configMap.yaml)
   # To be actually used, must be enabled in otelCollectorConfig.metrics.pipelines.metrics.processors
   metricstransformAttributes:
@@ -278,15 +298,16 @@ otelcollector:
     #   secretName: "azure-managed-prometheus-auth"
     #   secretKey: "token"
     #   token: "" # Azure Managed Prometheus authentication token
-  # Enabled pipelines configuration
 
+    # Enabled pipelines configuration
   pipelines:
     metrics:
-      receivers: [prometheus]
-      processors: [metricstransform, k8sattributes, batch/metrics]
+      receivers: [ prometheus ]
+      processors: [ metricstransform, k8sattributes, batch/metrics ]
       # Azure Managed Prometheus exporter is experimental. Add to exporters if needed. Debug exporter can be also added if needed.
       # exporters: [ debug, natsexporter, prometheus ]
-      exporters: [natsexporter]
+      exporters: [ natsexporter ]
+
   image:
     # Using image build with custom implementation of nats-exporter to be able to push
     # telemetry and metrics from NATS server.
@@ -295,11 +316,15 @@ otelcollector:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: release-0.1.1
+
   mode: deployment
+
   replicaCount: 1
+
   command:
     name: "otelcol-kubiya"
-    extraArgs: ["--config=/etc/otel/config.yaml"]
+    extraArgs: [ "--config=/etc/otel/config.yaml" ]
+
   # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
   # extraEnvs:
   # - name: AZURE_PROMETHEUS_AUTH_TOKEN
@@ -307,19 +332,20 @@ otelcollector:
   #     secretKeyRef:
   #       name: kubiya-runner-azure-prometheus-auth
   #       key: token
+
   extraVolumes:
-    - name: otel-config
-      configMap:
-        name: kubiya-runner-otel-collector-config
-        items:
-          - key: config.yaml
-            path: config.yaml
-    - name: nats-creds-volume
-      secret:
-        secretName: kubiya-runner-nats-creds-customer
-        items:
-          - key: nats.creds
-            path: nats.creds
+  - name: otel-config
+    configMap:
+      name: kubiya-runner-otel-collector-config
+      items:
+      - key: config.yaml
+        path: config.yaml
+  - name: nats-creds-volume
+    secret:
+      secretName: kubiya-runner-nats-creds-customer
+      items:
+      - key: nats.creds
+        path: nats.creds
   # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
   # - name: azure-prometheus-auth
   #   secret:
@@ -327,11 +353,11 @@ otelcollector:
   #     cpu: 250m
 
   extraVolumeMounts:
-    - name: otel-config
-      mountPath: /etc/otel
-    - name: nats-creds-volume
-      mountPath: "/etc/nats"
-      readOnly: true
+  - name: otel-config
+    mountPath: /etc/otel
+  - name: nats-creds-volume
+    mountPath: "/etc/nats"
+    readOnly: true
   # TODO / PROD_READY: Experimental Azure Managed Prometheus exporter config. Remove if not needed.
   # - name: azure-prometheus-auth
   #   mountPath: "/etc/azure"
@@ -339,6 +365,7 @@ otelcollector:
 
   configMap:
     create: false
+
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
   resources:
@@ -348,6 +375,7 @@ otelcollector:
     requests:
       cpu: 250m
       memory: 256Mi
+
   # Adding Role and RoleBinding with least permissions for limit access to clients cluster resources. 
   serviceAccount:
     create: true
@@ -368,29 +396,38 @@ otelcollector:
   # #   - 'watch'
   # clusterRoleBinding:
   # name: ""
+
 dagger:
   enabled: true
+
   # Override fullname for dagger engine deployment to be able to use kustomize patch
   volumeMountsPostfix: "{{ .Values.kubiyaAgentUUID }}"
+
   engine:
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
     # which is used by tool-manager.
     labels:
       app.kubernetes.io/component: engine
+
     newServiceAccount:
       name: "kubiya-runner-dagger-helm"
       create: true
+
     image:
       ref: registry.dagger.io/engine:v0.11.6
+
       # From update with headless svc template: v0.1.1
       # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
+
     args:
       - --oci-max-parallelism
       - num-cpu
+
     readinessProbeCommand:
       - buildctl
       - debug
       - workers
+
     config: |
       # TODO: remove debug when tested - performance penalty?
       debug = true
@@ -406,6 +443,7 @@ dagger:
         format = "json"
       [grpc]
         address = ["unix:///run/buildkit/buildkitd.sock", "tcp://0.0.0.0:8080"]
+
     # Explicit resources are mandatory. See README.md or more info.
     # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
     resources:
@@ -415,14 +453,15 @@ dagger:
       requests:
         cpu: 100m
         memory: 128Mi
+
   magicache:
     # Secret must be created manually in the runner namespace per each client side runner.
     enabled: false
     # url: https://api.dagger.cloud/magicache
     # token: YOUR_DAGGER_CLOUD_TOKEN
     # secretName: EXISTING_SECRET_NAME
-# Extras for weak dagger subchart 
 
+    # Extras for weak dagger subchart 
 daggerAdditionalResources:
   # Role & RoleBinding for dagger engine.
   # Not created by default via dagger subchart, they still may be required for some use cases.
@@ -445,6 +484,7 @@ daggerAdditionalResources:
     # ---------------------------------------------------------------------------------------------------------------------
     name: dagger-engine-service
     port: 8080
+
 blackboxexporter:
   enabled: true
   config:
@@ -469,12 +509,12 @@ blackboxexporter:
   # Direct configuration for targets
   targets:
     http:
-      - agent-manager:80
-      - kubiya-operator:80
-      - tool-manager:80
+    - agent-manager:80
+    - kubiya-operator:80
+    - tool-manager:80
     grpc:
-      - sdk-server:50051
-      - dagger-engine:8080
+    - sdk-server:50051
+    - dagger-engine:8080
     tcp:
-      - otel-collector:4317
-      - otel-collector:13133
+    - otel-collector:4317
+    - otel-collector:13133
