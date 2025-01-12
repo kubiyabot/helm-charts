@@ -414,19 +414,18 @@ dagger:
       create: true
 
     image:
-      ref: registry.dagger.io/engine:v0.11.6
+      ref: registry.dagger.io/engine:v0.15.1
 
       # From update with headless svc template: v0.1.1
       # ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
 
-    args:
-      - --oci-max-parallelism
-      - num-cpu
+    args: []
 
     readinessProbeCommand:
-      - buildctl
-      - debug
-      - workers
+      - sh
+      - -exc
+      - |-
+        dagger core version
 
     config: |
       # TODO: remove debug when tested - performance penalty?
