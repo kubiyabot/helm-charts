@@ -125,7 +125,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: v0.3.0
+    tag: v0.3.1
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
@@ -352,22 +352,22 @@ otelcollector:
   serviceAccount:
     create: true
     name: "kubiya-runner-otel-collector"
-  # Enable if need to use clusterRole
-  # clusterRole:
-  # create: false
-  # name: ""
-  # rules: []
-  # # - apiGroups:
-  # #   - ''
-  # #   resources:
-  # #   - 'pods'
-  # #   - 'nodes'
-  # #   verbs:
-  # #   - 'get'
-  # #   - 'list'
-  # #   - 'watch'
-  # clusterRoleBinding:
-  # name: ""
+    # Enable if need to use clusterRole
+    # clusterRole:
+    # create: false
+    # name: ""
+    # rules: []
+    # # - apiGroups:
+    # #   - ''
+    # #   resources:
+    # #   - 'pods'
+    # #   - 'nodes'
+    # #   verbs:
+    # #   - 'get'
+    # #   - 'list'
+    # #   - 'watch'
+    # clusterRoleBinding:
+    # name: ""
 dagger:
   enabled: true
   # Override fullname for dagger engine deployment to be able to use kustomize patch
