@@ -35,7 +35,6 @@ kubestatemetrics:
   revisionHistoryLimit: 2
   metricLabelsAllowlist:
   - pods=[*]
-
   # TODO keep if rbac role is not applied or metrics are not collected
   # namespaces: "kubiya"
   releaseNamespace: true
