@@ -1,9 +1,9 @@
 # Repository Structure
 
-1. Helm Charts Repository: Contains the Helm charts and any shared resources.
+1. Helm Charts repo: current repo, contains our helm charts, docs, shared resources.
 
 ```
-helm-charts-repo/
+helm-charts/
 ├── charts/
 │   ├── kubiya-runner/
 │   │   ├── Chart.yaml
@@ -16,16 +16,16 @@ helm-charts-repo/
 └── README.md
 ```
 
-2. Runners configs repo: contains the customer-specific configurations for the Helm charts.
+2. Deployments configs repo: centralized, single source of true for all runners deployments configs. Desired state for all runners deployments configs (container version, secrets, scaling options, env var, etc.)
 
 ```
-customer-configs-repo/
+customer-configs/
 ├── clusters/
 │   ├── customer1/
-│   │   ├── helmrelease.yaml
-│   │   ├── overrides.yaml
+│   │   ├── helmrelease.yaml ---------------> helm release definition (see balow)
+│   │   ├── overrides.yaml -----------------> unencrypted customer specific overrides (image versions, etc.)
 │   │   └── secrets/
-│   │       └── sealed-secret.yaml
+│   │       └── sealed-secret.yaml ----------> encrypted secrets for the Helm release (API tokens, etc.)
 │   ├── customer2/
 │   │   ├── helmrelease.yaml
 │   │   ├── overrides.yaml
@@ -34,28 +34,24 @@ customer-configs-repo/
 │   └── ...
 └── README.md
 ```
-`helmrelease` file contains:
-    - Helm release definition
-    - Overrides for the Helm chart
-    - Secrets for the Helm release
-  
-Example:
+
+`helmrelease` example:
 
 ```yaml
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: kubiya-runner
-  namespace: default
+  namespace: kubiya
 spec:
-  releaseName: kubiya-runner
+  releaseName: kubiya-runner-customer-name
   chart:
     spec:
       chart: kubiya-runner
       sourceRef:
         kind: GitRepository
         name: helm-charts
-        namespace: flux-system
+        namespace: kubiya
         ref:
           branch: main
   interval: 5m
@@ -89,7 +85,7 @@ agentManager:
     tag: "v1.20.0"
 ```
 
-4. `FluxCD` Controller: Manages the deployment of the Helm charts to the Kubernetes clusters 
+1. `FluxCD` Controller: Manages the deployment of the Helm charts to the Kubernetes clusters 
     - Installed along with runner in kubiya namespace customer's K8s cluster
     - Resources overhead (max. avg): 200 MB / 0.2 CPU
 
@@ -111,13 +107,70 @@ agentManager:
 
 # Key Points
 
-- Centralized configuration, secret and version source of truth.
-- Modularity: Separate repositories allow for independent updates and maintenance of Helm charts and customer configurations.
-- Security: Ensure that sensitive data in overrides.yaml is managed securely, potentially using tools like Sealed Secrets for encryption.
-- FluxCD Integration: Use FluxCD to automate the deployment process, monitoring the customer configurations repository for changes.
-- This approach provides a clean separation between the core Helm charts and customer-specific configurations, making it easier to manage and scale deployments.
+- A *centralized* place for remote runners, configurations/secrets, git level versioning and tracability
+- Easy upgrades, rollouts and rollbacks: from GUI, manual or automated git commits from CD pipelines, 1-to-many config clones (mass update)
+- Branching for development on multiple staging/prod envs
+- Detaching from frontend: no more pain, bugs and effort wasted on passing updated list of values one by one to `helm install ...` UI
+- Separation of deployment configs from charts repo: less chance of conflicts, easier to manage and scale, more secure - less chance of unencrypted secrets leaking to public repo
+- Security single per customer key for encryption sensitive data data. Customer names can be replaced with uuids for extra security.
+- FluxCD deployments - CNCF graduated, lightweight, technically and conceptually easy to go
+- POC without secrets - can be done in a day
 
 # NATS
 
-- As alternative to sealed secrets we can use already existing NATS as a per customer secrets manager.
-- Configuration git repo can also be stored in NATS (e.g. key value or file storage)
+- Can be used as a secret manager as we already have NATS in place (althougth it's not free).
+- Or, it can securely host deployments configuration "repo" too (e.g. key value or file storage backend)
+
+
+# Sealed Secrets
+
+- Example of a Sealed Secret
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+     name: my-secret
+     namespace: default
+   type: Opaque
+   data:
+     username: bXktdXNlcm5hbWU=  # base64 encoded 'my-username'
+     password: c2VjdXJlLXBhc3N3b3Jk  # base64 encoded 'secure-password'
+```
+
+2. Seal the Secret
+
+Use the kubeseal CLI tool to encrypt the secret. This requires access to the Sealed Secrets controller's public key, which is typically available in k8s cluster.
+```bash
+kubectl create secret generic my-secret --dry-run=client --from-literal=username=my-username --from-literal=password=secure-password -o yaml | kubeseal --format yaml > sealed-secret.yaml
+```
+
+3. The `sealed-secret.yaml` file will look something like this:
+
+```yaml
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+     name: my-secret
+     namespace: default
+   spec:
+     encryptedData:
+       password: AgB+3J... (encrypted data)
+       username: AgB+3J... (encrypted data)
+```
+
+## Workflow for Using Sealed Secrets
+
+1. Install the Sealed Secrets Controller
+
+```bash
+kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.17.0/controller.yaml
+```
+
+2. Commit encrypted sealed Secret to Git as-is
+
+3. Deploy the Sealed Secret to k8s cluster as a regular Secret
+
+```bash
+kubectl apply -f sealed-secret.yaml
+```
