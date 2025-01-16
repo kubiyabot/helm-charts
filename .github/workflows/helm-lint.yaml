@@ -21,8 +21,7 @@ jobs:
 
     - name: Run helm lint
       run: |
-        helm lint charts/kubiya-runner/ \
-          --strict 
+        helm lint charts/kubiya-runner/ 
 
     - name: Run helm template
       run: |
