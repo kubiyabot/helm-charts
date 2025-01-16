@@ -1,6 +1,7 @@
 
 # [DRAFT] Calculations for cumulative health score, based on available metrics that we have for each component.
 
+**This is draft document. There are no dashboards or alerts based on this approach.**
 
 ## Grouped metrics into tiers of criticality based on their impact on the app’s health
 
@@ -96,11 +97,14 @@ avg by (namespace) (
 
 If a metric (e.g., Blackbox probe_success) is entirely missing for a component, substitute a neutral score (e.g., 0.5) instead of zero to prevent unfair penalty:
 
-```if absent(probe_success{namespace="$namespace"}) then 0.5```
+```
+if absent(probe_success{namespace="$namespace"}) then 0.5
+```
 
 ## Final Aggregated Health Score
 
 Aggregate all components into a namespace-wide health score:
+
 ```
 (
   avg_over_time(component_1_health[5m]) * 0.5
@@ -163,7 +167,6 @@ avg by (namespace, runner) (
 )
 ```
 
-
 ## Transform into discreate state:
 
 ```
@@ -178,6 +181,6 @@ label_replace(
 
 Measure rates:
 
-- \>0.8 → Healthy
+- >0.8 → Healthy
 - 0.6–0.8 → Degraded
 - <0.6 → Critical
