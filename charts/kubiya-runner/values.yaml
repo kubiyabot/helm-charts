@@ -1,7 +1,9 @@
 # Runner organization
-organization: ""
+organization: "testOrg"
+
 # Runner UUID
-kubiyaAgentUUID: ""
+kubiyaAgentUUID: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
 # NATS credentials and destination subject
 nats:
   jwt: ""
@@ -360,8 +362,8 @@ alloy:
   enabled: true
 
   # Pipeline live debug via Alloy GUI (GUI needs port forward to alloy service, port 12345)
-  # livedebugging:
-  # enabled: true
+  livedebugging:
+    enabled: false
 
   # Stage II - extra exporters. Disabled by default as not needed and not tested for first chart update release.
   extraExporters:
