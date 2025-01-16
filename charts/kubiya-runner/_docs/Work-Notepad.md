@@ -79,36 +79,67 @@
 - [x] Configure Azure Managed Prometheus to work remote_writes
   - [x] Apply config changes on new prometheus instance
   - [x] Test data sent went to prometheus and visible in Grafana
-- [x] Add Grafana Alloy
+- [x] Add Grafana `alloy`
   - [x] Create & test minimal config with export to Azure Prometheus
   - [x] Add as subchart to runner
-    - [x] Translate otel-collector config to Grafana Alloy
+    - [x] Translate `otel-collector` config to Grafana Alloy
     - [x] Test: make sure all data with correct labels sent to Azure Prometheus from local cluster
     - [x] Test multiple runner instances with different labels
-    - [x] Remove blackbox-exporter as dependency, replace with Grafana Alloy integration
-    - [x] Make scraping of runners components exporters precise as now unbolocked by otel-collector bug
-  - [x] ~Add tested grafana alloy remote write -> Azure Prometheus to 'otel-collector'~
-  - [x] Remove otel-collector as dependency OR leave it disabled by default OR make it frozen branch
+    - [x] Remove `blackbox-exporter` as dependency, replace with Grafana Alloy integration
+    - [x] Make scraping of runners components exporters precise as now unbolocked by `otel-collector` bug
+  - [x] ~Add tested grafana alloy remote write -> Azure Prometheus to `otel-collector`~
+  - [x] Remove `otel-collector` as dependency OR leave it disabled by default OR make it frozen branch
   - [x] Create basic documentation for Grafana Alloy integration
   - [x] Based on full metrics set obtained via Alloy - finalize dashboards for remote runners
-    - [x] Fix already existed with missing blackbox-exporter
-    - [x] Add Alloy self monitoring dashboard to see all runners Alloy main metrics
+    - [x] Fix already existed with missing `blackbox-exporter`
+    - [x] Add Alloy self monitoring dashboard to see all runners `alloy` main metrics
     - [x] Runners Health Overview
  
 # Next Steps
+
+## Environments & Security
+
+- [ ] Azure Prometheus/Keys/Grafana: separate prod from staging; change endpoint for prod
+- [ ] Azure Key: Verify Permissions and provide frontend with `overrides.yaml` including all azure things
+
+## Development & delivery guidance
+
+- [ ] [ToDo] Review all PR: pending
+- [ ] [ToDo] Fix tool manager / dagger / Tool-manager for ARM? `[x]`
+- [ ] [ToDo] Review & redo all merged where needed (e.g. growing mess in `values.yaml`) `[x]`
+- [ ] [ToDo] Merge to main; protect it; set minimum 2 reviewers required;
+- [ ] [ToDo] Release v1.0; cleanup branches; fix CI; upload .tgz
+- [ ] [Devs assistance] override vs Set Provide dev with override example: correct one, without mess and invalid values passing `[x]`
+- [ ] [Devs assistance] packaging, versioning, upgrade procedures `[x]`
+- [x] [Devs assistance] Configuration `--set a=foo b=bar .. ... ... .... z=omfg` use `-f override_customer_name.yaml`, store in NATS or git repo (with sealed secrets)
+
+## Observability Best Practices Talks
+
+- [ ] `/metrics` - ok 200 vs if response.t < 60 -> ok 200 
+- [ ] `readiness` vs `liveness` vs `startup` - scaling/load balancing/pod lifecycle; `health` vs `healtz`; `http_request_total`, `http_status_code`, `xxx_xxx_http_request_total` and etc. `[x]`
+- [ ] CRDs, pod/helm lebeling, ServiceMonitor, Blackbox eporter for user workloads, etc. `[x]`
+
+## Costs & Scale
+
+- [ ] Create chart and alert on metric volume increase & threshold volume reached
+- [ ] All setup cost charts in Grafana, mainly Azure Prometheus Instance cost
+- [ ] Separate all Staging/Production
 
 ## Leftovers
 
 - [ ] Export tested AZ resources chain for storing as-a-code in Terraform or at least in git repo (make sure no secrets committed)
 - [ ] Dashboard merge/leftovers
 - [ ] Dashboard -> All Runners Status linked to Runner Health Overview
-- [ ] Reduce scope to namespace level metrics only precreated RBAC and ServiceAccount, make all k8s meta required permissions are given (check alloy default RBAC)
+- [ ] Reduce scope to namespace level metrics only precreated RBAC and Se4rviceAccount, make all k8s meta required permissions are given (check alloy default RBAC)
   - [ ] Consider remote config for oauth2 client and remote endpoint url - security measure, centralization + easy to switch off/on
-  - [ ] Current deplopy model - replicates otel-collector (deployment) - must be reconsidered as soon as we start get more data have different use scenarios - mention in demo about this or in docs
-- [ ] Update README
-  - [ ] Alloy
+  - [ ] Current alloy `deplopy` model - replicates `otel-collector` (deployment). Reconsider as we start get into diff deployment scenarios.
+- [ ] Update README `[!]`
+  - [ ] Alloy: take screenshot of dashboard graph & other(?)
+  - [ ] Component labels used (!)
+  - [ ] Grafana dashboards set;
   - [ ] Remote Writes
   - [ ] Azure cfg
+  - [ ] JIRA TASKS / CHANGELOG
 - [ ] Check as-is transfered from old template volume postfixes for dagger imnages - should be removed or moved to hostPath not volumeMount?
 - [ ] UUID and other params pass to runner conflicts from recent PR
 
