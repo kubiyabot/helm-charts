@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - tmp_alloy # TODO: temporary including branch for CI refactor debug
   pull_request:
     branches:
       - main
