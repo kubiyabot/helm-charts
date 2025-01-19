@@ -41,38 +41,44 @@ jobs:
           sudo apt-get install -y yamllint
           helm plugin install https://github.com/quintush/helm-unittest --version v0.2.8
 
-      # Step 1: Package Local Charts (for intra-repo dependencies)
+      # Step 1: Update Dependencies Before Packaging
+      - name: Update Helm Dependencies
+        run: |
+          for chart in charts/dagger-helm charts/kubiya-runner; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              echo "Updating dependencies for $chart..."
+              helm dep update "$chart"
+            fi
+          done
+
+      # Step 2: Hardcoded Order for Intra-Repo Chart Packaging
       - name: Package Local Charts
         run: |
           mkdir -p packaged
-          for chart in charts/*; do
-            echo "Packaging $chart..."
-            helm package "$chart" --destination packaged
-          done
+          
+          # Ensure dagger-helm is packaged first
+          if [ -d "charts/dagger-helm" ]; then
+            echo "Packaging dagger-helm..."
+            helm package charts/dagger-helm --destination packaged
+          fi
+          
+          # Ensure kubiya-runner is packaged after dagger-helm
+          if [ -d "charts/kubiya-runner" ]; then
+            echo "Packaging kubiya-runner..."
+            helm package charts/kubiya-runner --destination packaged
+          fi
 
-      # Step 2: Create Local Helm Repo
+      # Step 3: Create Local Helm Repo
       - name: Create Local Helm Repo
         run: |
           helm repo index packaged --url file://$(pwd)/packaged
           helm repo add local-charts file://$(pwd)/packaged
           helm repo update
 
-      # Step 3: Update Helm Dependencies (external + intra-repo)
-      - name: Update Helm Dependencies
-        run: |
-          for chart in charts/*; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              echo "Updating dependencies for $chart..."
-              helm dep update "$chart"
-            else
-              echo "Skipping $chart - No Chart.yaml found."
-            fi
-          done
-
       # Step 4: Lint Helm Charts
       - name: Lint Helm Charts
         run: |
-          for chart in charts/*; do
+          for chart in charts/dagger-helm charts/kubiya-runner; do
             if [ -f "$chart/Chart.yaml" ]; then
               helm lint "$chart"
             fi
@@ -81,7 +87,7 @@ jobs:
       # Step 5: Run Helm Unit Tests
       - name: Run Helm Unit Tests
         run: |
-          for chart in charts/*; do
+          for chart in charts/dagger-helm charts/kubiya-runner; do
             if [ -f "$chart/Chart.yaml" ]; then
               helm unittest "$chart" || echo "No tests defined for $chart"
             fi
@@ -91,11 +97,18 @@ jobs:
       - name: Build and Package Helm Charts
         run: |
           mkdir -p packaged-final
-          for chart in charts/*; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              helm package "$chart" --destination packaged-final
-            fi
-          done
+          
+          # Ensure dagger-helm is packaged first
+          if [ -d "charts/dagger-helm" ]; then
+            echo "Packaging final version of dagger-helm..."
+            helm package charts/dagger-helm --destination packaged-final
+          fi
+          
+          # Ensure kubiya-runner is packaged after dagger-helm
+          if [ -d "charts/kubiya-runner" ]; then
+            echo "Packaging final version of kubiya-runner..."
+            helm package charts/kubiya-runner --destination packaged-final
+          fi
 
       # Step 7: Upload Packaged Charts as Artifacts
       - name: Upload Packaged Charts
