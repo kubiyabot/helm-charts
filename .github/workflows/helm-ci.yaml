@@ -37,17 +37,24 @@ jobs:
           sudo apt-get install -y yamllint
           helm plugin install https://github.com/quintush/helm-unittest --version v0.2.8
 
-      # Step 1: Update Dependencies for All Charts
-      - name: Update Helm Dependencies
+      # Step 1: Update & Build Dependencies for All Charts
+      - name: Update & Build Helm Dependencies
         run: |
           for chart in charts/dagger-helm charts/kubiya-runner; do
             if [ -f "$chart/Chart.yaml" ]; then
               echo "Updating dependencies for $chart..."
               helm dep update "$chart"
+              echo 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              ls charts/kubiya-runner/charts
+              
+              echo "Building dependencies for $chart to persist them in charts/ directory..."
+              helm dep build "$chart"
+              echo 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              ls charts/kubiya-runner/charts
             fi
           done
 
-      # Step 2: Copy Intra-Repo Dependencies Manually (dagger-helm → kubiya-runner/charts)
+      # Step 2: Copy Intra-Repo Dependencies Manually (`dagger-helm` → `kubiya-runner/charts/`)
       - name: Copy Intra-Repo Dependencies
         run: |
           mkdir -p charts/kubiya-runner/charts
@@ -55,9 +62,12 @@ jobs:
           if [ -d "charts/dagger-helm" ]; then
             echo "Copying dagger-helm into kubiya-runner charts/ directory..."
             cp -r charts/dagger-helm charts/kubiya-runner/charts/
+            ls "charts/kubiya-runner/charts"
           fi
+          echo 3!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ls charts/kubiya-runner/charts
 
-      # Step 3: Package Local Charts in Correct Order
+      # Step 4: Package Local Charts in Correct Order
       - name: Package Local Charts
         run: |
           mkdir -p packaged
@@ -68,13 +78,13 @@ jobs:
             helm package charts/dagger-helm --destination packaged
           fi
           
-          # Package kubiya-runner after dagger-helm has been copied
+          # Package kubiya-runner after dependencies are built
           if [ -d "charts/kubiya-runner" ]; then
             echo "Packaging kubiya-runner..."
             helm package charts/kubiya-runner --destination packaged
           fi
 
-      # Step 4: Lint Helm Charts
+      # Step 5: Lint Helm Charts
       - name: Lint Helm Charts
         run: |
           for chart in charts/dagger-helm charts/kubiya-runner; do
@@ -83,7 +93,7 @@ jobs:
             fi
           done
 
-      # Step 5: Run Helm Unit Tests
+      # Step 6: Run Helm Unit Tests
       - name: Run Helm Unit Tests
         run: |
           for chart in charts/dagger-helm charts/kubiya-runner; do
@@ -92,7 +102,7 @@ jobs:
             fi
           done
 
-      # Step 6: Final Build and Packaging
+      # Step 7: Final Build and Packaging
       - name: Build and Package Helm Charts
         run: |
           mkdir -p packaged-final
@@ -103,13 +113,13 @@ jobs:
             helm package charts/dagger-helm --destination packaged-final
           fi
           
-          # Package kubiya-runner after dagger-helm has been copied
+          # Package kubiya-runner after dependencies are built
           if [ -d "charts/kubiya-runner" ]; then
             echo "Packaging final version of kubiya-runner..."
             helm package charts/kubiya-runner --destination packaged-final
           fi
 
-      # Step 7: Upload Packaged Charts as Artifacts
+      # Step 8: Upload Packaged Charts as Artifacts
       - name: Upload Packaged Charts
         uses: actions/upload-artifact@v3
         with:
