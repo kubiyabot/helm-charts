@@ -110,7 +110,7 @@ data:
 
     // Relabel & filter discovered targets for kubiya components
     // default rule action is 'replace' which adds/overwrites label from discovered target
-    // TODO: add extensove label collection of k8s metadata to reduze resource/traffic usage
+    // TODO: add extensive label collection of k8s metadata to reduce resource/traffic usage
 
     discovery.relabel "runner_app_pods" {
       targets = discovery.kubernetes.runner_namespace_pods.targets
