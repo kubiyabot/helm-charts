@@ -37,6 +37,11 @@ jobs:
           sudo apt-get install -y yamllint
           helm plugin install https://github.com/quintush/helm-unittest --version v0.2.8
 
+      - name: Add External Helm Repositories
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
       # Step 1: Update & Build Dependencies for All Charts
       - name: Update & Build Helm Dependencies
         run: |
