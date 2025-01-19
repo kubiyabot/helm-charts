@@ -44,14 +44,12 @@ jobs:
             if [ -f "$chart/Chart.yaml" ]; then
               echo "Updating dependencies for $chart..."
               helm dep update "$chart"
-              echo 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              ls charts/kubiya-runner/charts
-              
+             
               echo "Building dependencies for $chart to persist them in charts/ directory..."
               helm dep build "$chart"
-              echo 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              ls charts/kubiya-runner/charts
             fi
+            echo 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ls charts/kubiya-runner/charts
           done
 
       # Step 2: Copy Intra-Repo Dependencies Manually (`dagger-helm` → `kubiya-runner/charts/`)
@@ -64,14 +62,16 @@ jobs:
             cp -r charts/dagger-helm charts/kubiya-runner/charts/
             ls "charts/kubiya-runner/charts"
           fi
-          echo 3!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          echo 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           ls charts/kubiya-runner/charts
 
       # Step 4: Package Local Charts in Correct Order
       - name: Package Local Charts
         run: |
           mkdir -p packaged
-          
+          echo 3!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          ls charts/kubiya-runner/charts
+
           # Package dagger-helm first
           if [ -d "charts/dagger-helm" ]; then
             echo "Packaging dagger-helm..."
