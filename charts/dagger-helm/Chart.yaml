@@ -2,8 +2,8 @@ apiVersion: v2
 name: dagger-helm
 description: A Helm chart for Dagger - a programmable CI/CD engine that runs your pipelines in containers
 type: application
-version: 0.2.0
-appVersion: "0.13.6"
+version: 0.3.0
+appVersion: "0.11.6"
 
 maintainers:
 - name: Costa
