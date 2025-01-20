@@ -101,6 +101,7 @@
 
 - [ ] Azure Prometheus/Keys/Grafana: separate prod from staging; change endpoint for prod
 - [ ] Azure Key: Verify Permissions and provide frontend with `overrides.yaml` including all azure things
+- [ ] ClusterRole & Scope: with PR to repo `tool-manager` got non-default cluster wide admin, and default cluster wide PVC management permissions. This should be reviewed and mentioned in docs.
 
 ## Development & delivery guidance
 

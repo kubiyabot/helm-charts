@@ -154,17 +154,18 @@ In such deployments pre-installed webhooks may deny installation of runner's k8s
 **TBD (work in progress section)** 
 
 - Reduce RBAC for alloy (namespace-scoped)
-- Namespace-scoped RBAC permissions
+- Namespace-scoped RBAC permissions.
+  Except `tool-manager`. Merged PR gave `tool-manager` optional cluster wide full access permissions (`values.adminClusterRole.create`, and default cluster-wide PVC management permission.
 - Service accounts for each component
 - TLS support for registry communication (used by `tool-manager`)
 
+
 ## Optional Permissions Extensions:
+*[Section is Under Development]*
 
-*[Under Development]*
+
 - Kubiya Operator full access toggle (controlled via values)
-- Custom OpenTelemetry roles
 - Optional Dagger permissions
-
 
 ## Installation
 
