@@ -21,10 +21,17 @@ A Helm chart for deploying the Kubiya Runner.
     - [Helm Dependencies](#helm-dependencies)
     - [Container Images](#container-images)
   - [Monitoring \& Telemetry](#monitoring--telemetry)
-    - [Depricated approach](#depricated-approach)
-    - [Current approach](#current-approach)
+    - [Security](#security)
+    - [Architecture](#architecture)
+    - [Grafana Alloy Configuration](#grafana-alloy-configuration)
+  - [Grafana Dashboards](#grafana-dashboards)
+    - [List of available dashboards:](#list-of-available-dashboards)
+      - [Kubernetes State Dashboard (`runner-namespace-kubernetes-state.json`)](#kubernetes-state-dashboard-runner-namespace-kubernetes-statejson)
+      - [5. Health Overview by Components (`customer-runners-runner-health-overview-by-components.json`)](#5-health-overview-by-components-customer-runners-runner-health-overview-by-componentsjson)
+  - [Dashboard Features](#dashboard-features)
+  - [Usage](#usage)
   - [K8s Resources Definitions](#k8s-resources-definitions)
-  - [Security](#security)
+  - [Security](#security-1)
   - [Optional Permissions Extensions:](#optional-permissions-extensions)
   - [Installation](#installation)
   - [Minimum Required Configuration](#minimum-required-configuration)
@@ -105,8 +112,8 @@ This version of this chart as of version 0.3.0 is tested to be compatible with t
 ### Helm Dependencies
 
 | Chart | Version | App Version |
-|-------|---------|
-| dagger-helm | 0.3.0 | 0.13.6 |
+|-------|---------|--------|  
+| dagger-helm | 0.3.0 | 0.11.6 |
 | kube-state-metrics | 5.27.0 | 2.14.0 |
 | alloy | 0.10.1 | v1.5.1 |
 
@@ -114,10 +121,10 @@ This version of this chart as of version 0.3.0 is tested to be compatible with t
 
 | Component | Image | Version/Tag |
 |-----------|-------|-------------|
-| Agent Manager | ghcr.io/kubiyabot/agent-manager |  |
+| Agent Manager | ghcr.io/kubiyabot/agent-manager | 0.0.22 |
 | Kubiya Operator | ghcr.io/kubiyabot/kubiya-operator | runner_v2 |
-| Tool Manager | ghcr.io/kubiyabot/tool-manager | 53d7902438e1415e08740b147b828e62de4b1bec |
-| SDK Server | ghcr.io/kubiyabot/sdk-py | v1.5.0 |
+| Tool Manager | ghcr.io/kubiyabot/tool-manager | v0.3.2 |
+| SDK Server | ghcr.io/kubiyabot/sdk-py | v1.7.1 |
 | Image Updater | bitnami/kubectl | 1.30.6 |
 | Dagger Engine | ghcr.io/kubiyabot/kubiya-registry | v0.13.6 |
 | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | 2.14.0 |
@@ -125,22 +132,152 @@ This version of this chart as of version 0.3.0 is tested to be compatible with t
 
 ## Monitoring & Telemetry
 
-### Depricated approach
+The `kubiya-runner`uses [Grafana Alloy](https://grafana.com/docs/alloy/latest/) for metrics collection from multiple customer runner deployments.
+Alloy scrapes data from a set of targets (pods, services, etc) which expose metrics on an endpoint (usually `/metrics`), process them (filter, add runner deployment labels, ...) and push via Prometheus native `remote_writes` into **Azure Managed Prometheus**.
 
+Later `kubiya-runner` chart releases expect to use Alloy for other types of telemetry data collection (such as logs and traces). **Alloy** also fully compatible with OpenTelemetry and can be configured to listen/send messages in `OTEL` format if needed, has a long list of vendor platforms and message formats compatibility and a rich set of data processing modules. 
+
+###  Security
+
+Both `Alloy` and `kube-state-metrics` has limited RBAC permissions and configured to be able to collect only data within kubernetes namespace where `kubiya-runner` is deployed (`kubiya` by default).
+
+### Architecture
+
+```mermaid
+graph LR
+H[alloy-self-metrics]
+A[kube-state-metrics]
+B[blackbox-exporter]
+C[tool-manager exporter]
+D[agent-manager exporter]
+E[grafana alloy]
+F[azure managed prometheus]
+G[grafana dashboards]
+subgraph kubiya-runner
+    A ---> E
+    B ---> E
+    C ---> E
+    D ---> E
+    H ---> E
+    E
+end
+E ---> F
+F ---> G
 ```
-The chart includes comprehensive monitoring setup:
-- `otel-collector` for metrics and traces collection, processing and sending. Utilize [non-oficial container image](https://github.com/kubiyabot/otel-collector) built with custom implementation of `nats-exporter` exporter plugin which send collected data to NATS Cloud (Synadia).
-- `kube-state-metrics` for Kubernetes metrics. Configured to be limited to collect metrics only for single namespace of Runner deployment due to security concerns for client side deployment scenarios.
-- Metrics are labeled with 'organization' and 'cluster' labels to allow deployment filtering and grouping; configured via `values.yaml` for particular deployment.
-```
 
-### Current approach
+### Grafana Alloy Configuration
 
-**TBD (work in progress section)**
+1. **Security Context**
+   - Runs as non-root user (UID: 473, GID: 473)
+   - Enhanced security through minimal privileges
+   
 
-Grafana Alloy -> Remote Writes -> Azure Managed Prometheus (DCE/DCR/Azure Monitor)
-Alloy security context - running as non-root user
-Resource estimation = https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+2. **Resource Management**
+   - Default resource limits:
+     ```yaml
+     resources:
+       limits:
+         cpu: 1
+         memory: 1Gi
+       requests:
+         cpu: 100m
+         memory: 128Mi
+     ```
+   - Resource estimation guidelines available at: https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+
+3. **Scraping Configuration**
+   - Default intervals:
+     - `tool-manager` and `agent-manager` exporters: 60s
+     - Alloy exporter: 60s
+     - Blackbox exporter: 60s
+     - Kube State Metrics: 60s
+     - Optional cAdvisor: 60s (disabled by default)
+
+4. **Azure Integration**
+   Required environment variables for Azure Managed Prometheus:
+   - `AZURE_REMOTE_WRITE_URL`: Azure Prometheus endpoint
+   - `AZURE_CLIENT_ID`: Azure service principal client ID
+   - `AZURE_CLIENT_SECRET`: Azure service principal secret
+   - `AZURE_TOKEN_URL`: Azure OAuth token URL
+
+
+## Grafana Dashboards
+
+ Grafana dashboards available in the `kubiya-runner` and located in `helm-charts/charts/kubiya-runner/grafana-dashboards/`.
+
+### List of available dashboards:
+
+**Runner Health Overview** (`customer-runners-runner-health-overview.json`)
+ ()
+- Provides a comprehensive view of runner components' health status
+- Features:
+  - Filtering by organization, runner and namespace
+  - Component pods readiness status, restarts, health probes, etc.
+  - Component container running versions tracking
+  - Real-time health metrics visualization
+
+**Tool Manager Dashboard** (`customer-runners-component-exporter-tool-manager.json`)
+
+- Focused on Tool Manager performance metrics
+- Features:
+  - HTTP response time distribution
+  - Go runtime metrics (goroutines, threads, GC)
+  - Request/response statistics
+
+**Agent Manager Dashboard** (`customer-runners-component-exporter-agent-manager.json`)
+
+- Monitors Agent Manager performance
+- Features:
+  - HTTP request metrics
+  - Error rate tracking
+  - Performance indicators
+
+#### Kubernetes State Dashboard (`runner-namespace-kubernetes-state.json`)
+
+(*Under development*)
+  
+- Provides Kubernetes state metrics for the runner namespace
+- Based on `kube-state-metrics` data
+- Includes summary metrics about the runner's Kubernetes resources
+
+4. Alloy Dashboard (`customer-runners-metrics-alloy-prometheus-components.json`)
+
+- Monitors Alloy pipelines
+- Focus on Remote Writes to Prometheus (success/errors/count,...)
+- Can show metrics flow for particular runner deployment (count/error/success/volume etc.
+- Visuzlize targets it scrapes metrics from (count/error/success/volume etc.
+- Can be used to control and on data alert spikes (and therefore cost) and broken metrics flow
+
+#### 5. Health Overview by Components (`customer-runners-runner-health-overview-by-components.json`)
+
+- Detailed breakdown of health metrics by individual components
+- Features:
+  - Component version tracking
+  - Services status monitoring
+  - Can show multiple runner instances
+
+## Dashboard Features
+
+- **Filtering Capabilities**: All dashboards support filtering by:
+  - Organization
+  - Namespace
+  - Runner instance
+  - Component type
+
+- **Visualization Types**:
+  - State timelines
+  - Heatmaps
+  - Time series graphs
+  - Tables for version information
+
+- **Data Sources**:
+  - Primary data source: Prometheus
+  - Integration with Grafana Alloy for metrics collection
+
+## Usage
+
+These dashboards are automatically provisioned when the Helm chart is installed with monitoring enabled. They provide comprehensive visibility into the health and performance of your Kubiya Runner deployment.
+
 
 ## K8s Resources Definitions
 
