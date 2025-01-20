@@ -74,6 +74,32 @@ engine:
 
   existingServiceAccount: {} # name: "default"
 
+    # Extras added to "fork" of dagger subchart to support kubiya-runner
+additionalResources:
+  # Role & RoleBinding for dagger engine.
+  # Not created by default via original dagger subchart, they still may be required for some use cases.
+  # Transfered as-is from original runner template. If enabled will be attached to dagger.serviceAccount.name specified above.
+  role:
+    create: false
+  roleBinding:
+    create: false
+  # headless service for dagger engine discovery and load balancing used by tool-manager
+    # At moment of writing this, dagger subchart does not provide headless service, while it's required for tool-manager (for now)to do load balancing
+  # Port defined must match dagger container port in dagger.engine.config section.
+  service:
+    create: true
+    # These values are need to match tool-manager's dagger config and therefore referenced in tool-manager configuration as environment variables in this file.
+    # ---------------------------------------------------------------------------------------------------------------------
+    # If not set, will be auto generated as name: {{ include "kubiya-runner.fullname" . }}-dagger-engine but in this case,
+    # which, to be used, needs to be set in tool-manager deployment via tpl function call, which is currently done in values.yaml.
+    # Should be refactored to move all required env_vars to component deployments with ability to override from values.yaml.
+    # ---------------------------------------------------------------------------------------------------------------------
+    name: dagger-engine-service
+    port: 8080
+
+labels:
+  app.kubernetes.io/kubiya-runner-component: dagger-engine
+
 magicache:
   enabled: false
   url: https://api.dagger.cloud/magicache

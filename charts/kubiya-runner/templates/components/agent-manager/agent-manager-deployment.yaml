@@ -1,20 +1,23 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agent-manager
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "agent-manager.labels" . | indent 4 }}
+    {{- include "agent-manager.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.agentManager.replicas }}
   selector:
     matchLabels:
-      {{- include "agent-manager.selectorLabels" . | indent 6 }}
+      {{- include "agent-manager.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with .Values.agentManager.extraPodsAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        {{- include "agent-manager.labels" . | indent 8 }}
+        {{- include "agent-manager.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "kubiya-runner.serviceAccountName.agentManager" . }}
       containers:
@@ -32,6 +35,15 @@ spec:
               value: {{ tpl $value $ | quote }}
             {{- end }}
             {{- end }}
+          {{- if .Values.agentManager.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.agentManager.livenessProbe.httpGet.path }}
+              port: {{ .Values.agentManager.service.targetPort }}
+            initialDelaySeconds: {{ .Values.agentManager.livenessProbe.initialDelaySeconds }} 
+            periodSeconds: {{ .Values.agentManager.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.agentManager.livenessProbe.timeoutSeconds }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.agentManager.service.targetPort }}
         {{- with .Values.agentManager.volumeMounts }}
