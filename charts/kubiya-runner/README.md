@@ -25,11 +25,8 @@ A Helm chart for deploying the Kubiya Runner.
     - [Architecture](#architecture)
     - [Grafana Alloy Configuration](#grafana-alloy-configuration)
   - [Grafana Dashboards](#grafana-dashboards)
-    - [List of available dashboards:](#list-of-available-dashboards)
-      - [Kubernetes State Dashboard (`runner-namespace-kubernetes-state.json`)](#kubernetes-state-dashboard-runner-namespace-kubernetes-statejson)
-      - [5. Health Overview by Components (`customer-runners-runner-health-overview-by-components.json`)](#5-health-overview-by-components-customer-runners-runner-health-overview-by-componentsjson)
-  - [Dashboard Features](#dashboard-features)
-  - [Usage](#usage)
+    - [List of available dashboards](#list-of-available-dashboards)
+  - [Dashboards as a Code](#dashboards-as-a-code)
   - [K8s Resources Definitions](#k8s-resources-definitions)
   - [Security](#security-1)
   - [Optional Permissions Extensions:](#optional-permissions-extensions)
@@ -173,19 +170,19 @@ F ---> G
    
 
 2. **Resource Management**
-   - Default resource limits:
-     ```yaml
-     resources:
-       limits:
-         cpu: 1
-         memory: 1Gi
-       requests:
-         cpu: 100m
-         memory: 128Mi
-     ```
-   - Resource estimation guidelines available at: https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+Default resource limits:
+    ```yaml
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    ```
+  - Resource estimation guidelines available at: https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
 
-3. **Scraping Configuration**
+1. **Scraping Configuration**
    - Default intervals:
      - `tool-manager` and `agent-manager` exporters: 60s
      - Alloy exporter: 60s
@@ -193,7 +190,7 @@ F ---> G
      - Kube State Metrics: 60s
      - Optional cAdvisor: 60s (disabled by default)
 
-4. **Azure Integration**
+2. **Azure Integration**
    Required environment variables for Azure Managed Prometheus:
    - `AZURE_REMOTE_WRITE_URL`: Azure Prometheus endpoint
    - `AZURE_CLIENT_ID`: Azure service principal client ID
@@ -205,78 +202,87 @@ F ---> G
 
  Grafana dashboards available in the `kubiya-runner` and located in `helm-charts/charts/kubiya-runner/grafana-dashboards/`.
 
-### List of available dashboards:
+### List of available dashboards
+
+![Grafana Dashboards](_docs/dashboards-list.png)
 
 **Runner Health Overview** (`customer-runners-runner-health-overview.json`)
- ()
+  
 - Provides a comprehensive view of runner components' health status
-- Features:
-  - Filtering by organization, runner and namespace
-  - Component pods readiness status, restarts, health probes, etc.
-  - Component container running versions tracking
-  - Real-time health metrics visualization
+- Filtering by organization, runner and namespace
+- Component pods readiness status, restarts, health probes, etc.
+- Component container running versions tracking
+- Real-time health metrics visualization
+
+![Runner Health Overview](_docs/runner-health-overview-dashboard.png)
+
+**Health Overview by Components** (`customer-runners-runner-health-overview-by-components.json`)
+  
+Detailed breakdown of health metrics by individual components.
+
+- Component version tracking
+- Services status monitoring
+- Can show multiple runner instances
+
+![Health Overview by Components](_docs/runner-health-overview-by-components.png)
 
 **Tool Manager Dashboard** (`customer-runners-component-exporter-tool-manager.json`)
 
 - Focused on Tool Manager performance metrics
-- Features:
-  - HTTP response time distribution
-  - Go runtime metrics (goroutines, threads, GC)
-  - Request/response statistics
+- HTTP response time distribution
+- Go runtime metrics (goroutines, threads, GC)
+- Request/response statistics
+
+![Health Overview by Components](_docs/tool-manager-dashboard.png)
 
 **Agent Manager Dashboard** (`customer-runners-component-exporter-agent-manager.json`)
 
 - Monitors Agent Manager performance
-- Features:
-  - HTTP request metrics
-  - Error rate tracking
-  - Performance indicators
+- HTTP request metrics
+- Error rate tracking
+- Performance indicators
 
-#### Kubernetes State Dashboard (`runner-namespace-kubernetes-state.json`)
+![Health Overview by Components](_docs/agent-manager-dashboard.png)
+
+**Kubernetes State Dashboard** (`runner-namespace-kubernetes-state.json`)
 
 (*Under development*)
-  
+ 
 - Provides Kubernetes state metrics for the runner namespace
 - Based on `kube-state-metrics` data
 - Includes summary metrics about the runner's Kubernetes resources
 
-4. Alloy Dashboard (`customer-runners-metrics-alloy-prometheus-components.json`)
+**Alloy Dashboard** (`customer-runners-metrics-alloy-prometheus-components.json`)
 
 - Monitors Alloy pipelines
 - Focus on Remote Writes to Prometheus (success/errors/count,...)
 - Can show metrics flow for particular runner deployment (count/error/success/volume etc.
-- Visuzlize targets it scrapes metrics from (count/error/success/volume etc.
+- Visualize targets it scrapes metrics from (count/error/success/volume etc.
 - Can be used to control and on data alert spikes (and therefore cost) and broken metrics flow
 
-#### 5. Health Overview by Components (`customer-runners-runner-health-overview-by-components.json`)
+![Health Overview by Components](_docs/alloy-dashboard.png)
+ 
+**Blackbox Exporter Dashboards**  (`customer-runners-blackbox-exporter-alternate-view`, 
+`customer-runners-blackbox-exporter.json`)
 
-- Detailed breakdown of health metrics by individual components
-- Features:
-  - Component version tracking
-  - Services status monitoring
-  - Can show multiple runner instances
+- Alternative visualization of HTTP probe metrics
+- Focus on probe success rates and latencies
+- SSL/TLS status monitoring
+- DNS resolution performance
+- Comprehensive HTTP request timing breakdown
 
-## Dashboard Features
+![Blackbox Exporter Alternate View](_docs/blackbox-dashboard.png)
+![Blackbox Dashboard](_docs/blackbox-alternate-dashboard.png)
+ 
+## Dashboards as a Code
 
-- **Filtering Capabilities**: All dashboards support filtering by:
-  - Organization
-  - Namespace
-  - Runner instance
-  - Component type
+Initial set of dashboards are stored as code for future automatic provisioning into customer's Grafana instances, currently serving as version-controlled backups.
 
-- **Visualization Types**:
-  - State timelines
-  - Heatmaps
-  - Time series graphs
-  - Tables for version information
+A dashboard export script is available at `kubiya-runner/_grafana-dashboards/grafana-dashboards-export.sh` for exporting dashboards from Azure Managed Grafana. When you create a new dashboard or modify an existing one, the recommended workflow is:
 
-- **Data Sources**:
-  - Primary data source: Prometheus
-  - Integration with Grafana Alloy for metrics collection
-
-## Usage
-
-These dashboards are automatically provisioned when the Helm chart is installed with monitoring enabled. They provide comprehensive visibility into the health and performance of your Kubiya Runner deployment.
+1. Use the export script to save the dashboard as a JSON file
+2. Commit the file to the repository
+3. Create a pull request to the main branch
 
 
 ## K8s Resources Definitions
