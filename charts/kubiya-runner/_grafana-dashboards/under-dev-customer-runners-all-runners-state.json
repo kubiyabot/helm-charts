@@ -10,10 +10,10 @@
         "url": "/d/bea2idbz3hh4wf/under-dev-customer-runners-all-runners-state",
         "expires": "0001-01-01T00:00:00Z",
         "created": "2025-01-15T13:25:53Z",
-        "updated": "2025-01-15T15:46:36Z",
+        "updated": "2025-01-21T08:08:51Z",
         "updatedBy": "sergey.demyachonok@kubiya.ai",
         "createdBy": "sergey.demyachonok@kubiya.ai",
-        "version": 15,
+        "version": 28,
         "hasAcl": false,
         "isFolder": false,
         "folderId": 118,
@@ -428,7 +428,7 @@
                 },
                 "gridPos": {
                     "h": 4,
-                    "w": 2,
+                    "w": 4.8,
                     "x": 0,
                     "y": 1
                 },
@@ -531,7 +531,7 @@
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 13
+                    "y": 10
                 },
                 "id": 20,
                 "panels": [],
@@ -742,7 +742,7 @@
                     "h": 21,
                     "w": 24,
                     "x": 0,
-                    "y": 14
+                    "y": 11
                 },
                 "id": 14,
                 "options": {
@@ -847,6 +847,197 @@
                                 },
                                 "runner": {
                                     "aggregations": [],
+                                    "operation": "groupby"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "type": "table"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus-staging"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "custom": {
+                            "align": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
+                            "inspect": false
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        }
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "label_app_kubernetes_io_name"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 386
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "organization"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 195
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "runner"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 158
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "label_helm_sh_chart (uniqueValues)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 616
+                                },
+                                {
+                                    "id": "displayName",
+                                    "value": "Helm Charts Installed"
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Helm Charts Installed"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 1878
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "gridPos": {
+                    "h": 5,
+                    "w": 24,
+                    "x": 0,
+                    "y": 32
+                },
+                "id": 31,
+                "options": {
+                    "cellHeight": "sm",
+                    "footer": {
+                        "countRows": false,
+                        "fields": "",
+                        "reducer": [
+                            "sum"
+                        ],
+                        "show": false
+                    },
+                    "showHeader": true,
+                    "sortBy": []
+                },
+                "pluginVersion": "10.4.11",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_info{namespace=~\"$namespace\", runner=~\"$runner\", organization=~\"$organization\"} * on(pod) group_left(label_helm_sh_chart) kube_pod_labels{label_helm_sh_chart!=\"\"}",
+                        "format": "table",
+                        "instant": false,
+                        "legendFormat": "__auto",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Helm Chart Versions Installed",
+                "transformations": [
+                    {
+                        "id": "filterFieldsByName",
+                        "options": {
+                            "include": {
+                                "names": [
+                                    "label_helm_sh_chart",
+                                    "organization",
+                                    "runner"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "groupBy",
+                        "options": {
+                            "fields": {
+                                "Value": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ]
+                                },
+                                "created_by_name": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "label_helm_sh_chart": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ],
+                                    "operation": "aggregate"
+                                },
+                                "namespace": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ],
+                                    "operation": "aggregate"
+                                },
+                                "organization": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "runner": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ],
                                     "operation": "groupby"
                                 }
                             }
@@ -1042,7 +1233,7 @@
         "timezone": "browser",
         "title": "[Under Dev] Customer Runners / All Runners State",
         "uid": "bea2idbz3hh4wf",
-        "version": 15,
+        "version": 28,
         "weekStart": ""
     }
 }

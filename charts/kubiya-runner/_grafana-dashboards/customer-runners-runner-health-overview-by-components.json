@@ -10,10 +10,10 @@
         "url": "/d/runner-health-detail4/92cf851e-118c-57c7-a10a-6f43b2adb5ea",
         "expires": "0001-01-01T00:00:00Z",
         "created": "2025-01-07T08:14:22Z",
-        "updated": "2025-01-15T13:14:54Z",
+        "updated": "2025-01-21T08:12:50Z",
         "updatedBy": "sergey.demyachonok@kubiya.ai",
         "createdBy": "sergey.demyachonok@kubiya.ai",
-        "version": 77,
+        "version": 78,
         "hasAcl": false,
         "isFolder": false,
         "folderId": 118,
@@ -532,12 +532,26 @@
                     "h": 1,
                     "w": 24,
                     "x": 0,
-                    "y": 21
+                    "y": 14
                 },
                 "id": 20,
                 "panels": [],
                 "title": "Component Versions",
                 "type": "row"
+            },
+            {
+                "gridPos": {
+                    "h": 4,
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "id": 32,
+                "libraryPanel": {
+                    "name": "Helm Chart Versions Installed",
+                    "uid": "cean4ucxlidxcb"
+                },
+                "title": "Helm Chart Versions Installed"
             },
             {
                 "datasource": {
@@ -743,7 +757,7 @@
                     "h": 15,
                     "w": 24,
                     "x": 0,
-                    "y": 22
+                    "y": 19
                 },
                 "id": 14,
                 "options": {
@@ -1043,7 +1057,7 @@
         "timezone": "browser",
         "title": "Customer Runners / Runner Health Overview (By Components)",
         "uid": "runner-health-detail4",
-        "version": 77,
+        "version": 78,
         "weekStart": ""
     }
 }

@@ -10,10 +10,10 @@
         "url": "/d/k8s-app-health-dashboard/customer-runners-runner-health-overview",
         "expires": "0001-01-01T00:00:00Z",
         "created": "2024-12-25T17:14:21Z",
-        "updated": "2025-01-14T06:29:36Z",
+        "updated": "2025-01-21T09:07:24Z",
         "updatedBy": "sergey.demyachonok@kubiya.ai",
         "createdBy": "sergey.demyachonok@kubiya.ai",
-        "version": 47,
+        "version": 51,
         "hasAcl": false,
         "isFolder": false,
         "folderId": 118,
@@ -86,7 +86,7 @@
                                     "result": {
                                         "color": "green",
                                         "index": 0,
-                                        "text": "Up"
+                                        "text": "Healthy"
                                     },
                                     "to": 1
                                 },
@@ -326,7 +326,7 @@
                                     "1": {
                                         "color": "green",
                                         "index": 1,
-                                        "text": "Up"
+                                        "text": "Healthy"
                                     }
                                 },
                                 "type": "value"
@@ -416,42 +416,76 @@
                             "lineWidth": 1,
                             "spanNulls": false
                         },
-                        "fieldMinMax": true,
+                        "decimals": 0,
+                        "fieldMinMax": false,
                         "mappings": [
                             {
                                 "options": {
-                                    "95": {
-                                        "index": 1,
-                                        "text": "Down"
-                                    },
                                     "100": {
+                                        "color": "green",
                                         "index": 0,
-                                        "text": "Up"
+                                        "text": "Healthy"
                                     }
                                 },
                                 "type": "value"
                             },
                             {
                                 "options": {
-                                    "match": "null+nan",
+                                    "from": 95,
                                     "result": {
-                                        "index": 2,
-                                        "text": "No Data"
-                                    }
+                                        "color": "yellow",
+                                        "index": 1,
+                                        "text": "Warning"
+                                    },
+                                    "to": 99
                                 },
-                                "type": "special"
+                                "type": "range"
+                            },
+                            {
+                                "options": {
+                                    "from": 80,
+                                    "result": {
+                                        "color": "orange",
+                                        "index": 2,
+                                        "text": "Degraded"
+                                    },
+                                    "to": 94
+                                },
+                                "type": "range"
+                            },
+                            {
+                                "options": {
+                                    "from": 0,
+                                    "result": {
+                                        "color": "red",
+                                        "index": 3,
+                                        "text": "Down"
+                                    },
+                                    "to": 79
+                                },
+                                "type": "range"
                             }
                         ],
+                        "max": 100,
+                        "min": 0,
                         "noValue": "No Data",
                         "thresholds": {
                             "mode": "absolute",
                             "steps": [
                                 {
-                                    "color": "red",
+                                    "color": "green",
                                     "value": null
                                 },
                                 {
                                     "color": "red",
+                                    "value": 80
+                                },
+                                {
+                                    "color": "orange",
+                                    "value": 94
+                                },
+                                {
+                                    "color": "yellow",
                                     "value": 95
                                 },
                                 {
@@ -495,7 +529,7 @@
                         },
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "100 * (sum(rate(response_status{status=~\"2..\", runner=\"$runner\", app=\"tool-manager\", kubernetes_namespace=\"$namespace\"}[5m]))/sum(rate(http_requests_total{runner=\"$runner\", app=\"tool-manager\", kubernetes_namespace=\"$namespace\"}[5m])))",
+                        "expr": "100 * (\n  sum(\n    rate(\n      response_status{\n        status=~\"2..\",\n        runner=\"$runner\",\n        app=\"tool-manager\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n  /\n  sum(\n    rate(\n      http_requests_total{\n        runner=\"$runner\",\n        app=\"tool-manager\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n)",
                         "format": "time_series",
                         "hide": false,
                         "instant": false,
@@ -510,7 +544,7 @@
                             "uid": "prometheus-staging"
                         },
                         "editorMode": "code",
-                        "expr": "(100 * (sum(rate(agent_manager_http_requests_total{status=~\"2..\", runner=\"$runner\", app=\"agent-manager\", namespace=\"$namespace\"}[5m]))/sum(rate(agent_manager_http_requests_total{runner=\"$runner\", app=\"agent-manager\", namespace=\"$namespace\"}[5m]))))",
+                        "expr": "100 * (\n  sum(\n    rate(\n      agent_manager_http_requests_total{\n        status=~\"2..\",\n        runner=\"$runner\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n  /\n  sum(\n    rate(\n      agent_manager_http_requests_total{\n        runner=\"$runner\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n)",
                         "hide": false,
                         "instant": false,
                         "legendFormat": "agent-manager",
@@ -520,6 +554,20 @@
                 ],
                 "title": "HTTP Requests Success",
                 "type": "state-timeline"
+            },
+            {
+                "gridPos": {
+                    "h": 4,
+                    "w": 24,
+                    "x": 0,
+                    "y": 22
+                },
+                "id": 10,
+                "libraryPanel": {
+                    "name": "Helm Chart Versions Installed",
+                    "uid": "cean4ucxlidxcb"
+                },
+                "title": "Helm Chart Versions Installed"
             },
             {
                 "datasource": {
@@ -662,10 +710,10 @@
                     ]
                 },
                 "gridPos": {
-                    "h": 13,
+                    "h": 10,
                     "w": 24,
                     "x": 0,
-                    "y": 22
+                    "y": 26
                 },
                 "id": 8,
                 "options": {
@@ -890,7 +938,7 @@
         "timezone": "browser",
         "title": "Customer Runners / Runner Health Overview",
         "uid": "k8s-app-health-dashboard",
-        "version": 47,
+        "version": 51,
         "weekStart": ""
     }
 }

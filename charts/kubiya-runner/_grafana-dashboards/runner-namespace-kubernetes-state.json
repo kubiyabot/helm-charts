@@ -6,14 +6,14 @@
         "canAdmin": false,
         "canStar": true,
         "canDelete": false,
-        "slug": "runner-namespace-kubernetes-state",
-        "url": "/d/garysdevil-kube-state-metrics-v2/runner-namespace-kubernetes-state",
+        "slug": "under-dev-runner-namespace-kubernetes-state",
+        "url": "/d/garysdevil-kube-state-metrics-v2/under-dev-runner-namespace-kubernetes-state",
         "expires": "0001-01-01T00:00:00Z",
         "created": "2024-12-19T08:12:38Z",
-        "updated": "2025-01-14T07:35:28Z",
+        "updated": "2025-01-21T06:01:13Z",
         "updatedBy": "sergey.demyachonok@kubiya.ai",
         "createdBy": "sergey.demyachonok@kubiya.ai",
-        "version": 8,
+        "version": 9,
         "hasAcl": false,
         "isFolder": false,
         "folderId": 118,
@@ -4033,9 +4033,9 @@
             ]
         },
         "timezone": "browser",
-        "title": "Runner Namespace Kubernetes State",
+        "title": "[Under Dev] Runner Namespace Kubernetes State",
         "uid": "garysdevil-kube-state-metrics-v2",
-        "version": 8,
+        "version": 9,
         "weekStart": ""
     }
 }

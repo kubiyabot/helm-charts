@@ -206,6 +206,24 @@ Default resource limits:
 
 ![Grafana Dashboards](_docs/dashboards-list.png)
 
+**Health Overview by Components** (`customer-runners-runner-health-overview-by-components.json`)
+  
+Detailed breakdown of health metrics by individual components for multiple runners.
+
+- Multiple runner instances state
+- Component version tracking
+- Services status monitoring
+
+| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red) |
+|--------|----------------|------------------|-------------------|------------|
+| Service Status | 100% | 95-100% | 80-95% | 0-80% |
+| Pod Restarts per | 0-1 restarts | 1.1-2 restarts | 2.1-4 restarts | >4.1 restarts |
+| HTTP Success Rate | 100% | 95-99% | 80-94% | 0-79% |
+| Pod Status Ready | 100% | 90-99% | 70-89% | 0-69% |
+
+![Health Overview by Components](_docs/runner-health-overview-by-components.png)
+
+
 **Runner Health Overview** (`customer-runners-runner-health-overview.json`)
   
 - Provides a comprehensive view of runner components' health status
@@ -214,17 +232,14 @@ Default resource limits:
 - Component container running versions tracking
 - Real-time health metrics visualization
 
+| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red) |
+|--------|----------------|------------------|-------------------|------------|
+| Service Status | 100% | 95-100% | 80-95% | 0-80% |
+| Pod Restarts per | 0-1 restarts | 1.1-2 restarts | 2.1-4 restarts | >4.1 restarts |
+| HTTP Success Rate | 100% | 95-99% | 80-94% | 0-79% |
+| Pod Status Ready | 100% | 90-99% | 70-89% | 0-69% |
+
 ![Runner Health Overview](_docs/runner-health-overview-dashboard.png)
-
-**Health Overview by Components** (`customer-runners-runner-health-overview-by-components.json`)
-  
-Detailed breakdown of health metrics by individual components.
-
-- Component version tracking
-- Services status monitoring
-- Can show multiple runner instances
-
-![Health Overview by Components](_docs/runner-health-overview-by-components.png)
 
 **Tool Manager Dashboard** (`customer-runners-component-exporter-tool-manager.json`)
 
