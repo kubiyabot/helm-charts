@@ -265,6 +265,7 @@ imageUpdater:
     name: "" # Leave empty when create is true to use the default generated name
     automountServiceAccountToken: true
 
+# Dagger subchart config
 dagger:
   enabled: true
   # Override fullname for dagger engine deployment to be able to use kustomize patch
@@ -284,6 +285,13 @@ dagger:
     - --oci-max-parallelism
     - num-cpu
     # Add "debug = true" when needed
+    # Overriding readiness probe from forked dagger to match one from our custom dagger build
+    readinessProbe:
+      exec:
+        command:
+          - buildctl
+          - debug
+          - workers
     config: |
       insecure-entitlements = ["security.insecure"]
       [registry."ghcr.io"]

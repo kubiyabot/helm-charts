@@ -55,13 +55,20 @@ engine:
   ### Set priorityClassName to avoid eviction
   priorityClassName: ""
 
-  readinessProbeSettings:
+  # Original readiness probe from forked dagger chart
+  readinessProbe:
+    exec:
+      command:
+        - sh
+        - -exc
+        - |-
+          dagger core version
     initialDelaySeconds: 5
     timeoutSeconds: 14
     periodSeconds: 15
     successThreshold: 1
     failureThreshold: 10
-
+    
   ### The Engine may need to finish operations in flight, or sync its state to a remote destination.
   #   We give it ample time by setting this value to 5 mins by default.
   #   You may want to adjust this to fit your workloads so that the Engine stops quicker.
