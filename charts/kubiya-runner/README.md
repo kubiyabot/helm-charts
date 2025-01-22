@@ -24,6 +24,7 @@ A Helm chart for deploying the Kubiya Runner.
     - [Security](#security)
     - [Architecture](#architecture)
     - [Grafana Alloy Configuration](#grafana-alloy-configuration)
+  - [**Azure Prometheus Integration**](#azure-prometheus-integration)
   - [Grafana Dashboards](#grafana-dashboards)
     - [List of available dashboards](#list-of-available-dashboards)
   - [Dashboards as a Code](#dashboards-as-a-code)
@@ -66,7 +67,6 @@ kubiya-runner/
 - PV provisioner support in the underlying infrastructure
 - NATS credentials for messaging
 - Registry TLS certificates (if using private registry)
-`
 
 ## Permissions
 
@@ -76,13 +76,13 @@ kubiya-runner/
 
 Repository: [kubiya-agent-manager](https://github.com/kubiyabot/kubiya-agent-manager)
 
-[#TODO: Needs documentation]
+The Agent Manager handles lifecycle management of Kubiya agents within the cluster.
 
 ### Kubiya Operator
 
 Repository: [kubiya-operator](https://github.com/kubiyabot/kubiya-operator)
 
-[#TODO: Needs documentation]
+The Kubiya Operator manages operational aspects and configuration of the runner components.
 
 ### Tool Manager
 
@@ -104,7 +104,7 @@ Full documentation is available [in project repository](https://github.com/kubiy
 ```
 ## Dependencies & Compatibility Matrix
 
-This version of this chart as of version 0.3.0 is tested to be compatible with the following versions of container images and Helm dependencies.
+This chart (as of version 0.6.x) is tested to be compatible with the following versions of container images and Helm dependencies.
 
 ### Helm Dependencies
 
@@ -129,14 +129,15 @@ This version of this chart as of version 0.3.0 is tested to be compatible with t
 
 ## Monitoring & Telemetry
 
-The `kubiya-runner`uses [Grafana Alloy](https://grafana.com/docs/alloy/latest/) for metrics collection from multiple customer runner deployments.
-Alloy scrapes data from a set of targets (pods, services, etc) which expose metrics on an endpoint (usually `/metrics`), process them (filter, add runner deployment labels, ...) and push via Prometheus native `remote_writes` into **Azure Managed Prometheus**.
+The `kubiya-runner` uses [Grafana Alloy](https://grafana.com/docs/alloy/latest/) for metrics collection from multiple customer runner deployments.
+Alloy scrapes data from a set of targets (pods, services, etc.) which expose metrics on an endpoint (usually `/metrics`), processes them (filters, adds runner deployment labels, etc.) and pushes via Prometheus native `remote_writes` into **Azure Managed Prometheus**.
 
 Later `kubiya-runner` chart releases expect to use Alloy for other types of telemetry data collection (such as logs and traces). **Alloy** also fully compatible with OpenTelemetry and can be configured to listen/send messages in `OTEL` format if needed, has a long list of vendor platforms and message formats compatibility and a rich set of data processing modules. 
 
 ###  Security
 
-Both `Alloy` and `kube-state-metrics` has limited RBAC permissions and configured to be able to collect only data within kubernetes namespace where `kubiya-runner` is deployed (`kubiya` by default).
+Both `Alloy` and `kube-state-metrics` has limited RBAC permissions and configured to collect only data from same kubernetes namespace where `kubiya-runner` is deployed (`kubiya` by default).
+`Alloy` runs as non-root user.
 
 ### Architecture
 
@@ -163,14 +164,10 @@ F ---> G
 ```
 
 ### Grafana Alloy Configuration
+  
+1. **Resource Management**
 
-1. **Security Context**
-   - Runs as non-root user (UID: 473, GID: 473)
-   - Enhanced security through minimal privileges
-   
-
-2. **Resource Management**
-Default resource limits:
+  Default resource limits for `alloy`
     ```yaml
     resources:
       limits:
@@ -180,23 +177,36 @@ Default resource limits:
         cpu: 100m
         memory: 128Mi
     ```
-  - Resource estimation guidelines available at: https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+  `alloy` resource estimation guidelines available at: https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+  
+2. **Resources & Data Collection Configuration**
 
-1. **Scraping Configuration**
-   - Default intervals:
-     - `tool-manager` and `agent-manager` exporters: 60s
-     - Alloy exporter: 60s
-     - Blackbox exporter: 60s
-     - Kube State Metrics: 60s
-     - Optional cAdvisor: 60s (disabled by default)
+**To minimizes resource usage and cost on both the client and server sides, telemetry collection strategy focuses on deploying and configuring components to capture only the metrics essential for current business and operational goals. This pattern is highly recommended keeping when contributing.**
 
-2. **Azure Integration**
-   Required environment variables for Azure Managed Prometheus:
-   - `AZURE_REMOTE_WRITE_URL`: Azure Prometheus endpoint
-   - `AZURE_CLIENT_ID`: Azure service principal client ID
-   - `AZURE_CLIENT_SECRET`: Azure service principal secret
-   - `AZURE_TOKEN_URL`: Azure OAuth token URL
+Alloy is configured with a single scrape interval, collecting metrics from all targets once every 60 seconds. As a result, 60 seconds is the maximum precision for all metric visualizations and alerting.
 
+If this level of precision is insufficient, the scrape interval can be adjusted—either increased or decreased—to balance resource impact. These adjustments can be applied globally or to specific targets via `values.yaml`:
+
+```yaml
+  alloy:
+    scrapeIntervals:
+      default: 60s
+      runnerExporters: 60s
+      alloyExporter: 60s
+      blackboxExporter: 60s
+      kubeStateMetrics: 60s
+      cadvisor: 60s (disabled by default)
+```
+## **Azure Prometheus Integration**
+
+Required set of environment variables to be set for Azure Managed Prometheus remote writes support:
+
+- `AZURE_REMOTE_WRITE_URL`: Azure Prometheus endpoint
+- `AZURE_CLIENT_ID`: Azure service principal client ID
+- `AZURE_CLIENT_SECRET`: Azure service principal secret
+- `AZURE_TOKEN_URL`: Azure OAuth token URL
+
+These variables confurable via `values.yaml` `alloy.alloy.extraEnv`)
 
 ## Grafana Dashboards
 
@@ -309,14 +319,12 @@ In such deployments pre-installed webhooks may deny installation of runner's k8s
 
 ## Security
 
-**TBD (work in progress section)** 
+**Security Considerations:**
 
-- Reduce RBAC for alloy (namespace-scoped)
-- Namespace-scoped RBAC permissions.
-  Except `tool-manager`. Merged PR gave `tool-manager` optional cluster wide full access permissions (`values.adminClusterRole.create`, and default cluster-wide PVC management permission.
-- Service accounts for each component
+- Namespace-scoped RBAC permissions for components (except `tool-manager`: optional cluster full access via `values.adminClusterRole.create`, default cluster-wide PVC management)
+- Dedicated service accounts for each component 
 - TLS support for registry communication (used by `tool-manager`)
-
+- Reduced RBAC permissions for Alloy (namespace-scoped)
 
 ## Optional Permissions Extensions:
 *[Section is Under Development]*
@@ -332,14 +340,15 @@ As of moment of writing this, default configuration set via `values.yaml` should
 ## Minimum Required Configuration
 
 - `runnerNameOverride`: This can be used to override default runner name generated from release name. 
-  *IMPORTANT* Runner name must match one encoded in JWT token configured in `nats.*` values. Propagated via config map of `alloy.alloy.extraENV` all environment variables must be set to configure Grafana Alloy for remote writes of metrics data into Azure Managed Prometheus.
+  *IMPORTANT* Runner name must match one encoded in JWT token configured in `nats.*` values.
+- `alloy.alloy.extraENV` all env vars must be set for support of metrics push to remote Prometheus via remote writes (see [Azure Prometheus Integration](#azure-prometheus-integration))
 - `organization`: "my_organization" - given organization name
 - `kubiyaAgentUUID`: "679adc53-7068-4454-aa9f-16df30b14a50" - UUID of the agent
 - `nats.jwt` and `nats.secondJwt`: NATS credentials for sending metrics to NATS Cloud (Synadia). Tokens are generated by kubiya frontend UI with frontend-specific runner name encoded as a part of token.
 - `nats.subject`: NATS destination subject for metrics sending
 - `nats.serverUrl`: NATS server URL
 - `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (used by `tool-manager`) 
-
+-  (`alloy.alloy.extraEnv`):
 
 ## Using Name Overrides
 
