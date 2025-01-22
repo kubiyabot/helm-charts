@@ -65,12 +65,11 @@ Overrides are used to override customer specific values in the Helm chart:
 
 ```yaml
 organization: "customer-org"
-kubiyaAgentUUID: "123exxxx7-e89b-12d3-a456-xxxxxx"
+uuid: "123exxxx7-e89b-12d3-a456-xxxxxx"
 nats:
   jwt: "customer-specific-jwt"
   secondJwt: "customer-specific-second-jwt"
   subject: "customer-specific-subject"
-  org: "customer-specific-org"
 toolManager:
   image:
     repository: "ghcr.io/kubiyabot/tool-manager"
