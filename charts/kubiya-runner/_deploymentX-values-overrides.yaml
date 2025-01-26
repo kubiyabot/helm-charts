@@ -1,0 +1,21 @@
+# Minimal required values overrides for a new runner deployment. These are considered as non-mutable secrets.
+# See README.md for more details
+nats:
+  jwt: "xxx"
+  secondJwt: "xxx"
+  subject: "xxx"
+
+uuid: "xxx"
+organization: "xxx"
+
+alloy:
+  alloy:
+    extraEnv:
+      - name: AZURE_REMOTE_WRITE_URL
+        value: "xxx"
+      - name: AZURE_CLIENT_ID
+        value: "xxx"
+      - name: AZURE_CLIENT_SECRET
+        value: "xxx"
+      - name: AZURE_TOKEN_URL
+        value: "xxx"

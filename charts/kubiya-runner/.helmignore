@@ -43,3 +43,7 @@ _debug*.yaml
 _docs/*
 _docs/
 _debug_values_overrides.yaml
+
+# Examples
+examples/*
+_deploymentX-values-overrides.yaml
