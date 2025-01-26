@@ -1,0 +1,1239 @@
+{
+    "meta": {
+        "type": "db",
+        "canSave": false,
+        "canEdit": false,
+        "canAdmin": false,
+        "canStar": true,
+        "canDelete": false,
+        "slug": "under-dev-customer-runners-all-runners-state",
+        "url": "/d/bea2idbz3hh4wf/under-dev-customer-runners-all-runners-state",
+        "expires": "0001-01-01T00:00:00Z",
+        "created": "2025-01-15T13:25:53Z",
+        "updated": "2025-01-21T08:08:51Z",
+        "updatedBy": "sergey.demyachonok@kubiya.ai",
+        "createdBy": "sergey.demyachonok@kubiya.ai",
+        "version": 28,
+        "hasAcl": false,
+        "isFolder": false,
+        "folderId": 118,
+        "folderUid": "ce7de1i4gq8zkc",
+        "folderTitle": "Customer Runners",
+        "folderUrl": "/dashboards/f/ce7de1i4gq8zkc/customer-runners",
+        "provisioned": false,
+        "provisionedExternalId": "",
+        "annotationsPermissions": {
+            "dashboard": {
+                "canAdd": false,
+                "canEdit": false,
+                "canDelete": false
+            },
+            "organization": {
+                "canAdd": false,
+                "canEdit": false,
+                "canDelete": false
+            }
+        }
+    },
+    "dashboard": {
+        "annotations": {
+            "list": [
+                {
+                    "builtIn": 1,
+                    "datasource": {
+                        "type": "grafana",
+                        "uid": "-- Grafana --"
+                    },
+                    "enable": true,
+                    "hide": true,
+                    "iconColor": "rgba(0, 211, 255, 1)",
+                    "name": "Annotations & Alerts",
+                    "type": "dashboard"
+                }
+            ]
+        },
+        "editable": true,
+        "fiscalYearStartMonth": 0,
+        "graphTooltip": 1,
+        "id": 142,
+        "links": [],
+        "panels": [
+            {
+                "collapsed": false,
+                "gridPos": {
+                    "h": 1,
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "id": 9,
+                "panels": [],
+                "repeat": "runner",
+                "repeatDirection": "h",
+                "title": "${runner}",
+                "type": "row"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus-staging"
+                },
+                "description": "",
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "fieldMinMax": false,
+                        "mappings": [],
+                        "noValue": "NO DATA",
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                }
+                            ]
+                        },
+                        "unit": "string"
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Service Status"
+                            },
+                            "properties": [
+                                {
+                                    "id": "unit",
+                                    "value": "percent"
+                                },
+                                {
+                                    "id": "mappings",
+                                    "value": [
+                                        {
+                                            "options": {
+                                                "100": {
+                                                    "color": "green",
+                                                    "index": 0,
+                                                    "text": "Healthy"
+                                                }
+                                            },
+                                            "type": "value"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 95,
+                                                "result": {
+                                                    "color": "yellow",
+                                                    "index": 1,
+                                                    "text": "Warning"
+                                                },
+                                                "to": 100
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 80,
+                                                "result": {
+                                                    "color": "orange",
+                                                    "index": 2,
+                                                    "text": "Degraded"
+                                                },
+                                                "to": 95
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 0,
+                                                "result": {
+                                                    "color": "red",
+                                                    "index": 3,
+                                                    "text": "Down"
+                                                },
+                                                "to": 80
+                                            },
+                                            "type": "range"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Pod Restarts"
+                            },
+                            "properties": [
+                                {
+                                    "id": "unit",
+                                    "value": "none"
+                                },
+                                {
+                                    "id": "mappings",
+                                    "value": [
+                                        {
+                                            "options": {
+                                                "from": 0,
+                                                "result": {
+                                                    "color": "green",
+                                                    "index": 0,
+                                                    "text": "Healthy"
+                                                },
+                                                "to": 1
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 1.1,
+                                                "result": {
+                                                    "color": "yellow",
+                                                    "index": 1,
+                                                    "text": "Warning"
+                                                },
+                                                "to": 2
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 2.1,
+                                                "result": {
+                                                    "color": "orange",
+                                                    "index": 2,
+                                                    "text": "Degraded"
+                                                },
+                                                "to": 4
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 4.1,
+                                                "result": {
+                                                    "color": "red",
+                                                    "index": 3,
+                                                    "text": "Down"
+                                                },
+                                                "to": 999
+                                            },
+                                            "type": "range"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "HTTP Success Rate"
+                            },
+                            "properties": [
+                                {
+                                    "id": "unit",
+                                    "value": "percent"
+                                },
+                                {
+                                    "id": "mappings",
+                                    "value": [
+                                        {
+                                            "options": {
+                                                "100": {
+                                                    "color": "green",
+                                                    "index": 0,
+                                                    "text": "Healthy"
+                                                }
+                                            },
+                                            "type": "value"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 95,
+                                                "result": {
+                                                    "color": "yellow",
+                                                    "index": 1,
+                                                    "text": "Warning"
+                                                },
+                                                "to": 99
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 80,
+                                                "result": {
+                                                    "color": "orange",
+                                                    "index": 2,
+                                                    "text": "Degraded"
+                                                },
+                                                "to": 94
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 0,
+                                                "result": {
+                                                    "color": "red",
+                                                    "index": 3,
+                                                    "text": "Down"
+                                                },
+                                                "to": 79
+                                            },
+                                            "type": "range"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Pod Status Ready"
+                            },
+                            "properties": [
+                                {
+                                    "id": "unit",
+                                    "value": "percent"
+                                },
+                                {
+                                    "id": "thresholds",
+                                    "value": {
+                                        "mode": "percentage",
+                                        "steps": [
+                                            {
+                                                "color": "green",
+                                                "value": null
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "id": "mappings",
+                                    "value": [
+                                        {
+                                            "options": {
+                                                "100": {
+                                                    "color": "green",
+                                                    "index": 0,
+                                                    "text": "Healthy"
+                                                }
+                                            },
+                                            "type": "value"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 90,
+                                                "result": {
+                                                    "color": "yellow",
+                                                    "index": 1,
+                                                    "text": "Warning"
+                                                },
+                                                "to": 99
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 70,
+                                                "result": {
+                                                    "color": "orange",
+                                                    "index": 2,
+                                                    "text": "Degraded"
+                                                },
+                                                "to": 89
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 0,
+                                                "result": {
+                                                    "color": "red",
+                                                    "index": 3,
+                                                    "text": "Down"
+                                                },
+                                                "to": 69
+                                            },
+                                            "type": "range"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "HTTP Success Rate (TBF)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "mappings",
+                                    "value": [
+                                        {
+                                            "options": {
+                                                "100": {
+                                                    "color": "green",
+                                                    "index": 0,
+                                                    "text": "Healthy"
+                                                }
+                                            },
+                                            "type": "value"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 90,
+                                                "result": {
+                                                    "color": "yellow",
+                                                    "index": 1,
+                                                    "text": "Warning"
+                                                },
+                                                "to": 99
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 70,
+                                                "result": {
+                                                    "color": "orange",
+                                                    "index": 2,
+                                                    "text": "Degraded"
+                                                },
+                                                "to": 89
+                                            },
+                                            "type": "range"
+                                        },
+                                        {
+                                            "options": {
+                                                "from": 0,
+                                                "result": {
+                                                    "color": "red",
+                                                    "index": 3,
+                                                    "text": "Down"
+                                                },
+                                                "to": 69
+                                            },
+                                            "type": "range"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 4.8,
+                    "x": 0,
+                    "y": 1
+                },
+                "id": 1,
+                "maxPerRow": 8,
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "none",
+                    "justifyMode": "auto",
+                    "orientation": "auto",
+                    "reduceOptions": {
+                        "calcs": [
+                            "lastNotNull"
+                        ],
+                        "fields": "",
+                        "values": false
+                    },
+                    "showPercentChange": false,
+                    "textMode": "auto",
+                    "wideLayout": true
+                },
+                "pluginVersion": "10.4.11",
+                "repeat": "component",
+                "repeatDirection": "h",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "expr": "(sum(\n  avg_over_time(\n    kube_pod_status_ready{\n      namespace=\"$namespace\",\n      runner=\"$runner\",\n      organization=\"$organization\",\n      condition=\"true\"\n    }[5m]\n  )\n  * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component)\n  kube_pod_labels{\n    namespace=\"$namespace\",\n    runner=\"$runner\",\n    organization=\"$organization\",\n    label_app_kubernetes_io_kubiya_runner_component=\"$component\"\n  }\n) /\nsum(\n  avg_over_time(\n    kube_pod_status_ready{\n      namespace=\"$namespace\",\n      runner=\"$runner\",\n      organization=\"$organization\"\n    }[5m]\n  )\n  * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component)\n  kube_pod_labels{\n    namespace=\"$namespace\",\n    runner=\"$runner\",\n    organization=\"$organization\",\n    label_app_kubernetes_io_kubiya_runner_component=\"$component\"\n  }\n)) * 100",
+                        "legendFormat": "Pod Status Ready",
+                        "range": true,
+                        "refId": "Pod Status Ready"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "expr": "sum(\n  rate(\n    kube_pod_container_status_restarts_total{\n      namespace=\"$namespace\",\n      runner=\"$runner\",\n      organization=\"$organization\"\n    }[5m]\n  )\n  * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component)\n  kube_pod_labels{\n    namespace=\"$namespace\",\n    runner=\"$runner\",\n    organization=\"$organization\",\n    label_app_kubernetes_io_kubiya_runner_component=\"$component\"\n  }\n) * 300",
+                        "legendFormat": "Pod Restarts",
+                        "range": true,
+                        "refId": "Pod Restarts"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "expr": "100 * (\n  sum(\n    rate(\n      agent_manager_http_requests_total{\n        status=~\"2..\",\n        runner=\"$runner\",\n        app=\"$component\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n  /\n  sum(\n    rate(\n      agent_manager_http_requests_total{\n        runner=\"$runner\",\n        app=\"$component\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n)",
+                        "legendFormat": "HTTP Success Rate",
+                        "range": true,
+                        "refId": "HTTP Success Rate"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "expr": "100 * (\n  sum(\n    rate(\n      response_status{\n        status=~\"2..\",\n        runner=~\"$runner\",\n        app=\"$component\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n  /\n  sum(\n    rate(\n      http_requests_total{\n        runner=\"$runner\",\n        app=\"$component\",\n        namespace=\"$namespace\",\n        organization=\"$organization\"\n      }[5m]\n    )\n  )\n)",
+                        "hide": false,
+                        "legendFormat": "HTTP Success Rate (TBF)",
+                        "range": true,
+                        "refId": "HTTP Success Rate (TBF)"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "expr": "100 * (avg_over_time(\n  probe_success{\n    namespace=\"$namespace\",\n    runner=\"$runner\",\n    organization=\"$organization\",\n    app=\"$component\"\n  }[5m]\n))",
+                        "hide": false,
+                        "legendFormat": "Service Status",
+                        "range": true,
+                        "refId": "Service Health Response Status"
+                    }
+                ],
+                "title": "$component",
+                "transformations": [
+                    {
+                        "id": "joinByField",
+                        "options": {
+                            "byField": "Value",
+                            "mode": "outer"
+                        }
+                    }
+                ],
+                "transparent": true,
+                "type": "stat"
+            },
+            {
+                "collapsed": false,
+                "gridPos": {
+                    "h": 1,
+                    "w": 24,
+                    "x": 0,
+                    "y": 10
+                },
+                "id": 20,
+                "panels": [],
+                "title": "Component Versions",
+                "type": "row"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus-staging"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "fixed"
+                        },
+                        "custom": {
+                            "align": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
+                            "filterable": true,
+                            "inspect": true
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                }
+                            ]
+                        }
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "image"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 614
+                                },
+                                {
+                                    "id": "displayName",
+                                    "value": "version (container image)"
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "namespace"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 142
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "container"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 221
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "pod (distinctCount)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 60
+                                },
+                                {
+                                    "id": "displayName",
+                                    "value": "# pods"
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "pod (uniqueValues)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 20
+                                },
+                                {
+                                    "id": "displayName",
+                                    "value": "pod names"
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "# of pods running this image"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 315
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "# of pods (running this image version)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 289
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "all pod names (running this image version)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 1396
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "pod names"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 1225
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "# pods"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 103
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "image_spec"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 448
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "image_id"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 233
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "version (container image)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 463
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "gridPos": {
+                    "h": 21,
+                    "w": 24,
+                    "x": 0,
+                    "y": 11
+                },
+                "id": 14,
+                "options": {
+                    "cellHeight": "sm",
+                    "footer": {
+                        "countRows": false,
+                        "enablePagination": true,
+                        "fields": "",
+                        "reducer": [
+                            "sum"
+                        ],
+                        "show": false
+                    },
+                    "frameIndex": 0,
+                    "showHeader": true,
+                    "sortBy": [
+                        {
+                            "desc": false,
+                            "displayName": "runner"
+                        }
+                    ]
+                },
+                "pluginVersion": "10.4.11",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_container_info{namespace=~\"$namespace\", runner=~\"$runner\", organization=~\"$organization\", kubiya_type=\"customers-runners\"}",
+                        "format": "table",
+                        "instant": true,
+                        "legendFormat": "{{container}}",
+                        "range": false,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Components Versions",
+                "transformations": [
+                    {
+                        "id": "filterFieldsByName",
+                        "options": {
+                            "include": {
+                                "names": [
+                                    "container",
+                                    "image",
+                                    "namespace",
+                                    "organization",
+                                    "pod",
+                                    "runner"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "groupBy",
+                        "options": {
+                            "fields": {
+                                "Time": {
+                                    "aggregations": [
+                                        "lastNotNull"
+                                    ],
+                                    "operation": "aggregate"
+                                },
+                                "container": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "container_id": {
+                                    "aggregations": []
+                                },
+                                "image": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "image_id": {
+                                    "aggregations": []
+                                },
+                                "image_spec": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "kubernetes_service": {
+                                    "aggregations": []
+                                },
+                                "namespace": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "organization": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "pod": {
+                                    "aggregations": [
+                                        "distinctCount",
+                                        "uniqueValues"
+                                    ],
+                                    "operation": "aggregate"
+                                },
+                                "runner": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "type": "table"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prometheus-staging"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "custom": {
+                            "align": "auto",
+                            "cellOptions": {
+                                "type": "auto"
+                            },
+                            "inspect": false
+                        },
+                        "mappings": [],
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": null
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 80
+                                }
+                            ]
+                        }
+                    },
+                    "overrides": [
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "label_app_kubernetes_io_name"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 386
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "organization"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 195
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "runner"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 158
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "label_helm_sh_chart (uniqueValues)"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 616
+                                },
+                                {
+                                    "id": "displayName",
+                                    "value": "Helm Charts Installed"
+                                }
+                            ]
+                        },
+                        {
+                            "matcher": {
+                                "id": "byName",
+                                "options": "Helm Charts Installed"
+                            },
+                            "properties": [
+                                {
+                                    "id": "custom.width",
+                                    "value": 1878
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "gridPos": {
+                    "h": 5,
+                    "w": 24,
+                    "x": 0,
+                    "y": 32
+                },
+                "id": 31,
+                "options": {
+                    "cellHeight": "sm",
+                    "footer": {
+                        "countRows": false,
+                        "fields": "",
+                        "reducer": [
+                            "sum"
+                        ],
+                        "show": false
+                    },
+                    "showHeader": true,
+                    "sortBy": []
+                },
+                "pluginVersion": "10.4.11",
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prometheus-staging"
+                        },
+                        "editorMode": "code",
+                        "exemplar": false,
+                        "expr": "kube_pod_info{namespace=~\"$namespace\", runner=~\"$runner\", organization=~\"$organization\"} * on(pod) group_left(label_helm_sh_chart) kube_pod_labels{label_helm_sh_chart!=\"\"}",
+                        "format": "table",
+                        "instant": false,
+                        "legendFormat": "__auto",
+                        "range": true,
+                        "refId": "A"
+                    }
+                ],
+                "title": "Helm Chart Versions Installed",
+                "transformations": [
+                    {
+                        "id": "filterFieldsByName",
+                        "options": {
+                            "include": {
+                                "names": [
+                                    "label_helm_sh_chart",
+                                    "organization",
+                                    "runner"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "id": "groupBy",
+                        "options": {
+                            "fields": {
+                                "Value": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ]
+                                },
+                                "created_by_name": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "label_helm_sh_chart": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ],
+                                    "operation": "aggregate"
+                                },
+                                "namespace": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ],
+                                    "operation": "aggregate"
+                                },
+                                "organization": {
+                                    "aggregations": [],
+                                    "operation": "groupby"
+                                },
+                                "runner": {
+                                    "aggregations": [
+                                        "uniqueValues"
+                                    ],
+                                    "operation": "groupby"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "type": "table"
+            }
+        ],
+        "refresh": "",
+        "schemaVersion": 39,
+        "tags": [
+            "wip",
+            "not_ready",
+            "runners"
+        ],
+        "templating": {
+            "list": [
+                {
+                    "current": {
+                        "selected": false,
+                        "text": "kubiya-test-sniff",
+                        "value": "kubiya-test-sniff"
+                    },
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus-staging"
+                    },
+                    "definition": "label_values(up{kubiya_type=\"customers-runners\"},organization)",
+                    "hide": 0,
+                    "includeAll": false,
+                    "label": "",
+                    "multi": false,
+                    "name": "organization",
+                    "options": [],
+                    "query": {
+                        "qryType": 1,
+                        "query": "label_values(up{kubiya_type=\"customers-runners\"},organization)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "type": "query"
+                },
+                {
+                    "current": {
+                        "selected": true,
+                        "text": [
+                            "sergey-metrics-test",
+                            "sergey-demo-2",
+                            "sergey-demo-1"
+                        ],
+                        "value": [
+                            "sergey-metrics-test",
+                            "sergey-demo-2",
+                            "sergey-demo-1"
+                        ]
+                    },
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus-staging"
+                    },
+                    "definition": "label_values(up{kubiya_type=\"customers-runners\", organization=~\"$organization\"},runner)",
+                    "hide": 0,
+                    "includeAll": false,
+                    "label": "",
+                    "multi": true,
+                    "name": "runner",
+                    "options": [],
+                    "query": {
+                        "qryType": 1,
+                        "query": "label_values(up{kubiya_type=\"customers-runners\", organization=~\"$organization\"},runner)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "type": "query"
+                },
+                {
+                    "current": {
+                        "isNone": true,
+                        "selected": false,
+                        "text": "None",
+                        "value": ""
+                    },
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus-staging"
+                    },
+                    "definition": "label_values(up{kubiya_type=\"customers-runners\", organization=~\"$organization\",runner=\"$runner\"},namespace)",
+                    "hide": 2,
+                    "includeAll": false,
+                    "label": "",
+                    "multi": false,
+                    "name": "namespaceSelector",
+                    "options": [],
+                    "query": {
+                        "qryType": 1,
+                        "query": "label_values(up{kubiya_type=\"customers-runners\", organization=~\"$organization\",runner=\"$runner\"},namespace)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "type": "query"
+                },
+                {
+                    "allValue": "",
+                    "current": {
+                        "selected": true,
+                        "text": [
+                            "agent-manager",
+                            "dagger-engine",
+                            "kubiya-operator",
+                            "tool-manager",
+                            "alloy"
+                        ],
+                        "value": [
+                            "agent-manager",
+                            "dagger-engine",
+                            "kubiya-operator",
+                            "tool-manager",
+                            "alloy"
+                        ]
+                    },
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus-staging"
+                    },
+                    "definition": "label_values(kube_pod_labels{kubiya_type=\"customers-runners\"}, label_app_kubernetes_io_kubiya_runner_component)",
+                    "hide": 0,
+                    "includeAll": false,
+                    "label": "component",
+                    "multi": true,
+                    "name": "component",
+                    "options": [],
+                    "query": {
+                        "qryType": 5,
+                        "query": "label_values(kube_pod_labels{kubiya_type=\"customers-runners\"}, label_app_kubernetes_io_kubiya_runner_component)",
+                        "refId": "PrometheusVariableQueryEditor-VariableQuery"
+                    },
+                    "refresh": 1,
+                    "regex": "",
+                    "skipUrlSync": false,
+                    "sort": 0,
+                    "type": "query"
+                },
+                {
+                    "current": {
+                        "selected": false,
+                        "text": "kubiya",
+                        "value": "kubiya"
+                    },
+                    "hide": 1,
+                    "includeAll": false,
+                    "label": "",
+                    "multi": false,
+                    "name": "namespace",
+                    "options": [
+                        {
+                            "selected": true,
+                            "text": "kubiya",
+                            "value": "kubiya"
+                        }
+                    ],
+                    "query": "kubiya",
+                    "queryValue": "",
+                    "skipUrlSync": false,
+                    "type": "custom"
+                }
+            ]
+        },
+        "time": {
+            "from": "now-24h",
+            "to": "now-1m"
+        },
+        "timepicker": {
+            "nowDelay": "1m",
+            "refresh_intervals": [
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "1d"
+            ]
+        },
+        "timezone": "browser",
+        "title": "[Under Dev] Customer Runners / All Runners State",
+        "uid": "bea2idbz3hh4wf",
+        "version": 28,
+        "weekStart": ""
+    }
+}

@@ -21,8 +21,19 @@ spec:
         - name: kubiya-operator
           image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
           imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
-          ports:
-            - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
+          {{- with .Values.kubiyaOperator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.kubiyaOperator.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.kubiyaOperator.livenessProbe.httpGet.path }}
+              port: {{ .Values.kubiyaOperator.ports.containerPort }}
+            initialDelaySeconds: {{ .Values.kubiyaOperator.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.kubiyaOperator.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.kubiyaOperator.livenessProbe.timeoutSeconds }}
+          {{- end }}
           env:
             {{- with .Values.kubiyaOperator.env }}
             {{- range $key, $value := . }}

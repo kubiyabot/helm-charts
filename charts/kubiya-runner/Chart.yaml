@@ -2,8 +2,8 @@ apiVersion: v2
 name: kubiya-runner
 description: A Helm chart for Kubiya Runner deployment
 type: application
-version: 0.5.31
-appVersion: "0.5.31"
+version: 0.6.2
+appVersion: "0.6.2"
 kubeVersion: ">=1.19.0-0"
 home: https://kubiya.ai
 icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
@@ -19,7 +19,7 @@ maintainers:
   email: sergey.demyachonok@kubiya.ai
 dependencies:
 - name: dagger-helm
-  version: "0.2.2"
+  version: "0.3.0"
   repository: "file://../dagger-helm"
   alias: dagger
   condition: dagger.enabled
@@ -27,14 +27,9 @@ dependencies:
   version: 5.27.0
   repository: "https://prometheus-community.github.io/helm-charts"
   alias: kubestatemetrics
-  condition: kube-state-metrics.enabled
-- name: opentelemetry-collector
-  alias: otelcollector
-  version: 0.109.0
-  repository: "https://open-telemetry.github.io/opentelemetry-helm-charts"
-  condition: opentelemetry-collector.enabled
-- name: prometheus-blackbox-exporter
-  alias: blackboxexporter
-  version: 8.5.0
-  repository: https://prometheus-community.github.io/helm-charts
-  condition: blackboxexporter.enabled
+  condition: kubestatemetrics.enabled
+- name: alloy
+  version: 0.10.1
+  alias: alloy
+  repository: https://grafana.github.io/helm-charts
+  condition: alloy.enabled

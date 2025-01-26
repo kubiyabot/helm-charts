@@ -12,6 +12,10 @@ spec:
       {{- include "tool-manager.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        {{- with .Values.toolManager.extraPodsAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         {{- include "tool-manager.labels" . | nindent 8 }}
     spec:
@@ -33,10 +37,18 @@ spec:
             {{- end }}
             {{- end }}
           ports:
-            - containerPort: {{ .Values.toolManager.containerPort }}
+          - containerPort: {{ .Values.toolManager.containerPort }}
           {{- with .Values.toolManager.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.toolManager.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.toolManager.livenessProbe.httpGet.path }}
+              port: {{ .Values.toolManager.service.targetPort }}
+            initialDelaySeconds: {{ .Values.toolManager.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.toolManager.livenessProbe.periodSeconds }}
           {{- end }}
 
         - name: kubiya-sdk-server
@@ -59,6 +71,15 @@ spec:
           {{- with .Values.toolManager.sdkServer.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.toolManager.sdkServer.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.toolManager.sdkServer.livenessProbe.httpGet.path }}
+              port: {{ .Values.toolManager.sdkServer.containerPort }}
+            initialDelaySeconds: {{ .Values.toolManager.sdkServer.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.toolManager.sdkServer.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.toolManager.sdkServer.livenessProbe.timeoutSeconds }}
           {{- end }}
       {{- with .Values.toolManager.volumes }}
       volumes:

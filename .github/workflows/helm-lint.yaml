@@ -10,7 +10,7 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
 
@@ -21,7 +21,7 @@ jobs:
 
     - name: Run helm lint
       run: |
-        helm lint charts/kubiya-runner/ 
+        helm lint charts/kubiya-runner/
 
     - name: Run helm template
       run: |
