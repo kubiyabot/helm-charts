@@ -1,0 +1,61 @@
+name: Helm Charts CI
+
+on:
+  push:
+    branches:
+      - ci
+    # paths:
+    #   - 'charts/**'
+  pull_request:
+    branches:
+      - ci
+    # paths:
+    #   - 'charts/**'
+
+permissions:
+  contents: write
+
+jobs:
+  helm-ci:
+    name: Helm Charts CI
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+         
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.13.3
+
+      - name: Add Helm Repositories
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+
+      - name: Update Helm Dependencies
+        run: |
+          for chart in charts/*; do
+            if [ -f "$chart/Chart.yaml" ]; then
+              helm dependency update "$chart"
+            fi
+          done
+      
+      - name: Lint Helm Charts
+        run: |
+          for chart in charts/*; do
+            if [ -d "$chart" ]; then
+              helm lint "$chart"
+            fi
+          done
+
+      # - name: Run chart-releaser
+      #   uses: helm/chart-releaser-action@v1.6.0
+      #   env:
+      #     CR_TOKEN: "${{ secrets.HELM_RELEASE_TOKEN }}"
