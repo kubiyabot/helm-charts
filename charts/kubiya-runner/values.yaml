@@ -402,3 +402,6 @@ alloy:
     requests:
       cpu: 100m
       memory: 128Mi
+sdkServer:
+  image:
+    tag: v1.12.0
