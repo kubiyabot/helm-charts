@@ -1,18 +1,20 @@
-name: Release Charts
+# Lint Helm Charts on all branches except main
+name: Lint Charts
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'charts/**'
+    branches-ignore:
+      - 'main'
+  pull_request:
+    branches-ignore:
+      - 'main'
 
 permissions:
   contents: write
 
 jobs:
   helm-ci:
-    name: Release Charts
+    name: Lint Charts
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
@@ -22,7 +24,7 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          
+         
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
@@ -49,8 +51,3 @@ jobs:
               helm lint "$chart"
             fi
           done
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
-        env:
-          CR_TOKEN: "${{ secrets.HELM_RELEASE_TOKEN }}"
