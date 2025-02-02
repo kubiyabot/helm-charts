@@ -33,3 +33,8 @@ dependencies:
   alias: alloy
   repository: https://grafana.github.io/helm-charts
   condition: alloy.enabled
+- name: flux2
+  version: "2.12.2"
+  repository: "https://fluxcd-community.github.io/helm-charts"
+  alias: fluxcd
+  condition: fluxcd.enabled

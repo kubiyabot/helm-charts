@@ -19,19 +19,16 @@ helm-charts/
 2. Deployments configs repo: centralized, single source of true for all runners deployments configs. Desired state for all runners deployments configs (container version, secrets, scaling options, env var, etc.)
 
 ```
-customer-configs/
-├── clusters/
-│   ├── customer1/
-│   │   ├── helmrelease.yaml ---------------> helm release definition (see balow)
-│   │   ├── overrides.yaml -----------------> unencrypted customer specific overrides (image versions, etc.)
-│   │   └── secrets/
-│   │       └── sealed-secret.yaml ----------> encrypted secrets for the Helm release (API tokens, etc.)
-│   ├── customer2/
+flux-repo/
+├── clients/
+│   ├── client-a/
+│   │   ├── helmrelease.yaml       # Defines Helm release for client A
+│   │   ├── values_override.yaml   # Non-sensitive values
+│   │   ├── values_override.enc.yaml # Encrypted secrets
+│   ├── client-b/
 │   │   ├── helmrelease.yaml
-│   │   ├── overrides.yaml
-│   │   └── secrets/
-│   │       └── sealed-secret.yaml
-│   └── ...
+│   │   ├── values_override.yaml
+│   │   ├── values_override.enc.yaml
 └── README.md
 ```
 
@@ -173,3 +170,30 @@ kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/downloa
 ```bash
 kubectl apply -f sealed-secret.yaml
 ```
+
+# Keys / Vault
+
+# Private (decryption) key provided to customer only once stored as secret in their k8s
+
+```mermaid
+flowchart TD
+    A[Customer Registration via UI] --> B[Backend Generates Key Pair in Vault]
+    B --> C[Store Public Key in Backend]
+    B --> D[Return Private Key to Frontend]
+    D --> E[Customer Downloads Private Key]
+    E --> F[Install Private Key in K8s Cluster]
+    C --> G[Encrypt Secrets with Public Key]
+    G --> H[Store Encrypted Secrets in Git]
+    H --> I[FluxCD Syncs Secrets to Cluster]
+    I --> J[Sealed Secrets Decrypts at Runtime]
+```
+
+# Private key stored in our Vault
+
+1.	Customer registers via frontend.
+2.	Backend calls Vault to generate a per-customer key pair.
+3.	Vault stores the private key & grants customer access.
+4.	Customer’s Kubernetes cluster fetches and installs the private key.
+5.	Secrets are encrypted with the public key and stored in Git.
+6.	FluxCD syncs encrypted secrets into the customer’s cluster.
+7.	Sealed Secrets decrypts secrets at runtime inside Kubernetes.

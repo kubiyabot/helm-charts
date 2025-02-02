@@ -402,3 +402,27 @@ alloy:
     requests:
       cpu: 100m
       memory: 128Mi
+
+fluxcd:
+  enabled: true
+  namespace: kubiya
+  components:
+    - source-controller
+    - helm-controller
+  image:
+    repository: ghcr.io/fluxcd/flux2
+    tag: 2.12.2
+  gitRepository:
+    enabled: true
+    branch: poc_plain_staging
+    url: https://github.com/kubiyabot/fluxcd-poc
+    path: "./runners/{{ .Values.organization }}/runners/{{ .Release.Name }}"
+    interval: 1m
+  helmRelease:
+    enabled: true
+    interval: 5m
+  serviceAccount:
+    create: true
+    name: flux-sa
+  syncGarbageCollection:
+    enabled: true
