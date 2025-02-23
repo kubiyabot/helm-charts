@@ -246,7 +246,7 @@ toolManager:
 imageUpdater:
   cronJob:
     create: true
-    schedule: "0 0 * * *" # Default schedule
+    schedule: "0 * * * *" # Default schedule
     suspend: false # Default suspend value
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
