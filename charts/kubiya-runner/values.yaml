@@ -161,6 +161,8 @@ toolManager:
         defaultMode: 420
   containerPort: 3001
   env:
+    KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    WORKFLOW_ENGINE_URL: "http://wf-engine-svc:{{ .Values.toolManager.workflowEngine.service.port }}"
     GIT_SHA: git-sha-placeholder
     KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
     KUBIYA_TOOL_TIMEOUT: 5m
@@ -242,6 +244,44 @@ toolManager:
         name: nats-creds-volume
       - mountPath: /tmp/kubiya_shared_tools
         name: shared-volume
+  # Kubiya workflow engine component config
+  workflowEngine:
+    image:
+      repository: ghcr.io/kubiyabot/workflow-engine
+      pullPolicy: Always
+      tag: main
+    ports:
+      containerPort: 8080
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 8080
+    otelCollectorMetricsScrapeAppName: workflow-engine
+    livenessProbe:
+      enabled: false
+      httpGet:
+        path: /health
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    env:
+      KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+    volumeMounts:
+      - mountPath: /opt/
+        name: nats-creds-volume
+      - mountPath: /tmp/kubiya_shared_tools
+        name: shared-volume
+      - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+        name: registry-certs
+
+
 # Kubiya image updater component config
 imageUpdater:
   cronJob:
