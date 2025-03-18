@@ -243,6 +243,37 @@ toolManager:
     - mountPath: /tmp/kubiya_shared_tools
       name: shared-volume
 
+  # Kubiya workflow engine component config
+  workflowEngine:
+    image:
+      repository: ghcr.io/kubiyabot/workflow-engine
+      pullPolicy: IfNotPresent
+      tag: latest
+      ports:
+        containerPort: 80
+    service:
+      type: ClusterIP
+      port: 80
+      targetPort: 8080
+    otelCollectorMetricsScrapeAppName: workflow-engine
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    env:
+      EXAMPLE_ENV_VAR: "example-value"
+    volumeMounts:
+      - mountPath: /opt/
+        name: nats-creds-volume
+      - mountPath: /tmp/kubiya_shared_tools
+        name: shared-volume
+      - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+        name: registry-certs
+
+
 # Kubiya image updater component config
 imageUpdater:
   cronJob:

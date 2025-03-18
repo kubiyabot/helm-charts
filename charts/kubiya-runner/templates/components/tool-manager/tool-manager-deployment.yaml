@@ -60,6 +60,28 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
+        - name: workflow-engine
+          image: "{{ .Values.toolManager.workflowEngine.image.repository }}:{{ .Values.toolManager.workflowEngine.image.tag }}"
+          imagePullPolicy: {{ .Values.toolManager.workflowEngine.image.pullPolicy | quote }}
+          {{- with .Values.toolManager.workflowEngine.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command: {{ .Values.toolManager.workflowEngine.command | toYaml | nindent 10 | default "" }}
+          env:
+            {{- with .Values.toolManager.workflowEngine.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.toolManager.workflowEngine.ports.containerPort }}
+          {{- with .Values.toolManager.workflowEngine.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       {{- with .Values.toolManager.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
