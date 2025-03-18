@@ -161,6 +161,7 @@ toolManager:
         defaultMode: 420
   containerPort: 3001
   env:
+    WORKFLOW_ENGINE_URL: "http://wf-engine-svc:{{ .Values.toolManager.workflowEngine.service.port }}"
     GIT_SHA: git-sha-placeholder
     KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
     KUBIYA_TOOL_TIMEOUT: 5m
@@ -246,10 +247,10 @@ toolManager:
   workflowEngine:
     image:
       repository: ghcr.io/kubiyabot/workflow-engine
-      pullPolicy: IfNotPresent
-      tag: latest
+      pullPolicy: Always
+      tag: main
     ports:
-      containerPort: 80
+      containerPort: 8080
     service:
       type: ClusterIP
       port: 80
