@@ -161,6 +161,7 @@ toolManager:
         defaultMode: 420
   containerPort: 3001
   env:
+    KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
     WORKFLOW_ENGINE_URL: "http://wf-engine-svc:{{ .Values.toolManager.workflowEngine.service.port }}"
     GIT_SHA: git-sha-placeholder
     KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
@@ -271,7 +272,7 @@ toolManager:
         cpu: 100m
         memory: 128Mi
     env:
-      EXAMPLE_ENV_VAR: "example-value"
+      KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
     volumeMounts:
       - mountPath: /opt/
         name: nats-creds-volume
