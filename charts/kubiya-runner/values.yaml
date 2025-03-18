@@ -72,7 +72,7 @@ agentManager:
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
-    tag: v0.1.11
+    tag: v0.1.12
   service:
     port: 80
     targetPort: 8080
