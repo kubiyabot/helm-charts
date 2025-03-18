@@ -255,6 +255,13 @@ toolManager:
       port: 80
       targetPort: 8080
     otelCollectorMetricsScrapeAppName: workflow-engine
+    livenessProbe:
+      enabled: false
+      httpGet:
+        path: /health
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
     resources:
       limits:
         cpu: "500m"

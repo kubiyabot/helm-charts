@@ -103,6 +103,12 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.toolManager.workflowEngine.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.toolManager.workflowEngine.livenessProbe.httpGet.path }}
+              port: {{ .Values.toolManager.workflowEngine.containerPort }}
+          {{- end }}
       {{- with .Values.toolManager.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
