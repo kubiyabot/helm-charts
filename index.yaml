@@ -102,6 +102,45 @@ entries:
     version: 0.2.1
   kubiya-runner:
   - apiVersion: v2
+    appVersion: 0.6.31
+    created: "2025-03-18T12:09:38.976520138Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: file://../dagger-helm
+      version: 0.3.0
+    - alias: kubestatemetrics
+      condition: kubestatemetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.27.0
+    - alias: alloy
+      condition: alloy.enabled
+      name: alloy
+      repository: https://grafana.github.io/helm-charts
+      version: 0.10.1
+    description: A Helm chart for Kubiya Runner deployment
+    digest: 06dc2a28c7ffc411c6d52d333f8ba6e72026c82698ac9132c95caef05851ae66
+    home: https://kubiya.ai
+    icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+    keywords:
+    - kubiya.ai
+    - runner
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: costa@kubiya.ai
+      name: Costa
+    - email: sergey.demyachonok@kubiya.ai
+      name: Sergey Demyachonok
+    name: kubiya-runner
+    sources:
+    - https://github.com/kubiyabot/helm-charts
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.6.31/kubiya-runner-0.6.31.tgz
+    version: 0.6.31
+  - apiVersion: v2
     appVersion: 0.6.30
     created: "2025-03-18T09:21:47.801857213Z"
     dependencies:
@@ -2737,4 +2776,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.1/kubiya-runner-0.4.1.tgz
     version: 0.4.1
-generated: "2025-03-18T09:21:47.802078677Z"
+generated: "2025-03-18T12:09:38.976830997Z"
