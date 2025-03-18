@@ -5,9 +5,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "tool-manager.labels" . | indent 4 }}
-    {{- if .Values.toolManager.otelCollectorMetricsScrapeAppName }}
-    kubiya.io/metrics-name: {{ .Values.toolManager.otelCollectorMetricsScrapeAppName }}
-    {{- end }}
 spec:
   selector:
     {{- include "tool-manager.selectorLabels" . | indent 4 }}

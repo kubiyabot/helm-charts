@@ -11,7 +11,6 @@ A Helm chart for deploying the Kubiya Runner.
   - [Overview](#overview)
   - [Directory Structure](#directory-structure)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
   - [Permissions](#permissions)
   - [Components](#components)
     - [Agent Manager](#agent-manager)
@@ -22,11 +21,20 @@ A Helm chart for deploying the Kubiya Runner.
     - [Helm Dependencies](#helm-dependencies)
     - [Container Images](#container-images)
   - [Monitoring \& Telemetry](#monitoring--telemetry)
+    - [Security](#security)
+    - [Architecture](#architecture)
+    - [Grafana Alloy Configuration](#grafana-alloy-configuration)
+  - [**Azure Prometheus Integration**](#azure-prometheus-integration)
+  - [Grafana Dashboards](#grafana-dashboards)
+    - [List of available dashboards](#list-of-available-dashboards)
+  - [Dashboards as a Code](#dashboards-as-a-code)
   - [K8s Resources Definitions](#k8s-resources-definitions)
-  - [Security](#security)
+  - [Security](#security-1)
   - [Optional Permissions Extensions:](#optional-permissions-extensions)
-  - [Installation](#installation-1)
-  - [Minimum Required Configuration](#minimum-required-configuration)
+- [Deployment](#deployment)
+  - [Minimum Required Configuration \& Values Passing](#minimum-required-configuration--values-passing)
+  - [Installation](#installation)
+  - [Update](#update)
   - [Using Name Overrides](#using-name-overrides)
 
 ## Overview
@@ -45,13 +53,13 @@ kubiya-runner/
 │   │   ├── kubiya-operator/                       # Controls operational aspects
 │   │   ├── tool-manager/                          # Handles tool execution
 │   │   └── image-updater/                         # Automatic image updates
-│   ├── dagger-engine-headless-service.yaml        # Dagger suplimental headless service
-│   ├── otel-collector-configMap.yaml              # otel-collector configuration
-│   └── secrets.yaml                               # Secrets shared between runner components
+│   ├── alloy-configMap.yaml                       # Alloy configuration
+│   └── shared-secrets.yaml                        # Secrets shared between runner components
+│   └── _helpers.tpl                               # Helpers funtions for Helm Chart templates rendering
 └── charts/                                        # Dependencies (subcharts)
     ├── dagger-helm/                               # Container runtime for workflows
     ├── kube-state-metrics/                        # Cluster-level metrics
-    └── opentelemetry-collector/                   # Telemetry collection
+    └── alloy/                                     # Grafana Alloy telemetry collector
 ```
 
 ## Prerequisites
@@ -62,21 +70,7 @@ kubiya-runner/
 - NATS credentials for messaging
 - Registry TLS certificates (if using private registry)
 
-## Installation
-
-```bash
-# Add the Kubiya Helm repository
-helm repo add kubiya https://kubiyabot.github.io/helm-charts
-
-# Update your Helm repositories
-helm repo update
-
-# Install the chart
-helm install my-release kubiya/kubiya-runner
-```
-
 ## Permissions
-
 
 ## Components
 
@@ -84,13 +78,13 @@ helm install my-release kubiya/kubiya-runner
 
 Repository: [kubiya-agent-manager](https://github.com/kubiyabot/kubiya-agent-manager)
 
-[#TODO: Needs documentation]
+The Agent Manager handles lifecycle management of Kubiya agents within the cluster.
 
 ### Kubiya Operator
 
 Repository: [kubiya-operator](https://github.com/kubiyabot/kubiya-operator)
 
-[#TODO: Needs documentation]
+The Kubiya Operator manages operational aspects and configuration of the runner components.
 
 ### Tool Manager
 
@@ -104,40 +98,219 @@ Full documentation is available [in project repository](https://github.com/kubiy
 
 ### Image Updater
 
+**TBD, (depricated approach)**
+
+```
 - Checks for updates of latest stable image versions via CronJob (hourly by default).
 - Automatic updates for runner components (agent-manager, tool-manager, sdk-server) from stable release JSON file hosted in [S3 bucket](https://kubiya-cli.s3.amazonaws.com/stable/kubiya_versions.json).
-
+```
 ## Dependencies & Compatibility Matrix
 
-This version of this chart as of version 0.3.0 is tested to be compatible with the following versions of container images and Helm dependencies.
+This chart (as of version 0.6.x) is tested to be compatible with the following versions of container images and Helm dependencies.
 
 ### Helm Dependencies
 
-| Chart | Version |
-|-------|---------|
-| dagger-helm | 0.13.6 |
-| kube-state-metrics | 5.27.0 |
-| opentelemetry-collector | 0.109.0 |
+| Chart | Version | App Version |
+|-------|---------|--------|  
+| dagger-helm | 0.3.0 | 0.11.6 |
+| kube-state-metrics | 5.27.0 | 2.14.0 |
+| alloy | 0.10.1 | v1.5.1 |
 
 ### Container Images
 
 | Component | Image | Version/Tag |
 |-----------|-------|-------------|
-| Agent Manager | ghcr.io/kubiyabot/agent-manager | 0.0.17 |
+| Agent Manager | ghcr.io/kubiyabot/agent-manager | 0.0.22 |
 | Kubiya Operator | ghcr.io/kubiyabot/kubiya-operator | runner_v2 |
-| Tool Manager | ghcr.io/kubiyabot/tool-manager | 462d60470b8f8063bac9c11887dc3620a71b8c56 |
-| SDK Server | ghcr.io/kubiyabot/sdk-py | v0.47.1 |
+| Tool Manager | ghcr.io/kubiyabot/tool-manager | v0.3.2 |
+| SDK Server | ghcr.io/kubiyabot/sdk-py | v1.7.1 |
 | Image Updater | bitnami/kubectl | 1.30.6 |
-| OpenTelemetry Collector | ghcr.io/kubiyabot/otel-connector | release-0.1.1 |
-| Dagger Engine | ghcr.io/kubiyabot/kubiya-registry | v0.1.1 |
+| Dagger Engine | ghcr.io/kubiyabot/kubiya-registry | v0.13.6 |
 | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | 2.14.0 |
+| Grafana Alloy | grafana/alloy | v1.5.1 |
 
 ## Monitoring & Telemetry
 
-The chart includes comprehensive monitoring setup:
-- `otel-collector` for metrics and traces collection, processing and sending. Utilize [non-oficial container image](https://github.com/kubiyabot/otel-collector) built with custom implementation of `nats-exporter` exporter plugin which send collected data to NATS Cloud (Synadia).
-- `kube-state-metrics` for Kubernetes metrics. Configured to be limited to collect metrics only for single namespace of Runner deployment due to security concerns for client side deployment scenarios.
-- Metrics are labeled with 'organization' and 'cluster' labels to allow deployment filtering and grouping; configured via `values.yaml` for particular deployment.
+The `kubiya-runner` uses [Grafana Alloy](https://grafana.com/docs/alloy/latest/) for metrics collection from multiple customer runner deployments.
+Alloy scrapes data from a set of targets (pods, services, etc.) which expose metrics on an endpoint (usually `/metrics`), processes them (filters, adds runner deployment labels, etc.) and pushes via Prometheus native `remote_writes` into **Azure Managed Prometheus**.
+
+Later `kubiya-runner` chart releases expect to use Alloy for other types of telemetry data collection (such as logs and traces). **Alloy** also fully compatible with OpenTelemetry and can be configured to listen/send messages in `OTEL` format if needed, has a long list of vendor platforms and message formats compatibility and a rich set of data processing modules. 
+
+###  Security
+
+Both `Alloy` and `kube-state-metrics` has limited RBAC permissions and configured to collect only data from same kubernetes namespace where `kubiya-runner` is deployed (`kubiya` by default).
+`Alloy` runs as non-root user.
+
+### Architecture
+
+```mermaid
+graph LR
+H[alloy-self-metrics]
+A[kube-state-metrics]
+B[blackbox-exporter]
+C[tool-manager exporter]
+D[agent-manager exporter]
+E[grafana alloy]
+F[azure managed prometheus]
+G[grafana dashboards]
+subgraph kubiya-runner
+    A ---> E
+    B ---> E
+    C ---> E
+    D ---> E
+    H ---> E
+    E
+end
+E ---> F
+F ---> G
+```
+
+### Grafana Alloy Configuration
+  
+1. **Resource Management**
+
+  Default resource limits for `alloy`
+    ```yaml
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    ```
+  `alloy` resource estimation guidelines available at: https://grafana.com/docs/alloy/latest/introduction/estimate-resource-usage/
+  
+2. **Resources & Data Collection Configuration**
+
+**To minimizes resource usage and cost on both the client and server sides, telemetry collection strategy focuses on deploying and configuring components to capture only the metrics essential for current business and operational goals. This pattern is highly recommended keeping when contributing.**
+
+Alloy is configured with a single scrape interval, collecting metrics from all targets once every 60 seconds. As a result, 60 seconds is the maximum precision for all metric visualizations and alerting.
+
+If this level of precision is insufficient, the scrape interval can be adjusted—either increased or decreased—to balance resource impact. These adjustments can be applied globally or to specific targets via `values.yaml`:
+
+```yaml
+  alloy:
+    scrapeIntervals:
+      default: 60s
+      runnerExporters: 60s
+      alloyExporter: 60s
+      blackboxExporter: 60s
+      kubeStateMetrics: 60s
+      cadvisor: 60s (disabled by default)
+```
+## **Azure Prometheus Integration**
+
+Required set of environment variables to be set for Azure Managed Prometheus remote writes support:
+
+- `AZURE_REMOTE_WRITE_URL`: Azure Prometheus endpoint
+- `AZURE_CLIENT_ID`: Azure service principal client ID
+- `AZURE_CLIENT_SECRET`: Azure service principal secret
+- `AZURE_TOKEN_URL`: Azure OAuth token URL
+
+These variables confurable via `values.yaml` `alloy.alloy.extraEnv`)
+
+## Grafana Dashboards
+
+ Grafana dashboards available in the `kubiya-runner` and located in `helm-charts/charts/kubiya-runner/grafana-dashboards/`.
+
+### List of available dashboards
+
+![Grafana Dashboards](_docs/dashboards-list.png)
+
+**Health Overview by Components** (`customer-runners-runner-health-overview-by-components.json`)
+  
+Detailed breakdown of health metrics by individual components for multiple runners.
+
+- Multiple runner instances state
+- Component version tracking
+- Services status monitoring
+
+| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red) |
+|--------|----------------|------------------|-------------------|------------|
+| Service Status | 100% | 95-100% | 80-95% | 0-80% |
+| Pod Restarts per | 0-1 restarts | 1.1-2 restarts | 2.1-4 restarts | >4.1 restarts |
+| HTTP Success Rate | 100% | 95-99% | 80-94% | 0-79% |
+| Pod Status Ready | 100% | 90-99% | 70-89% | 0-69% |
+
+![Health Overview by Components](_docs/runner-health-overview-by-components.png)
+
+
+**Runner Health Overview** (`customer-runners-runner-health-overview.json`)
+  
+- Provides a comprehensive view of runner components' health status
+- Filtering by organization, runner and namespace
+- Component pods readiness status, restarts, health probes, etc.
+- Component container running versions tracking
+- Real-time health metrics visualization
+
+| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red) |
+|--------|----------------|------------------|-------------------|------------|
+| Service Status | 100% | 95-100% | 80-95% | 0-80% |
+| Pod Restarts per | 0-1 restarts | 1.1-2 restarts | 2.1-4 restarts | >4.1 restarts |
+| HTTP Success Rate | 100% | 95-99% | 80-94% | 0-79% |
+| Pod Status Ready | 100% | 90-99% | 70-89% | 0-69% |
+
+![Runner Health Overview](_docs/runner-health-overview-dashboard.png)
+
+**Tool Manager Dashboard** (`customer-runners-component-exporter-tool-manager.json`)
+
+- Focused on Tool Manager performance metrics
+- HTTP response time distribution
+- Go runtime metrics (goroutines, threads, GC)
+- Request/response statistics
+
+![Health Overview by Components](_docs/tool-manager-dashboard.png)
+
+**Agent Manager Dashboard** (`customer-runners-component-exporter-agent-manager.json`)
+
+- Monitors Agent Manager performance
+- HTTP request metrics
+- Error rate tracking
+- Performance indicators
+
+![Health Overview by Components](_docs/agent-manager-dashboard.png)
+
+**Kubernetes State Dashboard** (`runner-namespace-kubernetes-state.json`)
+
+(*Under development*)
+ 
+- Provides Kubernetes state metrics for the runner namespace
+- Based on `kube-state-metrics` data
+- Includes summary metrics about the runner's Kubernetes resources
+
+**Alloy Dashboard** (`customer-runners-metrics-alloy-prometheus-components.json`)
+
+- Monitors Alloy pipelines
+- Focus on Remote Writes to Prometheus (success/errors/count,...)
+- Can show metrics flow for particular runner deployment (count/error/success/volume etc.
+- Visualize targets it scrapes metrics from (count/error/success/volume etc.
+- Can be used to control and on data alert spikes (and therefore cost) and broken metrics flow
+
+![Health Overview by Components](_docs/alloy-dashboard.png)
+ 
+**Blackbox Exporter Dashboards**  (`customer-runners-blackbox-exporter-alternate-view`, 
+`customer-runners-blackbox-exporter.json`)
+
+- Alternative visualization of HTTP probe metrics
+- Focus on probe success rates and latencies
+- SSL/TLS status monitoring
+- DNS resolution performance
+- Comprehensive HTTP request timing breakdown
+
+![Blackbox Exporter Alternate View](_docs/blackbox-dashboard.png)
+![Blackbox Dashboard](_docs/blackbox-alternate-dashboard.png)
+ 
+## Dashboards as a Code
+
+Initial set of dashboards are stored as code for future automatic provisioning into customer's Grafana instances, currently serving as version-controlled backups.
+
+A dashboard export script is available at `kubiya-runner/_grafana-dashboards/grafana-dashboards-export.sh` for exporting dashboards from Azure Managed Grafana. When you create a new dashboard or modify an existing one, the recommended workflow is:
+
+1. Use the export script to save the dashboard as a JSON file
+2. Commit the file to the repository
+3. Create a pull request to the main branch
+
 
 ## K8s Resources Definitions
 
@@ -146,48 +319,65 @@ All resources defined in `values.yaml` are mandatory, but not yet set according 
 Apart from resource management goals, explicit resources may be mandatory for some particular deployments.
 In such deployments pre-installed webhooks may deny installation of runner's k8s entities with unsatisfied requirements (restrictions) of particular target k8s cluster, and requests/limits are common example of such restrictions.
 
-
 ## Security
 
-*[Under Development]*
-- Namespace-scoped RBAC permissions
-- Service accounts for each component
+**Security Considerations:**
+
+- Namespace-scoped RBAC permissions for components (except default required cluster-wide PVC management for `tool-manager` #TODO)
+- Dedicated service accounts for each component 
 - TLS support for registry communication (used by `tool-manager`)
+- Reduced RBAC permissions for `Grafana Alloy` (namespace-scoped)
+- Reduced RBAC permissions and targets for `kube-state-metrics` (namespace-scoped)
 
 ## Optional Permissions Extensions:
 
-*[Under Development]*
+- `tool-manager`: optional cluster full access via `values.adminClusterRole.create`,
 - Kubiya Operator full access toggle (controlled via values)
-- Custom OpenTelemetry roles
 - Optional Dagger permissions
 
-
-## Installation
+# Deployment
 
 As of moment of writing this, default configuration set via `values.yaml` should support most of the regular deployments. However, there are list of variables specific to each particular deployment, as well as list of secrets which must be configured before installing this chart.
 
-## Minimum Required Configuration
+## Minimum Required Configuration & Values Passing
 
-- `runnerNameOverride`: This can be used to override default runner name generated from release name. 
-  *IMPORTANT* Runner name must match one encoded in JWT token configured in `nats.*` values. Propagated via config map of `otel-collector` name will be used for labeling metrics which will be send by custom `nats-exporter` plugin to NATS/Synadia. Name mismatch between one set here (or generated from release name if not set) and the one encoded in JWT token will break communication causing NATS rejects.
+Values below can be considered as non-mutable secrets, unique for each runner deployment.
+
+- `alloy.alloy.extraENV` all env vars must be set for support of metrics push to remote Prometheus via remote writes (see [Azure Prometheus Integration](#azure-prometheus-integration))
 - `organization`: "my_organization" - given organization name
-- `kubiyaAgentUUID`: "679adc53-7068-4454-aa9f-16df30b14a50" - UUID of the agent
+- `uuid`: "679adc53-7068-4454-aa9f-16df30b14a50" - UUID of the agent
 - `nats.jwt` and `nats.secondJwt`: NATS credentials for sending metrics to NATS Cloud (Synadia). Tokens are generated by kubiya frontend UI with frontend-specific runner name encoded as a part of token.
 - `nats.subject`: NATS destination subject for metrics sending
 - `nats.serverUrl`: NATS server URL
-- `registryTls.crt` and `registryTls.key`: TLS certificates for private registry (used by `tool-manager`) 
 
+These requirements are present in a structured way in template file `_deploymentX-values-overrides.yaml` and expected to be in sync with requirements of current chart version. 
+Instead of passing values to helm install if form of `-set xxx=yyy`, it is highly recommended making a copy of this file as overrides base for a new deployment, and after installation keep it in safe, dry place for future purposes (upgrades, etc.)
+
+## Installation
+
+ *IMPORTANT* Runner name will be set to the release name by default (`deploymentX` in example cmd below).
+ If not overriden (see below) release name must match runner's name encoded in JWT token which set in `nats.*` values.
+
+```shell
+helm install deploymentX . -f values.yaml -f _deploymentX-values-overrides.yaml --namespace kubiya --create-namespace
+```
+
+## Update
+
+```shell
+helm upgrade deploymentX . -f values.yaml -f _deploymentX-values-overrides.yaml --namespace kubiya
+``` 
 
 ## Using Name Overrides
 
-The current implementation has a specific purpose: `runnerNameOverride` is critical because it must match the JWT token for NATS communication.
+`runnerNameOverride` if used, must match the JWT token for NATS communication. 
 
-Example of naming variable overrides available when installing chart release. 
+In some special cases there are name overrides values available to override runner name
 
 If `helm install my-release ./kubiya-runner:` used for installation, then:
-- If `runnerNameOverride`: "sergey-metrics-test":
-  - name = *sergey-metrics-test*
-  - fullname = *sergey-metrics-test*
+- If `runnerNameOverride`: "my-metrics-test":
+  - name = *my-metrics-test*
+  - fullname = *my-metrics-test*
   - All resources will use this name
 
 - If no `runnerNameOverride` but `nameOverride`: "custom":
@@ -201,3 +391,4 @@ If `helm install my-release ./kubiya-runner:` used for installation, then:
 - If no overrides:
   - name = Chart.Name
   - fullname = *my-release-kubiya-runner*
+
