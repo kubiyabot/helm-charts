@@ -37,7 +37,7 @@ spec:
             {{- end }}
             {{- end }}
           ports:
-          - containerPort: {{ .Values.toolManager.containerPort }}
+            - containerPort: {{ .Values.toolManager.containerPort }}
           {{- with .Values.toolManager.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
@@ -89,7 +89,9 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          command: {{ .Values.toolManager.workflowEngine.command | toYaml | nindent 10 | default "" }}
+          {{- with .Values.toolManager.workflowEngine.command }}
+          command: {{ toYaml . | nindent 10 }}
+          {{- end }}
           env:
             {{- with .Values.toolManager.workflowEngine.env }}
             {{- range $key, $value := . }}

@@ -248,8 +248,8 @@ toolManager:
       repository: ghcr.io/kubiyabot/workflow-engine
       pullPolicy: IfNotPresent
       tag: latest
-      ports:
-        containerPort: 80
+    ports:
+      containerPort: 80
     service:
       type: ClusterIP
       port: 80
