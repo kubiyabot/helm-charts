@@ -272,7 +272,8 @@ toolManager:
         cpu: 100m
         memory: 128Mi
     env:
-      KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
+      KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools/dags"
+      TOOL_MANAGER_URL: http://tool-manager.kubiya
     volumeMounts:
       - mountPath: /opt/
         name: nats-creds-volume
@@ -280,6 +281,8 @@ toolManager:
         name: shared-volume
       - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
         name: registry-certs
+
+
 # Kubiya image updater component config
 imageUpdater:
   cronJob:
