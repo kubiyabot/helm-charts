@@ -249,7 +249,7 @@ toolManager:
     image:
       repository: ghcr.io/kubiyabot/workflow-engine
       pullPolicy: Always
-      tag: v1.0.0
+      tag: main
     ports:
       containerPort: 8080
     service:
