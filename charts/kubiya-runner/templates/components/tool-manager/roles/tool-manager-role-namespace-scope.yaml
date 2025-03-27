@@ -8,8 +8,8 @@ metadata:
     {{- include "tool-manager.labels" . | nindent 4 }}
 rules:
   - apiGroups: [""]
-    resources: ["pods", "secrets", "deployments", "pvcs", "services"]
-    verbs: ["get", "list", "create"]
+    resources: ["pods", "secrets", "deployments", "pvcs", "services", "configmaps", "jobs"]
+    verbs: ["get", "list", "create", "update", "delete"]
   - apiGroups: ["apps"]
-    resources: ["pods", "secrets", "deployments"]
-    verbs: ["get", "list", "create"]
+    resources: ["pods", "secrets", "deployments", "configmaps", "jobs"]
+    verbs: ["get", "list", "create", "update", "delete"]
