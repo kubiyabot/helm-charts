@@ -25,6 +25,17 @@ kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
   replicas: 1
+  # Optional node selector for kubiya operator pods
+  # nodeSelector:
+  #   example-node-label: "true"
+  # Optional node affinity for kubiya operator pods
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #             - key: example-node-label
+  #               operator: Exists
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -69,6 +80,17 @@ kubiyaOperator:
 # Kubiya agent manager component config
 agentManager:
   replicas: 2
+  # Optional node selector for agent manager pods
+  # nodeSelector:
+  #   example-node-label: "true"
+  # Optional node affinity for agent manager pods
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #             - key: example-node-label
+  #               operator: Exists
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
@@ -119,6 +141,17 @@ agentManager:
 # Kubiya tool manager component config
 toolManager:
   # tool-manager container config
+  # Optional node selector for tool manager pods
+  # nodeSelector:
+  #   example-node-label: "true"
+  # Optional node affinity for tool manager pods
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #             - key: example-node-label
+  #               operator: Exists
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent

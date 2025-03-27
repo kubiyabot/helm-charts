@@ -19,6 +19,14 @@ spec:
       labels:
         {{- include "tool-manager.labels" . | nindent 8 }}
     spec:
+      {{- with .Values.toolManager.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.toolManager.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "kubiya-runner.serviceAccountName.toolManager" . }}
       containers:
         - name: tool-manager
