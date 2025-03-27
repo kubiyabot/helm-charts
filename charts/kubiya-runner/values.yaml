@@ -24,18 +24,14 @@ registryTls:
 kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
-  replicas: 1
-  # Optional node selector for kubiya operator pods
-  # nodeSelector:
-  #   example-node-label: "true"
-  # Optional node affinity for kubiya operator pods
-  # affinity:
-  #   nodeAffinity:
-  #     requiredDuringSchedulingIgnoredDuringExecution:
-  #       nodeSelectorTerms:
-  #         - matchExpressions:
-  #             - key: example-node-label
-  #               operator: Exists
+  replicas: 1  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -80,17 +76,14 @@ kubiyaOperator:
 # Kubiya agent manager component config
 agentManager:
   replicas: 2
-  # Optional node selector for agent manager pods
-  # nodeSelector:
-  #   example-node-label: "true"
-  # Optional node affinity for agent manager pods
-  # affinity:
-  #   nodeAffinity:
-  #     requiredDuringSchedulingIgnoredDuringExecution:
-  #       nodeSelectorTerms:
-  #         - matchExpressions:
-  #             - key: example-node-label
-  #               operator: Exists
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
@@ -140,18 +133,14 @@ agentManager:
     ENVIRONMENT: "production"
 # Kubiya tool manager component config
 toolManager:
-  # tool-manager container config
-  # Optional node selector for tool manager pods
-  # nodeSelector:
-  #   example-node-label: "true"
-  # Optional node affinity for tool manager pods
-  # affinity:
-  #   nodeAffinity:
-  #     requiredDuringSchedulingIgnoredDuringExecution:
-  #       nodeSelectorTerms:
-  #         - matchExpressions:
-  #             - key: example-node-label
-  #               operator: Exists
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
@@ -389,17 +378,13 @@ dagger:
       create: true
       name: dagger-engine-service
       port: 8080
-  # # Optional node selector for dagger engine pods
-  # nodeSelector:
-  #   example-node-label: "true"
-  # # Optional node affinity for dagger engine pods
-  # affinity:
-  #   nodeAffinity:
-  #     requiredDuringSchedulingIgnoredDuringExecution:
-  #       nodeSelectorTerms:
-  #         - matchExpressions:
-  #             - key: example-node-label
-  #               operator: Exists
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
 
 # ---------------------------------------- Telemetry Components Configuration ---------------------------------------- 
 
