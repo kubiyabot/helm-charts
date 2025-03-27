@@ -24,7 +24,15 @@ registryTls:
 kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
-  replicas: 1
+  replicas: 1  
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -69,6 +77,14 @@ kubiyaOperator:
 # Kubiya agent manager component config
 agentManager:
   replicas: 2
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
@@ -118,7 +134,14 @@ agentManager:
     ENVIRONMENT: "production"
 # Kubiya tool manager component config
 toolManager:
-  # tool-manager container config
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
@@ -356,6 +379,14 @@ dagger:
       create: true
       name: dagger-engine-service
       port: 8080
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}      
+
 # ---------------------------------------- Telemetry Components Configuration ---------------------------------------- 
 
 # kube-state-metrics subchart configuration
