@@ -24,7 +24,8 @@ registryTls:
 kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
-  replicas: 1  ## Node labels for pod assignment
+  replicas: 1  
+  ## Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
