@@ -389,6 +389,18 @@ dagger:
       create: true
       name: dagger-engine-service
       port: 8080
+  # # Optional node selector for dagger engine pods
+  # nodeSelector:
+  #   example-node-label: "true"
+  # # Optional node affinity for dagger engine pods
+  # affinity:
+  #   nodeAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       nodeSelectorTerms:
+  #         - matchExpressions:
+  #             - key: example-node-label
+  #               operator: Exists
+
 # ---------------------------------------- Telemetry Components Configuration ---------------------------------------- 
 
 # kube-state-metrics subchart configuration

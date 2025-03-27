@@ -2,7 +2,7 @@ apiVersion: v2
 name: dagger-helm
 description: A Helm chart for Dagger - a programmable CI/CD engine that runs your pipelines in containers
 type: application
-version: 0.3.0
+version: 0.3.1
 appVersion: "0.11.6"
 
 maintainers:
@@ -28,5 +28,6 @@ annotations:
     - Initial release of dagger-helm chart
     - Added support for kubiya-runner integration
     - Enhanced volume management capabilities
+    - Added nodeSelector support for dagger engine DaemonSet
   artifacthub.io/license: Apache-2.0
   artifacthub.io/prerelease: "true"
