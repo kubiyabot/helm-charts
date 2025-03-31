@@ -24,15 +24,13 @@ registryTls:
 kubiyaOperator:
   create: true
   fullAccess: false # Controls whether operator has full access to all API groups and resources in runner's namespace
-  replicas: 1  
+  replicas: 1
   ## Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Affinity settings for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}      
-
+  affinity: {}
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -80,11 +78,9 @@ agentManager:
   ## Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Affinity settings for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}      
-
+  affinity: {}
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
@@ -137,11 +133,9 @@ toolManager:
   ## Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Affinity settings for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}      
-
+  affinity: {}
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
@@ -225,7 +219,7 @@ toolManager:
     image:
       repository: ghcr.io/kubiyabot/sdk-py
       pullPolicy: IfNotPresent
-      tag: v1.16.0
+      tag: v1.17.0
     # Explicit resources are mandatory. See README.md or more info.
     # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
     resources:
@@ -382,11 +376,9 @@ dagger:
   ## Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
-
   ## Affinity settings for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}      
-
+  affinity: {}
 # ---------------------------------------- Telemetry Components Configuration ---------------------------------------- 
 
 # kube-state-metrics subchart configuration
