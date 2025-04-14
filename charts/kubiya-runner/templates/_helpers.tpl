@@ -101,6 +101,22 @@ app.kubernetes.io/kubiya-runner-component: tool-manager
 {{- end }}
 
 {{/*
+Workflow Engine labels
+*/}}
+{{- define "workflow-engine.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/kubiya-runner-component: workflow-engine
+{{- end }}
+
+{{/*
+Workflow Engine Selector labels
+*/}}
+{{- define "workflow-engine.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
+app.kubernetes.io/kubiya-runner-component: workflow-engine
+{{- end }}
+
+{{/*
 Kubiya Operator labels
 */}}
 {{- define "kubiya-operator.labels" }}
@@ -148,6 +164,14 @@ app.kubernetes.io/kubiya-runner-component: image-updater
 {{- default (printf "%s-tool-manager" (include "kubiya-runner.name" .)) .Values.toolManager.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.toolManager.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{- define "kubiya-runner.serviceAccountName.workflowEngine" -}}
+{{- if .Values.workflowEngine.serviceAccount.create }}
+{{- default (printf "%s-workflow-engine" (include "kubiya-runner.name" .)) .Values.workflowEngine.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.workflowEngine.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
