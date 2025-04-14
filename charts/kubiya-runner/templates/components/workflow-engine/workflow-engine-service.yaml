@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: workflow-engine
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "workflow-engine.labels" . | nindent 4 }}
+    {{- if .Values.workflowEngine.otelCollectorMetricsScrapeAppName }}
+    kubiya.io/metrics-name: {{ .Values.workflowEngine.otelCollectorMetricsScrapeAppName }}
+    {{- end }}
+spec:
+  type: {{ .Values.workflowEngine.service.type }}
+  ports:
+    - port: {{ .Values.workflowEngine.service.port }}
+      targetPort: {{ .Values.workflowEngine.ports.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "workflow-engine.selectorLabels" . | nindent 4 }} 

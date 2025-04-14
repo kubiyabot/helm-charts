@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workflow-engine
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "workflow-engine.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.workflowEngine.replicas }}
+  selector:
+    matchLabels:
+      {{- include "workflow-engine.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.workflowEngine.extraPodsAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "workflow-engine.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.workflowEngine.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.workflowEngine.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.workflowEngine" . }}
+      containers:
+        - name: workflow-engine
+          image: "{{ .Values.workflowEngine.image.repository }}:{{ .Values.workflowEngine.image.tag }}"
+          imagePullPolicy: {{ .Values.workflowEngine.image.pullPolicy | quote }}
+          {{- with .Values.workflowEngine.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.workflowEngine.command }}
+          command: {{ toYaml . | nindent 10 }}
+          {{- end }}
+          env:
+            {{- with .Values.workflowEngine.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.workflowEngine.ports.containerPort }}
+          {{- with .Values.workflowEngine.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.workflowEngine.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.workflowEngine.livenessProbe.httpGet.path }}
+              port: {{ .Values.workflowEngine.ports.containerPort }}
+            initialDelaySeconds: {{ .Values.workflowEngine.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.workflowEngine.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.workflowEngine.livenessProbe.timeoutSeconds }}
+          {{- end }}
+      {{- with .Values.workflowEngine.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }} 
