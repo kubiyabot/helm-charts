@@ -391,4 +391,3 @@ If `helm install my-release ./kubiya-runner:` used for installation, then:
 - If no overrides:
   - name = Chart.Name
   - fullname = *my-release-kubiya-runner*
-

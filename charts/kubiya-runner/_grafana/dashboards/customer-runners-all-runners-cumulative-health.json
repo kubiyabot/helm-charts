@@ -1,0 +1,1325 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Shows all Runners deployments health state based on calculated single cumulative health score. \n- Cumulative score is unweighted - all health signals are counted equal.\n- Current state (last 5m) - shown for each runner as single block on Stat chart. \n- Last x hours health dynamics shown below on State Timeline chart.\n- Both charts are interactive - clicking on each block will open new tab with detailed health signals breakdown dashboard for particular runner.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 255,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 16,
+      "panels": [],
+      "title": "Runners Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "defaultazuremonitorworkspace-eus"
+      },
+      "description": "The number on each Stat panel block shows Runner's Cumulative CURRENT (last 5m) health score, on 0 to 100 scale, while background on each block shows score changes for selected dashboard’s timeframe.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "Runner Details",
+              "url": "https://grafana-20240409160955-gaamenggg0a2ewdm.cse.grafana.azure.com/d/eedckk7jz94w0e/customer-runners-runner-health-overview?orgId=1&refresh=5m&var-runner=${__field.labels.runner}&var-organization=${__field.labels.organization}&var-namespace=kubiya"
+            }
+          ],
+          "mappings": [],
+          "max": 100,
+          "noValue": "No Data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "light-red",
+                "value": 80
+              },
+              {
+                "color": "orange",
+                "value": 90
+              },
+              {
+                "color": "super-light-yellow",
+                "value": 99
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 17,
+      "interval": "5m",
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 15,
+          "valueSize": 50
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(\n  ((sum by (organization, runner) ( rate(response_status{status=~\"2..\", namespace=~\"$namespace|.*\", organization!=\"\", app=\"tool-manager\", kubiya_type=\"customers-runners\"}[5m])) / sum by (organization, runner) (rate(http_requests_total{namespace=~\"$namespace|.*\", organization!=\"\", app=\"tool-manager\", kubiya_type=\"customers-runners\"}[5m])) ) * 100) \n+ \n((sum by (organization, runner) ( rate(agent_manager_http_requests_total{status=~\"2..\", namespace=~\"$namespace|.*\", organization!=\"\", app=\"agent-manager\", kubiya_type=\"customers-runners\"}[5m]) ) / sum by (organization, runner) ( rate(agent_manager_http_requests_total{namespace=~\"$namespace|.*\", organization!=\"\", app=\"agent-manager\", kubiya_type=\"customers-runners\"}[5m]) )) * 100)\n+\n(( sum by (organization, runner) ( avg_over_time( kube_pod_status_ready{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", condition=\"true\" }[5m] ) * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component) kube_pod_labels{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_job_name=\"\" } and on (pod) kube_pod_labels{label_app_kubernetes_io_kubiya_runner_component!=\"\"} ) / count by (organization, runner) ( kube_pod_labels{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_app_kubernetes_io_kubiya_runner_component!=\"\", label_job_name=\"\" })) * 100)\n+\n(( 1 - clamp_max( sum by (organization, runner)( rate(kube_pod_container_status_restarts_total{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_job_name=\"\" }[5m]) * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component) kube_pod_labels{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_job_name=\"\", label_app_kubernetes_io_kubiya_runner_component!=\"\" } ) * 300 / 1.0 , 1)) * 100)\n+\n(avg by (organization, runner) ( avg_over_time(probe_success{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", exporter=\"blackbox-exporter\"}[5m]) ) * 100)\n) /5",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "1m",
+          "legendFormat": "{{organization}}/{{runner}}",
+          "range": true,
+          "refId": "RunnerHealthScore"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "editorMode": "code",
+          "expr": "",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "All Runners Health State (Last 5m)",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "defaultazuremonitorworkspace-eus"
+      },
+      "description": "Shows Cumulative Runner Health for Selected Timeline Period (per each 5m(",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
+          },
+          "fieldMinMax": false,
+          "links": [
+            {
+              "title": "Runner Details",
+              "url": "https://grafana-20240409160955-gaamenggg0a2ewdm.cse.grafana.azure.com/d/eedckk7jz94w0e/customer-runners-runner-health-overview?orgId=1&refresh=5m&var-runner=${__field.labels.runner}&var-organization=${__field.labels.organization}&var-namespace=kubiya\n"
+            }
+          ],
+          "mappings": [
+            {
+              "options": {
+                "100": {
+                  "index": 0,
+                  "text": "Healthy"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "from": 98,
+                "result": {
+                  "index": 1,
+                  "text": "Degraded"
+                },
+                "to": 99
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 90,
+                "result": {
+                  "index": 2,
+                  "text": "Critical"
+                },
+                "to": 98
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "from": 0,
+                "result": {
+                  "index": 3,
+                  "text": "Down"
+                },
+                "to": 80
+              },
+              "type": "range"
+            }
+          ],
+          "max": 100,
+          "min": 0,
+          "noValue": "No Data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 90
+              },
+              {
+                "color": "yellow",
+                "value": 99
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 28,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 14,
+      "interval": "5m",
+      "options": {
+        "colWidth": 0.88,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "rowHeight": 0.66,
+        "showValue": "never",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.4.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "editorMode": "code",
+          "expr": "(\n  ((sum by (organization, runner) ( rate(response_status{status=~\"2..\", namespace=~\"$namespace|.*\", organization!=\"\", app=\"tool-manager\", kubiya_type=\"customers-runners\"}[5m])) / sum by (organization, runner) (rate(http_requests_total{namespace=~\"$namespace|.*\", organization!=\"\", app=\"tool-manager\", kubiya_type=\"customers-runners\"}[5m])) ) * 100)\n+ \n((sum by (organization, runner) ( rate(agent_manager_http_requests_total{status=~\"2..\", namespace=~\"$namespace|.*\", organization!=\"\", app=\"agent-manager\", kubiya_type=\"customers-runners\"}[5m]) ) / sum by (organization, runner) ( rate(agent_manager_http_requests_total{namespace=~\"$namespace|.*\", organization!=\"\", app=\"agent-manager\", kubiya_type=\"customers-runners\"}[5m]) )) * 100)\n+\n(( sum by (organization, runner) ( avg_over_time( kube_pod_status_ready{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", condition=\"true\" }[5m] ) * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component) kube_pod_labels{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_job_name=\"\" } and on (pod) kube_pod_labels{label_app_kubernetes_io_kubiya_runner_component!=\"\"} ) / count by (organization, runner) ( kube_pod_labels{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_app_kubernetes_io_kubiya_runner_component!=\"\", label_job_name=\"\" })) * 100)\n+\n(( 1 - clamp_max( sum by (organization, runner)( rate(kube_pod_container_status_restarts_total{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_job_name=\"\" }[5m]) * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component) kube_pod_labels{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", label_job_name=\"\", label_app_kubernetes_io_kubiya_runner_component!=\"\" } ) * 300 / 1.0 , 1)) * 100)\n+\n(avg by (organization, runner) ( avg_over_time(probe_success{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", exporter=\"blackbox-exporter\"}[5m]) ) * 100)\n) /5",
+          "hide": false,
+          "instant": false,
+          "interval": "5m",
+          "legendFormat": "{{organization}}/{{runner}}",
+          "range": true,
+          "refId": "RunnerHealthScore_v1"
+        }
+      ],
+      "title": "All Runners Health Timeline (per 5m)",
+      "type": "status-history"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "defaultazuremonitorworkspace-eus"
+      },
+      "description": "Shows ALL versions of kubiya-runner helm chart which were installed within selected time frame",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-green",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "string"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "chart (uniqueValues)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "versions installed within selected timeframe"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "chart (lastNotNull)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "last version installed"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "last version installed"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "runner"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 308
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "organization"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 352
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 24,
+        "x": 0,
+        "y": 45
+      },
+      "id": 10,
+      "interval": "5m",
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": true,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "10.4.15",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "editorMode": "code",
+          "expr": "kube_pod_labels{namespace=~\"$namespace|.*\", organization!=\"\", label_helm_sh_chart=~\"kubiya-runner.*\"}",
+          "format": "table",
+          "instant": false,
+          "interval": "1m",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Versions Installed",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "keepLabels": [
+              "instance",
+              "job",
+              "kubernetes_namespace",
+              "kubernetes_service",
+              "kubiya_type",
+              "label_app_kubernetes_io_instance",
+              "label_app_kubernetes_io_managed_by",
+              "label_app_kubernetes_io_name",
+              "label_app_kubernetes_io_part_of",
+              "label_app_kubernetes_io_version",
+              "label_helm_sh_chart",
+              "label_pod_template_hash",
+              "namespace",
+              "organization",
+              "pod",
+              "runner",
+              "uid",
+              "label_app_kubernetes_io_kubiya_runner_component",
+              "label_controller_revision_hash",
+              "label_name",
+              "label_pod_template_generation"
+            ],
+            "mode": "columns",
+            "valueLabel": "label_app_kubernetes_io_component"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true,
+              "exporter": true,
+              "instance": true,
+              "job": true,
+              "kubernetes_namespace": true,
+              "kubernetes_service": true,
+              "kubiya_type": true,
+              "label_app_kubernetes_io_component": false,
+              "label_app_kubernetes_io_instance": true,
+              "label_app_kubernetes_io_managed_by": false,
+              "label_app_kubernetes_io_name": true,
+              "label_app_kubernetes_io_part_of": false,
+              "label_app_kubernetes_io_version": true,
+              "label_controller_revision_hash": true,
+              "label_helm_sh_chart": false,
+              "label_name": true,
+              "label_pod_template_generation": true,
+              "label_pod_template_hash": true,
+              "namespace": true,
+              "organization": false,
+              "pod": true,
+              "uid": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Time": 3,
+              "Value": 4,
+              "label_helm_sh_chart": 2,
+              "organization": 0,
+              "runner": 1
+            },
+            "renameByName": {
+              "label_app_kubernetes_io_kubiya_runner_component": "kubiya runner components",
+              "label_helm_sh_chart": "chart",
+              "label_pod_template_hash": "",
+              "namespace": "namespace",
+              "organization": "organization",
+              "pod": "",
+              "runner": "runner"
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Chart": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Kubiya Runner Component": {
+                "aggregations": [
+                  "uniqueValues"
+                ],
+                "operation": "aggregate"
+              },
+              "Namespace": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Runner": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Time": {
+                "aggregations": []
+              },
+              "chart": {
+                "aggregations": [
+                  "lastNotNull",
+                  "uniqueValues"
+                ],
+                "operation": "aggregate"
+              },
+              "kubiya runner components": {
+                "aggregations": [
+                  "uniqueValues"
+                ]
+              },
+              "label_app_kubernetes_io_component": {
+                "aggregations": []
+              },
+              "label_app_kubernetes_io_managed_by": {
+                "aggregations": []
+              },
+              "label_app_kubernetes_io_part_of": {
+                "aggregations": []
+              },
+              "namespace": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "organization": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "pod": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              },
+              "runner": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 62
+      },
+      "id": 18,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineWidth": 0,
+                "spanNulls": false
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "from": 95,
+                    "result": {
+                      "color": "green",
+                      "index": 0,
+                      "text": "Healthy"
+                    },
+                    "to": 100
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 80,
+                    "result": {
+                      "color": "yellow",
+                      "index": 1,
+                      "text": "Degraded"
+                    },
+                    "to": 94
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 50,
+                    "result": {
+                      "color": "orange",
+                      "index": 2,
+                      "text": "Warning"
+                    },
+                    "to": 79
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "red",
+                      "index": 3,
+                      "text": "Dowm"
+                    },
+                    "to": 49
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 80
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 0,
+            "y": 63
+          },
+          "id": 12,
+          "interval": "5m",
+          "options": {
+            "alignValue": "left",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "never",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "defaultazuremonitorworkspace-eus"
+              },
+              "editorMode": "code",
+              "expr": "(\n   sum by (organization, runner) (\n      rate(response_status{status=~\"2..\", namespace=~\"$namespace|.*\", organization!=\"\", app=\"tool-manager\", kubiya_type=\"customers-runners\"}[5m])\n   )\n   /\n   sum by (organization, runner) (\n      rate(http_requests_total{namespace=~\"$namespace|.*\", organization!=\"\", app=\"tool-manager\", kubiya_type=\"customers-runners\"}[5m])\n   )\n) * 100",
+              "hide": false,
+              "instant": false,
+              "interval": "1s",
+              "legendFormat": "{{organization}} / {{runner}}",
+              "range": true,
+              "refId": "HTTPRequestsSuccessRate_ToolManager"
+            }
+          ],
+          "title": "HTTP Requests Success Rate - Tool Manager",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "description": "The container restart health signal is designed to show how often containers are restarting. Instead of just showing a raw restart count, we normalize the value to a 0-100 health scale, so it is easier to compare with other health metrics.\n* 0 restarts per 5 mins → 100% healthy\n* 1 restart per 5 mins → 0% healthy",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "transparent",
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineWidth": 1,
+                "spanNulls": false
+              },
+              "fieldMinMax": true,
+              "mappings": [
+                {
+                  "options": {
+                    "from": 95,
+                    "result": {
+                      "color": "green",
+                      "index": 0,
+                      "text": "Healthy"
+                    },
+                    "to": 100
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 75,
+                    "result": {
+                      "color": "yellow",
+                      "index": 1,
+                      "text": "Degraded"
+                    },
+                    "to": 94
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 50,
+                    "result": {
+                      "color": "orange",
+                      "index": 2,
+                      "text": "Critical"
+                    },
+                    "to": 74
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "red",
+                      "index": 3,
+                      "text": "Down"
+                    },
+                    "to": 49
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 75
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 12,
+            "y": 63
+          },
+          "id": 3,
+          "interval": "5m",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "never",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.4.11",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "defaultazuremonitorworkspace-eus"
+              },
+              "editorMode": "code",
+              "expr": "(\n  1 - clamp_max(\n    sum by (organization, runner)(\n      rate(kube_pod_container_status_restarts_total{\n        namespace=~\"$namespace|.*\",\n        organization!=\"\",\n        kubiya_type=\"customers-runners\",\n        label_job_name=\"\"\n      }[5m])\n      * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component)\n      kube_pod_labels{\n        namespace=~\"$namespace|.*\",\n        organization!=\"\",\n        kubiya_type=\"customers-runners\",\n        label_job_name=\"\",\n        label_app_kubernetes_io_kubiya_runner_component!=\"\"\n      }\n    )\n    * 300   # 300 seconds (5 minutes)\n    / 1.0   # 1 restart per 5 min considered problematic\n  , 1)\n) * 100",
+              "hide": false,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "{{organization}} / {{runner}}",
+              "range": true,
+              "refId": "ContainerRestartRateNormalizedWithoutJobs"
+            }
+          ],
+          "title": "Container Restarts (Per Minute) Health Score",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineWidth": 1,
+                "spanNulls": true
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "from": 95,
+                    "result": {
+                      "color": "green",
+                      "index": 0,
+                      "text": "Healthy"
+                    },
+                    "to": 100
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 80,
+                    "result": {
+                      "color": "yellow",
+                      "index": 1,
+                      "text": "Degraded"
+                    },
+                    "to": 94
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 50,
+                    "result": {
+                      "color": "orange",
+                      "index": 2,
+                      "text": "Critical"
+                    },
+                    "to": 79
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "red",
+                      "index": 3,
+                      "text": "Down"
+                    },
+                    "to": 50
+                  },
+                  "type": "range"
+                }
+              ],
+              "max": 1,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 80
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 0,
+            "y": 76
+          },
+          "id": 1,
+          "interval": "5m",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "never",
+            "tooltip": {
+              "mode": "none",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "defaultazuremonitorworkspace-eus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "(\n  sum by (organization, runner) (\n    avg_over_time(\n      kube_pod_status_ready{\n        namespace=~\"$namespace|.*\",\n        organization!=\"\",\n        kubiya_type=\"customers-runners\",\n        condition=\"true\"\n      }[5m]\n    )\n    * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component)\n    kube_pod_labels{\n      namespace=~\"$namespace|.*\",\n      organization!=\"\",\n      kubiya_type=\"customers-runners\",\n      label_job_name=\"\"\n    }\n    and on (pod) kube_pod_labels{label_app_kubernetes_io_kubiya_runner_component!=\"\"}\n  )\n  /\n  count by (organization, runner) (\n    kube_pod_labels{\n      namespace=~\"$namespace|.*\",\n      organization!=\"\",\n      kubiya_type=\"customers-runners\",\n      label_app_kubernetes_io_kubiya_runner_component!=\"\",\n      label_job_name=\"\"\n    }\n  )\n) * 100",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "{{organization}} / {{runner}}",
+              "range": true,
+              "refId": "ComponentsPodsReadyNormalizedWithoutJobs"
+            }
+          ],
+          "title": "Components Pods Ready",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineWidth": 0,
+                "spanNulls": false
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "from": 95,
+                    "result": {
+                      "color": "green",
+                      "index": 0,
+                      "text": "Healthy"
+                    },
+                    "to": 100
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 80,
+                    "result": {
+                      "color": "yellow",
+                      "index": 1,
+                      "text": "Degraded"
+                    },
+                    "to": 94
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 50,
+                    "result": {
+                      "color": "orange",
+                      "index": 2,
+                      "text": "Warning"
+                    },
+                    "to": 79
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "red",
+                      "index": 3,
+                      "text": "Dowm"
+                    },
+                    "to": 49
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 80
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 12,
+            "y": 76
+          },
+          "id": 13,
+          "interval": "5m",
+          "options": {
+            "alignValue": "left",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "never",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "defaultazuremonitorworkspace-eus"
+              },
+              "editorMode": "code",
+              "expr": "(\n   sum by (organization, runner, namespace) (\n      rate(agent_manager_http_requests_total{status=~\"2..\", namespace=~\"$namespace|.*\", organization!=\"\", app=\"agent-manager\", kubiya_type=\"customers-runners\"}[5m])\n   )\n   /\n   sum by (organization, runner, namespace) (\n      rate(agent_manager_http_requests_total{namespace=~\"$namespace|.*\", organization!=\"\", app=\"agent-manager\", kubiya_type=\"customers-runners\"}[5m])\n   )\n) * 100",
+              "hide": false,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "{{organization}} / {{runner}}",
+              "range": true,
+              "refId": "HTTPRequestsSuccessRate_AgentManager"
+            }
+          ],
+          "title": "HTTP Requests Success Rate - Agent Manager",
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "defaultazuremonitorworkspace-eus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineWidth": 1,
+                "spanNulls": false
+              },
+              "fieldMinMax": true,
+              "mappings": [
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "red",
+                      "index": 0,
+                      "text": "Down"
+                    },
+                    "to": 50
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 51,
+                    "result": {
+                      "color": "orange",
+                      "index": 1,
+                      "text": "Critical"
+                    },
+                    "to": 79
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 80,
+                    "result": {
+                      "color": "yellow",
+                      "index": 2,
+                      "text": "Degraded"
+                    },
+                    "to": 94
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 95,
+                    "result": {
+                      "color": "green",
+                      "index": 3,
+                      "text": "Healthy"
+                    },
+                    "to": 100
+                  },
+                  "type": "range"
+                }
+              ],
+              "min": 38,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red"
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 80
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 12,
+            "x": 0,
+            "y": 89
+          },
+          "id": 4,
+          "interval": "5m",
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "never",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.4.11",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "defaultazuremonitorworkspace-eus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "avg by (organization, runner) (\n  avg_over_time(probe_success{ namespace=~\"$namespace|.*\", organization!=\"\", kubiya_type=\"customers-runners\", exporter=\"blackbox-exporter\"}[5m])\n) * 100",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "1m",
+              "legendFormat": "{{organization}} / {{runner}}",
+              "range": true,
+              "refId": "ServicesHealthEndpointProbeSuccessRate"
+            }
+          ],
+          "title": "Services Health Endpoint Probe [per 5m]",
+          "type": "state-timeline"
+        }
+      ],
+      "title": "Debug Detailed Health Signals per Runner",
+      "type": "row"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [
+    "customer_runner_metrics",
+    "prometheus",
+    "customer_runner",
+    "managed_runner",
+    "agent_manager",
+    "metrics",
+    "tool_manager",
+    "global_runner_health",
+    "global_health_score"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "nowDelay": "",
+    "refresh_intervals": [
+      "5m",
+      "1h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Customer Runners / ALL Runners Cumulative Health",
+  "uid": "fegau55dgmgaod",
+  "version": 14,
+  "weekStart": ""
+}
