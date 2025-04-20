@@ -179,7 +179,7 @@ toolManager:
   containerPort: 3001
   env:
     KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
-    WORKFLOW_ENGINE_URL: "http://wf-engine-svc:{{ .Values.toolManager.workflowEngine.service.port }}"
+    WORKFLOW_ENGINE_URL: "http://workflow-engine.{{ .Release.Namespace }}:{{ .Values.workflowEngine.service.port }}"
     GIT_SHA: git-sha-placeholder
     KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
     KUBIYA_TOOL_TIMEOUT: 5m
@@ -261,43 +261,72 @@ toolManager:
         name: nats-creds-volume
       - mountPath: /tmp/kubiya_shared_tools
         name: shared-volume
-  # Kubiya workflow engine component config
-  workflowEngine:
-    image:
-      repository: ghcr.io/kubiyabot/workflow-engine
-      pullPolicy: Always
-      tag: main
-    ports:
-      containerPort: 8080
-    service:
-      type: ClusterIP
-      port: 80
-      targetPort: 8080
-    otelCollectorMetricsScrapeAppName: workflow-engine
-    livenessProbe:
-      enabled: false
-      httpGet:
-        path: /health
-      initialDelaySeconds: 30
-      periodSeconds: 30
-      timeoutSeconds: 5
-    resources:
-      limits:
-        cpu: "500m"
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    env:
-      KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools/dags"
-      TOOL_MANAGER_URL: http://tool-manager.kubiya
-    volumeMounts:
-      - mountPath: /opt/
-        name: nats-creds-volume
-      - mountPath: /tmp/kubiya_shared_tools
-        name: shared-volume
-      - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
-        name: registry-certs
+
+# Kubiya workflow engine component config
+workflowEngine:
+  replicas: 1
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+  ## Affinity settings for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}
+  image:
+    repository: ghcr.io/kubiyabot/workflow-engine
+    pullPolicy: Always
+    tag: main
+  ports:
+    containerPort: 8080
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+  otelCollectorMetricsScrapeAppName: workflow-engine
+  livenessProbe:
+    enabled: false
+    httpGet:
+      path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+  resources:
+    limits:
+      cpu: "500m"
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  env:
+    KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools/dags"
+    TOOL_MANAGER_URL: http://tool-manager.{{ .Release.Namespace }}
+  volumeMounts:
+    - mountPath: /opt/
+      name: nats-creds-volume
+    - mountPath: /tmp/kubiya_shared_tools
+      name: shared-volume
+    - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
+      name: registry-certs
+  volumes:
+    - name: nats-creds-volume
+      secret:
+        defaultMode: 420
+        items:
+          - key: nats.creds
+            path: nats.creds
+        secretName: kubiya-runner-nats-creds-customer
+    - name: shared-volume
+      emptyDir: {}
+    - name: registry-certs
+      secret:
+        secretName: registry-tls-secret
+        defaultMode: 420
+  serviceAccount:
+    create: true
+    name: "" # Leave empty when create is true to use the default generated name
+    automountServiceAccountToken: true
+  extraPodsAnnotations:
+    prometheus.io/scrape: "true"
+
 # Kubiya image updater component config
 imageUpdater:
   cronJob:

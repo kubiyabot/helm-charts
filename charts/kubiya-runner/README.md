@@ -16,6 +16,7 @@ A Helm chart for deploying the Kubiya Runner.
     - [Agent Manager](#agent-manager)
     - [Kubiya Operator](#kubiya-operator)
     - [Tool Manager](#tool-manager)
+    - [Workflow Engine](#workflow-engine)
     - [Image Updater](#image-updater)
   - [Dependencies \& Compatibility Matrix](#dependencies--compatibility-matrix)
     - [Helm Dependencies](#helm-dependencies)
@@ -52,6 +53,7 @@ kubiya-runner/
 │   │   ├── agent-manager/                         # Manages Kubiya agents lifecycle
 │   │   ├── kubiya-operator/                       # Controls operational aspects
 │   │   ├── tool-manager/                          # Handles tool execution
+│   │   ├── workflow-engine/                       # Manages workflow execution
 │   │   └── image-updater/                         # Automatic image updates
 │   ├── alloy-configMap.yaml                       # Alloy configuration
 │   └── shared-secrets.yaml                        # Secrets shared between runner components
@@ -96,6 +98,14 @@ Full documentation is available [in project repository](https://github.com/kubiy
 - Integrates with Dagger for container runtime
 - Includes SDK server for tool execution
 
+### Workflow Engine
+
+The Workflow Engine is responsible for managing and executing workflows in the Kubiya Runner. It provides a scalable, containerized environment for workflow execution and orchestration.
+
+- Manages workflow execution and orchestration
+- Communicates with the Tool Manager for tool execution
+- Provides workflow status and metrics
+
 ### Image Updater
 
 **TBD, (depricated approach)**
@@ -124,6 +134,7 @@ This chart (as of version 0.6.x) is tested to be compatible with the following v
 | Kubiya Operator | ghcr.io/kubiyabot/kubiya-operator | runner_v2 |
 | Tool Manager | ghcr.io/kubiyabot/tool-manager | v0.3.2 |
 | SDK Server | ghcr.io/kubiyabot/sdk-py | v1.7.1 |
+| Workflow Engine | ghcr.io/kubiyabot/workflow-engine | main |
 | Image Updater | bitnami/kubectl | 1.30.6 |
 | Dagger Engine | ghcr.io/kubiyabot/kubiya-registry | v0.13.6 |
 | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | 2.14.0 |
