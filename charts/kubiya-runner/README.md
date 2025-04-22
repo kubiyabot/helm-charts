@@ -25,9 +25,16 @@ A Helm chart for deploying the Kubiya Runner.
     - [Security](#security)
     - [Architecture](#architecture)
     - [Grafana Alloy Configuration](#grafana-alloy-configuration)
-  - [**Azure Prometheus Integration**](#azure-prometheus-integration)
+  - [Azure Prometheus Integration](#azure-prometheus-integration)
   - [Grafana Dashboards](#grafana-dashboards)
-    - [List of available dashboards](#list-of-available-dashboards)
+    - [Single View Runners Cumulative Health Score](#single-view-runners-cumulative-health-score)
+    - [Health Overview by Components](#health-overview-by-components)
+    - [Runner Health Overview](#runner-health-overview)
+    - [Tool Manager Dashboard](#tool-manager-dashboard)
+    - [Agent Manager Dashboard](#agent-manager-dashboard)
+    - [Kubernetes State Dashboard](#kubernetes-state-dashboard)
+    - [Alloy Dashboard](#alloy-dashboard)
+    - [Blackbox Exporter Dashboards](#blackbox-exporter-dashboards)
   - [Dashboards as a Code](#dashboards-as-a-code)
   - [K8s Resources Definitions](#k8s-resources-definitions)
   - [Security](#security-1)
@@ -53,7 +60,6 @@ kubiya-runner/
 │   │   ├── agent-manager/                         # Manages Kubiya agents lifecycle
 │   │   ├── kubiya-operator/                       # Controls operational aspects
 │   │   ├── tool-manager/                          # Handles tool execution
-│   │   ├── workflow-engine/                       # Manages workflow execution
 │   │   └── image-updater/                         # Automatic image updates
 │   ├── alloy-configMap.yaml                       # Alloy configuration
 │   └── shared-secrets.yaml                        # Secrets shared between runner components
@@ -120,25 +126,25 @@ This chart (as of version 0.6.x) is tested to be compatible with the following v
 
 ### Helm Dependencies
 
-| Chart | Version | App Version |
-|-------|---------|--------|  
-| dagger-helm | 0.3.0 | 0.11.6 |
-| kube-state-metrics | 5.27.0 | 2.14.0 |
-| alloy | 0.10.1 | v1.5.1 |
+| Chart              | Version | App Version |
+|--------------------|---------|-------------|
+| dagger-helm        | 0.3.0   | 0.11.6      |
+| kube-state-metrics | 5.27.0  | 2.14.0      |
+| alloy              | 0.10.1  | v1.5.1      |
 
 ### Container Images
 
-| Component | Image | Version/Tag |
-|-----------|-------|-------------|
-| Agent Manager | ghcr.io/kubiyabot/agent-manager | 0.0.22 |
-| Kubiya Operator | ghcr.io/kubiyabot/kubiya-operator | runner_v2 |
-| Tool Manager | ghcr.io/kubiyabot/tool-manager | v0.3.2 |
-| SDK Server | ghcr.io/kubiyabot/sdk-py | v1.7.1 |
-| Workflow Engine | ghcr.io/kubiyabot/workflow-engine | main |
-| Image Updater | bitnami/kubectl | 1.30.6 |
-| Dagger Engine | ghcr.io/kubiyabot/kubiya-registry | v0.13.6 |
-| Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | 2.14.0 |
-| Grafana Alloy | grafana/alloy | v1.5.1 |
+| Component          | Image                                                 | Version/Tag |
+|--------------------|-------------------------------------------------------|-------------|
+| Agent Manager      | ghcr.io/kubiyabot/agent-manager                       | v0.1.14     |
+| Kubiya Operator    | ghcr.io/kubiyabot/kubiya-operator                     | runner_v2   |
+| Tool Manager       | ghcr.io/kubiyabot/tool-manager                        | v0.3.17     |
+| SDK Server         | ghcr.io/kubiyabot/sdk-py                              | v1.18.1     |
+| Workflow Engine    | ghcr.io/kubiyabot/workflow-engine                     | main        |
+| Image Updater      | ghcr.io/kubiyabot/kubernetes                          | 1.32.0      |
+| Dagger Engine      | ghcr.io/kubiyabot/kubiya-registry                     | v0.1.1      |
+| Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | v2.14.0     |
+| Grafana Alloy      | grafana/alloy                                         | v1.5.1      |
 
 ## Monitoring & Telemetry
 
@@ -164,12 +170,14 @@ D[agent-manager exporter]
 E[grafana alloy]
 F[azure managed prometheus]
 G[grafana dashboards]
+W[workflow-engine exporter (under dev)]
 subgraph kubiya-runner
     A ---> E
     B ---> E
     C ---> E
     D ---> E
     H ---> E
+    W ---> E
     E
 end
 E ---> F
@@ -210,7 +218,7 @@ If this level of precision is insufficient, the scrape interval can be adjusted�
       kubeStateMetrics: 60s
       cadvisor: 60s (disabled by default)
 ```
-## **Azure Prometheus Integration**
+## Azure Prometheus Integration
 
 Required set of environment variables to be set for Azure Managed Prometheus remote writes support:
 
@@ -223,13 +231,129 @@ These variables confurable via `values.yaml` `alloy.alloy.extraEnv`)
 
 ## Grafana Dashboards
 
- Grafana dashboards available in the `kubiya-runner` and located in `helm-charts/charts/kubiya-runner/grafana-dashboards/`.
+Grafana dashboards JSONs available in the `kubiya-runner` and located in `helm-charts/charts/kubiya-runner/_grafana/dashboards/`, alerts as code can be found under `helm-charts/charts/kubiya-runner/_grafana/alerts`
 
-### List of available dashboards
+### Single View Runners Cumulative Health Score
 
-![Grafana Dashboards](_docs/dashboards-list.png)
+![Single View Runners Cumulative Health Score](_docs/all-runners-cumulative-health.png)
 
-**Health Overview by Components** (`customer-runners-runner-health-overview-by-components.json`)
+Dashboard monitors health using a composite scoring system. Each runner's cumulative health score is calculated as the unweighted average of five key health signals, each normalized to a 0-100% scale:
+
+```
+(
+  + Tool-Manager HTTP Success Rate (%)
+  + Agent-Manager HTTP Success Rate (%) 
+  + Pod Ready Status (%)
+  + Pod Restart Stability (%)
+  + Probe Success Rate (%)
+) / 5
+```
+
+**Individual Health Signal Formulas and PromQL Functions**
+
+1. **Tool-Manager HTTP Success Rate**
+   ```
+   (sum by (organization, runner) (rate(response_status{status=~"2..", app="tool-manager"}[5m])) / 
+    sum by (organization, runner) (rate(http_requests_total{app="tool-manager"}[5m]))) * 100
+   ```
+   - `rate()`: Calculates the per-second rate of successful responses over 5-minute window
+   - `sum by`: Aggregates metrics by organization and runner
+   - Purpose: Measures percentage of successful (2xx) HTTP responses from the Tool Manager
+
+2. **Agent-Manager HTTP Success Rate**
+   ```
+   (sum by (organization, runner) (rate(agent_manager_http_requests_total{status=~"2.."}[5m])) /
+    sum by (organization, runner) (rate(agent_manager_http_requests_total[5m]))) * 100
+   ```
+   - Similar functions as Tool-Manager rate, applied to Agent Manager metrics
+   - Purpose: Measures percentage of successful HTTP responses from the Agent Manager
+
+3. **Pod Ready Status**
+   ```
+   (sum by (organization, runner) (avg_over_time(kube_pod_status_ready{condition="true"}[5m]) 
+    * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component) 
+    kube_pod_labels{label_app_kubernetes_io_kubiya_runner_component!=""}) /
+    count by (organization, runner) (kube_pod_labels{label_app_kubernetes_io_kubiya_runner_component!=""})) * 100
+   ```
+   - `avg_over_time()`: Smooths pod ready status over 5 minutes
+   - `* on (pod) group_left()`: Joins metrics on pod label to include component information
+   - Purpose: Calculates percentage of runner pods in "ready" state
+
+4. **Pod Restart Stability**
+   ```
+   (1 - clamp_max(sum by (organization, runner)(rate(kube_pod_container_status_restarts_total[5m]) 
+    * on (pod) group_left(label_app_kubernetes_io_kubiya_runner_component) 
+    kube_pod_labels{label_app_kubernetes_io_kubiya_runner_component!=""}) * 300 / 1.0, 1)) * 100
+   ```
+   - `clamp_max()`: Caps the maximum value at 1
+   - `* 300 / 1.0`: Normalizes to consider 1 restart per 5 minutes (300s) as problematic
+   - Purpose: Penalizes container restarts (0 restarts = 100%, 1+ restart per 5 minutes = 0%)
+
+5. **Probe Success Rate**
+   ```
+   avg by (organization, runner) (avg_over_time(probe_success{exporter="blackbox-exporter"}[5m])) * 100
+   ```
+   - `avg by`: Calculates average success rate by organization and runner
+   - Purpose: Measures percentage of successful health endpoint probes from blackbox exporter
+
+**Health Thresholds**
+
+These thresholds are base and expected to be tuned in short term,
+
+| Metric               | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red)    |
+|----------------------|-----------------|------------------|-------------------|---------------|
+| Cumulative Score     | 100%            | 99-99.9%         | 90-98.9%          | 0-89.9%       |
+
+**Alerts**
+
+The dashboard is connected to an alerting rule that triggers when any runner's cumulative health score falls below 100% for more than 5 minutes. The alert includes:
+- Source: Panel ID 17 from the All Runners Health State dashboard
+- Description: "Cumulative Runner Health Score is below the threshold for >5mins"
+- Summary: "One or more runner components are not healthy"
+- Labels: component=runner
+
+**Interactive Features**
+
+The dashboard includes interactive data links that allow operators to:
+- Click on any runner's health score block to navigate to a detailed dashboard view for that specific runner
+- View health score changes over time with the State Timeline visualization
+- Filter and sort runners by organization, namespace, or component
+
+The visualization changes color based on the thresholds defined above, providing immediate visual indication of health status.
+
+**Future Enhancements**
+
+1. A weighted version of the health score calculation allows assigning specific importance to each signal. Each signal's weight can be adjusted through Grafana variables, optimizing the dashboard for customized operational priorities.
+
+Example of Proposed Base Weights Configuration (Draft Dashboard Available)
+
+| Signal           | Recommended Weight |
+|------------------|--------------------|
+| HTTP Success     | 0.30               |
+| Pod Restarts     | 0.25               |
+| Probe Success    | 0.25               |
+| Pod Ready Status | 0.20               |
+
+2. Tune up threshold for cumulative score, more precision
+   
+| Score Range | Status   | Color  | Action                                |
+|-------------|----------|--------|---------------------------------------|
+| 95-100%     | Healthy  | Green  | Normal operations                     |
+| 90-94.9%    | Warning  | Yellow | Monitor during next development cycle |
+| 80-89.9%    | Degraded | Orange | Investigate when resources available  |
+| <80%        | Critical | Red    | Prioritize investigation              |
+
+These adjusted thresholds:
+  - Provide more breathing room during development phases
+  - Allow focusing resources on critical issues only
+  - Still maintain visibility into system health
+  - Better align with startup priorities (feature development vs perfect stability)
+
+3. Split cumulative formula into set of separate, named health signals queries (not supported in currently running Grafana 10), then use in cumulative query along with weigh multiplies for readability and fine tune.
+
+2. Consider individual thresholds for each score (?)
+
+### Health Overview by Components
   
 Detailed breakdown of health metrics by individual components for multiple runners.
 
@@ -237,17 +361,17 @@ Detailed breakdown of health metrics by individual components for multiple runne
 - Component version tracking
 - Services status monitoring
 
-| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red) |
-|--------|----------------|------------------|-------------------|------------|
-| Service Status | 100% | 95-100% | 80-95% | 0-80% |
-| Pod Restarts per | 0-1 restarts | 1.1-2 restarts | 2.1-4 restarts | >4.1 restarts |
-| HTTP Success Rate | 100% | 95-99% | 80-94% | 0-79% |
-| Pod Status Ready | 100% | 90-99% | 70-89% | 0-69% |
+| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red)    |
+|----------------------|-----------------|------------------|-------------------|---------------|
+| Service Status       | 100%            | 95-100%          | 80-95%            | 0-80%         |
+| Pod Restarts per     | 0-1 restarts    | 1.1-2 restarts   | 2.1-4 restarts    | >4.1 restarts |
+| HTTP Success Rate    | 100%            | 95-99%           | 80-94%            | 0-79%         |
+| Pod Status Ready     | 100%            | 90-99%           | 70-89%            | 0-69%         |
 
 ![Health Overview by Components](_docs/runner-health-overview-by-components.png)
 
 
-**Runner Health Overview** (`customer-runners-runner-health-overview.json`)
+### Runner Health Overview 
   
 - Provides a comprehensive view of runner components' health status
 - Filtering by organization, runner and namespace
@@ -255,16 +379,16 @@ Detailed breakdown of health metrics by individual components for multiple runne
 - Component container running versions tracking
 - Real-time health metrics visualization
 
-| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red) |
-|--------|----------------|------------------|-------------------|------------|
-| Service Status | 100% | 95-100% | 80-95% | 0-80% |
-| Pod Restarts per | 0-1 restarts | 1.1-2 restarts | 2.1-4 restarts | >4.1 restarts |
-| HTTP Success Rate | 100% | 95-99% | 80-94% | 0-79% |
-| Pod Status Ready | 100% | 90-99% | 70-89% | 0-69% |
+| Metric (per 5m span) | Healthy (Green) | Warning (Yellow) | Degraded (Orange) | Down (Red)    |
+|----------------------|-----------------|------------------|-------------------|---------------|
+| Service Status       | 100%            | 95-100%          | 80-95%            | 0-80%         |
+| Pod Restarts per     | 0-1 restarts    | 1.1-2 restarts   | 2.1-4 restarts    | >4.1 restarts |
+| HTTP Success Rate    | 100%            | 95-99%           | 80-94%            | 0-79%         |
+| Pod Status Ready     | 100%            | 90-99%           | 70-89%            | 0-69%         |
 
 ![Runner Health Overview](_docs/runner-health-overview-dashboard.png)
 
-**Tool Manager Dashboard** (`customer-runners-component-exporter-tool-manager.json`)
+### Tool Manager Dashboard 
 
 - Focused on Tool Manager performance metrics
 - HTTP response time distribution
@@ -273,7 +397,7 @@ Detailed breakdown of health metrics by individual components for multiple runne
 
 ![Health Overview by Components](_docs/tool-manager-dashboard.png)
 
-**Agent Manager Dashboard** (`customer-runners-component-exporter-agent-manager.json`)
+### Agent Manager Dashboard 
 
 - Monitors Agent Manager performance
 - HTTP request metrics
@@ -282,7 +406,7 @@ Detailed breakdown of health metrics by individual components for multiple runne
 
 ![Health Overview by Components](_docs/agent-manager-dashboard.png)
 
-**Kubernetes State Dashboard** (`runner-namespace-kubernetes-state.json`)
+### Kubernetes State Dashboard 
 
 (*Under development*)
  
@@ -290,7 +414,7 @@ Detailed breakdown of health metrics by individual components for multiple runne
 - Based on `kube-state-metrics` data
 - Includes summary metrics about the runner's Kubernetes resources
 
-**Alloy Dashboard** (`customer-runners-metrics-alloy-prometheus-components.json`)
+### Alloy Dashboard 
 
 - Monitors Alloy pipelines
 - Focus on Remote Writes to Prometheus (success/errors/count,...)
@@ -300,8 +424,7 @@ Detailed breakdown of health metrics by individual components for multiple runne
 
 ![Health Overview by Components](_docs/alloy-dashboard.png)
  
-**Blackbox Exporter Dashboards**  (`customer-runners-blackbox-exporter-alternate-view`, 
-`customer-runners-blackbox-exporter.json`)
+### Blackbox Exporter Dashboards  
 
 - Alternative visualization of HTTP probe metrics
 - Focus on probe success rates and latencies
@@ -321,6 +444,11 @@ A dashboard export script is available at `kubiya-runner/_grafana-dashboards/gra
 1. Use the export script to save the dashboard as a JSON file
 2. Commit the file to the repository
 3. Create a pull request to the main branch
+4. Add more health signals: latency, saturation, scaling: expected vs desire replicas
+5. Finalize Alloy dashboard
+7. Separate helm value toggle for managed runners: implement add `node-exporter`, collect wider metrics with `kube-state-metrics`, add h/w metrics
+8. Consider reframe into RED/USE/4GSignals
+9. Connect Elasticsearch (or Loki) as a datasource for logs, get HTTP requests views and compound extra cumulative signals 
 
 
 ## K8s Resources Definitions
@@ -402,3 +530,4 @@ If `helm install my-release ./kubiya-runner:` used for installation, then:
 - If no overrides:
   - name = Chart.Name
   - fullname = *my-release-kubiya-runner*
+
