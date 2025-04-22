@@ -283,11 +283,18 @@ workflowEngine:
     targetPort: 8080
   otelCollectorMetricsScrapeAppName: workflow-engine
   livenessProbe:
-    enabled: false
+    enabled: true
     httpGet:
-      path: /health
+      path: /api/v1/health #/healthz
     initialDelaySeconds: 30
     periodSeconds: 30
+    timeoutSeconds: 5
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /api/v1/health
+    initialDelaySeconds: 15
+    periodSeconds: 10
     timeoutSeconds: 5
   resources:
     limits:
@@ -299,6 +306,8 @@ workflowEngine:
   env:
     KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools/dags"
     TOOL_MANAGER_URL: http://tool-manager.{{ .Release.Namespace }}
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
   volumeMounts:
     - mountPath: /opt/
       name: nats-creds-volume

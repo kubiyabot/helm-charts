@@ -61,6 +61,15 @@ spec:
             periodSeconds: {{ .Values.workflowEngine.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.workflowEngine.livenessProbe.timeoutSeconds }}
           {{- end }}
+          {{- if .Values.workflowEngine.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.workflowEngine.readinessProbe.httpGet.path }}
+              port: {{ .Values.workflowEngine.ports.containerPort }}
+            initialDelaySeconds: {{ .Values.workflowEngine.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.workflowEngine.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.workflowEngine.readinessProbe.timeoutSeconds }}
+          {{- end }}
       {{- with .Values.workflowEngine.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
