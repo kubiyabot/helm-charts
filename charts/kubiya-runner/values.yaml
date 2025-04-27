@@ -139,7 +139,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: v0.3.17
+    tag: v0.3.18
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
@@ -261,7 +261,6 @@ toolManager:
         name: nats-creds-volume
       - mountPath: /tmp/kubiya_shared_tools
         name: shared-volume
-
 # Kubiya workflow engine component config
 workflowEngine:
   replicas: 1
@@ -326,7 +325,6 @@ workflowEngine:
     automountServiceAccountToken: true
   extraPodsAnnotations:
     prometheus.io/scrape: "true"
-
 # Kubiya image updater component config
 imageUpdater:
   cronJob:
