@@ -272,8 +272,8 @@ workflowEngine:
   affinity: {}
   image:
     repository: ghcr.io/kubiyabot/workflow-engine
-    pullPolicy: Always
-    tag: main
+    pullPolicy: IfNotPresent
+    tag: release-0.0.8
   ports:
     containerPort: 8080
   service:
