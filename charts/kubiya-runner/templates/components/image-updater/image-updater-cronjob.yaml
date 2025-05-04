@@ -82,8 +82,7 @@ spec:
                 if ! helm upgrade {{ .Release.Name }} kubiya-helm-charts/kubiya-runner \
                   --namespace {{ .Release.Namespace }} \
                   -f /tmp/current_values.yaml \
-                  --version $LATEST_VERSION \
-                  --force; then
+                  --version $LATEST_VERSION --force; then
                   echo "Error: Helm upgrade failed"
                   exit 1
                 fi
