@@ -22,27 +22,27 @@ engine:
 
   ### Pod securityContext configuration
   securityContext:
-    runAsUser: 0
-    runAsGroup: 1001
-    fsGroup: 1001
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 2000
     fsGroupChangePolicy: "OnRootMismatch"
-    # Below are default security recommendations that can be enabled if compatible with your workload
-    # runAsNonRoot: true
-    # runAsUser: 1000
-    # fsGroup: 2000
+    # Legacy less secure settings (not recommended):
+    # runAsUser: 0
+    # runAsGroup: 1001
+    # fsGroup: 1001
 
   ### Container securityContext configuration
   containerSecurityContext:
-    privileged: true
+    allowPrivilegeEscalation: false
     capabilities:
-      add:
+      drop:
         - ALL
-    # Below are default security recommendations that can be enabled if compatible with your workload
-    # allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    # Legacy less secure settings (not recommended):
+    # privileged: true
     # capabilities:
-    #   drop:
+    #   add:
     #     - ALL
-    # readOnlyRootFilesystem: true
 
   resources:
     limits: {}

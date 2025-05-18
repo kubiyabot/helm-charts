@@ -11,21 +11,17 @@ Motivation behind cloning was to add support for kubiya-runner:
 
 ## Security Context Configuration
 
-By default, the Dagger engine runs with privileged access. The chart allows customizing security context settings for both the pod and container:
+The Dagger engine runs with secure defaults. The chart provides configurable security context settings for both the pod and container:
 
 ### Pod Security Context
 
 ```yaml
 engine:
   securityContext:
-    runAsUser: 0
-    runAsGroup: 1001
-    fsGroup: 1001
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 2000
     fsGroupChangePolicy: "OnRootMismatch"
-    # For enhanced security (requires compatible workload):
-    # runAsNonRoot: true
-    # runAsUser: 1000
-    # fsGroup: 2000
 ```
 
 ### Container Security Context
@@ -33,16 +29,29 @@ engine:
 ```yaml
 engine:
   containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+```
+
+Note: If your workload requires privileged access or specific capabilities, you can override these settings in your values file with less restrictive options.
+
+#### Legacy (Less Secure) Settings
+
+For workloads that require privileged access, the following settings can be used:
+
+```yaml
+engine:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 1001
+    fsGroup: 1001
+    
+  containerSecurityContext:
     privileged: true
     capabilities:
       add:
         - ALL
-    # For enhanced security (requires compatible workload):
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #     - ALL
-    # readOnlyRootFilesystem: true
 ```
-
-Note: Enabling the enhanced security options may require modifications to your workload to ensure compatibility.

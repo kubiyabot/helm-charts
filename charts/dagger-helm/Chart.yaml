@@ -2,7 +2,7 @@ apiVersion: v2
 name: dagger-helm
 description: A Helm chart for Dagger - a programmable CI/CD engine that runs your pipelines in containers
 type: application
-version: 0.3.2
+version: 0.3.3
 appVersion: "0.11.6"
 
 maintainers:
@@ -25,6 +25,9 @@ sources:
 
 annotations:
   artifacthub.io/changes: |
+    - Applied secure security context settings as defaults (runAsNonRoot, drop ALL capabilities, etc.)
+    - Added legacy security settings as comments for compatibility
+    - Updated documentation with new security defaults
     - Added configurable security context settings for pod and container
     - Added enhanced security options (runAsNonRoot, drop ALL capabilities, etc.)
     - Updated documentation with security context configuration examples

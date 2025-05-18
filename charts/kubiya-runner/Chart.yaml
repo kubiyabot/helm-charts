@@ -2,8 +2,8 @@ apiVersion: v2
 name: kubiya-runner
 description: A Helm chart for Kubiya Runner deployment
 type: application
-version: 0.6.71
-appVersion: "0.6.71"
+version: 0.6.72
+appVersion: "0.6.72"
 kubeVersion: ">=1.19.0-0" 
 home: https://kubiya.ai
 icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
@@ -19,7 +19,7 @@ maintainers:
   email: sergey.demyachonok@kubiya.ai
 dependencies:
 - name: dagger-helm
-  version: "0.3.2"
+  version: "0.3.3"
   repository: "file://../dagger-helm"
   alias: dagger
   condition: dagger.enabled
