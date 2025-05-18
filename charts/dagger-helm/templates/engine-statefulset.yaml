@@ -12,6 +12,7 @@ spec:
   # Only one (1) Engine is able to hold the lock, other replicas will not be able to start.
   # If using persistent volumes, this is not an issue. Use more than 1 replica if you know that you need it.
   replicas: 1
+  serviceName: {{ include "dagger.fullname" . }}-engine-headless
   podManagementPolicy: {{ .Values.engine.statefulSet.podManagementPolicy }}
   selector:
     matchLabels:

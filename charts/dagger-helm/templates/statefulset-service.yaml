@@ -1,0 +1,23 @@
+{{- if eq .Values.engine.kind "StatefulSet" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dagger.fullname" . }}-engine-headless
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dagger.labels" . | nindent 4 }}
+    app.kubernetes.io/component: engine
+  annotations:
+    # This explicitly marks the service as headless
+    service.kubernetes.io/headless: "true"
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    name: {{ include "dagger.fullname" . }}-engine
+  ports:
+    - name: dagger
+      port: {{ default 8080 .Values.additionalResources.service.port }}
+      targetPort: {{ default 8080 .Values.additionalResources.service.port }}
+      protocol: TCP
+{{- end }} 

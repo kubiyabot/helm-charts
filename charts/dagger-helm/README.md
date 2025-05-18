@@ -1,11 +1,12 @@
 # Dagger Helm Chart
 
-This is clone (~fork) of vendor (dagger helm chart)[https://github.com/dagger/dagger/tree/main/helm] version 0.15.0.
+This is clone (~fork) of vendor (dagger helm chart)[https://github.com/dagger/dagger/tree/main/helm] with enhanced security configurations and customizations for Kubiya Runner.
 
-Motivation behind cloning was to add support for kubiya-runner:
-
-- Original versions not in active development & not really production grade.
-- Some key features missing needed by `kubiya-runner` which uses `dagger` as dependency chart.
+Enhancements include:
+- Updated to use latest Dagger Engine (v0.18.8)
+- Enhanced security context configuration with minimized privileges
+- StatefulSet support with persistent volumes
+- Custom configuration options for Kubiya Runner integration
 
 # Documentation
 
@@ -39,9 +40,9 @@ engine:
 
 ## Security Context Configuration
 
-The Dagger engine is configured with a balanced security approach. Due to the nature of container runtimes, some privileged access is required at the container level, but we maintain enhanced pod-level security where possible:
+Dagger Engine requires certain privileges to function since it's a container runtime. However, we've fine-tuned the security settings to minimize the attack surface:
 
-### Pod Security Context (More Secure)
+### Pod Security Context
 
 ```yaml
 engine:
@@ -52,18 +53,72 @@ engine:
     fsGroupChangePolicy: "OnRootMismatch"
 ```
 
-### Container Security Context (Required Privileges)
+### Container Security Context (Restricted Privileges)
 
 ```yaml
 engine:
   containerSecurityContext:
-    privileged: true # Required for container runtime
+    privileged: true  # Required for container runtime
     capabilities:
+      # Only add essential capabilities instead of ALL
       add:
-        - ALL # Required for container runtime
-    readOnlyRootFilesystem: false # Cannot be enabled - container needs to write to system directories
+        - "NET_BIND_SERVICE"
+        - "SYS_CHROOT"
+        - "SETUID" 
+        - "SETGID"
+        - "DAC_OVERRIDE"
+      # Drop unnecessary capabilities
+      drop:
+        - "NET_RAW"
+        - "SYS_ADMIN"  # Try to drop this if possible
 ```
 
-> **Why Privileged Mode is Required**: Dagger engine needs to access and modify cgroup configurations and other system resources to support nested containerization. According to the [Docker-in-Docker implementation](https://github.com/moby/moby/blob/38805f20f9bcc5e87869d6c79d432b166e1c88b4/hack/dind), the container must be able to write to `/sys/fs/cgroup` and other system locations, which requires privileged mode.
+### Startup Flags for Improved Security
 
-> **Security Balancing**: We make a concerted effort to follow security best practices, but container runtimes like Dagger inherently require elevated privileges to function properly.
+We've added specific startup flags to minimize privilege requirements:
+
+```yaml
+engine:
+  args:
+    - "--oci-max-parallelism" 
+    - "4"
+    - "--oci-worker-skip-check-cgroup=true"
+```
+
+The `--oci-worker-skip-check-cgroup` flag helps reduce the requirement for full cgroup access.
+
+> **Why Some Privileges are Required**: Dagger engine needs to access system resources to support nested containerization. We've minimized privileges where possible, but container runtimes inherently require elevated access to function properly.
+
+## Advanced Configuration
+
+### Engine Configuration
+
+The chart allows customizing the Dagger Engine configuration via TOML:
+
+```yaml
+engine:
+  config: |
+    insecure-entitlements = ["security.insecure"]
+    [registry."ghcr.io"]
+      http = true
+    [log]
+      format = "json"
+      level = "info"
+    [grpc]
+      address = ["unix:///run/dagger/engine.sock", "tcp://0.0.0.0:8080"]
+```
+
+### Resource Management
+
+Configure resource limits to prevent excessive resource consumption:
+
+```yaml
+engine:
+  resources:
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+```

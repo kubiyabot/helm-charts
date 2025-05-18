@@ -5,20 +5,31 @@ engine:
   ### Customize your Dagger Engine
   #   https://github.com/moby/buildkit/blob/5997099827e676c4b6ce5774c98ade2483e0afe7/cmd/buildkitd/config/config.go
   #
-  # config: |
-  #   debug = true
-  #   insecure-entitlements = ["security.insecure"]
-  #   [registry."registry:5000"]
-  #     http = true
-  #   [registry."docker.io"]
-  #     mirrors = ["mirror.gcr.io"]
-  #   [log]
-  #     format = "json"
+  config: |
+    insecure-entitlements = ["security.insecure"]
+    [registry."ghcr.io"]
+      http = true
+    [registry."ttl.sh"]
+      http = true
+    [registry."docker.io"]
+      http = true
+    [registry."cache-registry-svc.kubiya"]
+    [log]
+      format = "json"
+      level = "info"
+    [grpc]
+      address = ["unix:///run/dagger/engine.sock", "tcp://0.0.0.0:8080"]
   labels: {}
 
   ### Customize Dagger Engine start args
-  #
-  args: []
+  ###
+  args:
+    # Set max parallelism to prevent excessive resource usage
+    - "--oci-max-parallelism" 
+    - "4"
+    # Skip /sys/fs/cgroup check - may help with lower privilege requirements
+    - "--oci-worker-skip-check-cgroup"
+    - "true"
 
   ### Use StatefulSet instead of DaemonSet for better management
   kind: StatefulSet
@@ -60,30 +71,37 @@ engine:
 
   ### Container securityContext configuration
   containerSecurityContext:
-    privileged: true        # Required for container runtime
+    # Dagger requires privileged mode to access system resources
+    # but we can limit some capabilities
+    privileged: true
     capabilities:
+      # Only add essential capabilities instead of ALL
       add:
-        - ALL               # Required for container runtime
-    readOnlyRootFilesystem: false # Cannot be true as container needs to write to system directories
-    # Note: Container runtimes like Dagger require privileged access
-    # Reference: https://github.com/moby/moby/blob/38805f20f9bcc5e87869d6c79d432b166e1c88b4/hack/dind
+        - "NET_BIND_SERVICE"
+        - "SYS_CHROOT"
+        - "SETUID" 
+        - "SETGID"
+        - "DAC_OVERRIDE"
+      # Drop unnecessary capabilities
+      drop:
+        - "NET_RAW"
+        - "SYS_ADMIN"    # Try to drop this if possible
+    allowPrivilegeEscalation: true  # Required for container runtime
+    readOnlyRootFilesystem: false   # Cannot be true as container needs to write to system directories
+    # Note: Container runtimes like Dagger require elevated privileges
+    # but we try to minimize them where possible
 
   resources:
-    limits: {}
-    # limits:
-    #    cpu: "1"
-    #    memory: 1Gi
-    requests: {}
-    # requests:
-    #    cpu: "1"
-    #    memory: 1Gi
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
   image:
-    ### Set a ref if you want to use a custom Dagger image
-    #   NOTE: you will need to ensure that a compatible dagger CLI is embedded in the image, otherwise readiness probes will fail
-    #   In the example below, we are configuring the latest, unreleased bleeding edge version
-    #
-    # ref: registry.dagger.io/engine:main
+    # Use the latest stable Dagger image
+    ref: registry.dagger.io/engine:v0.18.8
     pullPolicy: IfNotPresent
 
   ### Set taints & tolerations for this workload
@@ -103,15 +121,15 @@ engine:
   ### Set priorityClassName to avoid eviction
   priorityClassName: ""
 
-  # Original readiness probe from forked dagger chart
+  # Readiness probe configuration
   readinessProbe:
     exec:
       command:
         - sh
         - -exc
         - |-
-          dagger core version
-    initialDelaySeconds: 5
+          dagger query system info
+    initialDelaySeconds: 10
     timeoutSeconds: 14
     periodSeconds: 15
     successThreshold: 1

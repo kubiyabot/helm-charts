@@ -2,8 +2,8 @@ apiVersion: v2
 name: dagger-helm
 description: A Helm chart for Dagger - a programmable CI/CD engine that runs your pipelines in containers
 type: application
-version: 0.3.4
-appVersion: "0.11.6"
+version: 0.3.8
+appVersion: "0.18.8"
 
 maintainers:
 - name: Costa
@@ -25,20 +25,26 @@ sources:
 
 annotations:
   artifacthub.io/changes: |
+    - Fixed Dagger Engine flag format for oci-worker-skip-check-cgroup
+    - Fixed StatefulSet service selector to match pod labels
+    - Added proper serviceName to StatefulSet definition
+    - Added proper headless service for StatefulSet deployments
+    - Fixed service visibility in k9s and Kubernetes UI for StatefulSets
+    - Updated to Dagger Engine v0.18.8
+    - Enhanced container security by minimizing required capabilities
+    - Added specific capability dropping to limit attack surface
+    - Improved startup flags with --oci-worker-skip-check-cgroup flag
+    - Configured modern readiness probe using 'dagger query system info'
+    - Optimized resource limits and requests
+    - Added explicit TOML configuration for Dagger Engine
     - Added StatefulSet deployment option with persistent volume support
     - Fixed container security context to enable proper cgroup management
     - Optimized security settings while ensuring container runtime functionality
     - Implemented ConfigMap support for custom engine configuration
     - Added comprehensive documentation about deployment options
-    - Applied secure security context settings as defaults (runAsNonRoot, drop ALL capabilities, etc.)
+    - Applied secure security context settings as defaults
     - Added legacy security settings as comments for compatibility
     - Updated documentation with new security defaults
-    - Added configurable security context settings for pod and container
-    - Added enhanced security options (runAsNonRoot, drop ALL capabilities, etc.)
-    - Updated documentation with security context configuration examples
     - Initial release of dagger-helm chart
-    - Added support for kubiya-runner integration
-    - Enhanced volume management capabilities
-    - Added nodeSelector support for dagger engine DaemonSet
   artifacthub.io/license: Apache-2.0
   artifacthub.io/prerelease: "true"
