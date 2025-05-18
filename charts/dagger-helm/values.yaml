@@ -20,6 +20,30 @@ engine:
   #
   args: []
 
+  ### Pod securityContext configuration
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 1001
+    fsGroup: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+    # Below are default security recommendations that can be enabled if compatible with your workload
+    # runAsNonRoot: true
+    # runAsUser: 1000
+    # fsGroup: 2000
+
+  ### Container securityContext configuration
+  containerSecurityContext:
+    privileged: true
+    capabilities:
+      add:
+        - ALL
+    # Below are default security recommendations that can be enabled if compatible with your workload
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+    # readOnlyRootFilesystem: true
+
   resources:
     limits: {}
     # limits:

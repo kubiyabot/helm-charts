@@ -467,6 +467,10 @@ In such deployments pre-installed webhooks may deny installation of runner's k8s
 - TLS support for registry communication (used by `tool-manager`)
 - Reduced RBAC permissions for `Grafana Alloy` (namespace-scoped)
 - Reduced RBAC permissions and targets for `kube-state-metrics` (namespace-scoped)
+- Enhanced security for Dagger engine (configurable):
+  - Options for running as non-root with least privileges
+  - Options for dropping all capabilities and using read-only root filesystem
+  - See the Dagger subchart documentation for more details
 
 ## Optional Permissions Extensions:
 

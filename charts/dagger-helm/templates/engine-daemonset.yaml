@@ -38,10 +38,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        runAsUser: 0
-        runAsGroup: 1001
-        fsGroup: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
+        {{- toYaml .Values.engine.securityContext | nindent 8 }}
       serviceAccountName: {{ include "dagger.serviceAccountName" . }}
       {{- if .Values.engine.priorityClassName }}
       priorityClassName: {{ .Values.engine.priorityClassName }}
@@ -67,10 +64,7 @@ spec:
               {{- end }}
           {{- end }}
           securityContext:
-            privileged: true
-            capabilities:
-              add:
-                - ALL
+            {{- toYaml .Values.engine.containerSecurityContext | nindent 12 }}
           resources: {{- toYaml .Values.engine.resources | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.engine.readinessProbe | nindent 12 }}
