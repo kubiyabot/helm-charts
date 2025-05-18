@@ -1,16 +1,26 @@
-{{- if eq .Values.engine.kind "DaemonSet" -}}
+{{- if eq .Values.engine.kind "StatefulSet" -}}
 ---
 apiVersion: apps/v1
-kind: DaemonSet
+kind: StatefulSet
 metadata:
   name: {{ include "dagger.fullname" . }}-engine
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "dagger.labels" . | nindent 4 }}
 spec:
+  # DO NOT RUN MORE THAN 1 REPLICA IF USING HOSTPATH.
+  # Only one (1) Engine is able to hold the lock, other replicas will not be able to start.
+  # If using persistent volumes, this is not an issue. Use more than 1 replica if you know that you need it.
+  replicas: 1
+  podManagementPolicy: {{ .Values.engine.statefulSet.podManagementPolicy }}
   selector:
     matchLabels:
       name: {{ include "dagger.fullname" . }}-engine
+  {{- if and .Values.engine.statefulSet.persistentVolumeClaim.enabled .Values.engine.statefulSet.persistentVolumeClaimRetentionPolicy }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .Values.engine.statefulSet.persistentVolumeClaimRetentionPolicy.whenDeleted }}
+    whenScaled: {{ .Values.engine.statefulSet.persistentVolumeClaimRetentionPolicy.whenScaled }}
+  {{- end }}
   template:
     metadata:
       {{- if (or .Values.engine.config .Values.magicache.enabled) }}
@@ -67,15 +77,22 @@ spec:
           securityContext:
             {{- toYaml .Values.engine.containerSecurityContext | nindent 12 }}
           resources: {{- toYaml .Values.engine.resources | nindent 12 }}
+          {{- if .Values.engine.lifecycle }}
+          lifecycle:
+            {{- if .Values.engine.lifecycle.preStop }}
+            preStop:
+              {{- toYaml .Values.engine.lifecycle.preStop | nindent 14 }}
+            {{- end }}
+          {{- end }}
           readinessProbe:
             {{- toYaml .Values.engine.readinessProbe | nindent 12 }}
           volumeMounts:
-            - name: varlibdagger
+            - name: data
               mountPath: /var/lib/dagger{{- if .Values.volumeMountsPostfix }}-{{- .Values.volumeMountsPostfix }}{{- end }}
-              # Volume prefixes below are following mountPath name same as they were existed in initial pre-chart version of kubiya_runner template file and found working.
-              # TODO: review why we are not using hostPath name postfix instead?
-            - name: varrundagger
-              mountPath: /run/buildkit{{- if .Values.volumeMountsPostfix }}-{{- .Values.volumeMountsPostfix }}{{- end }}
+            {{- if .Values.engine.hostPath.runVolume.enabled }}
+            - name: run
+              mountPath: /run/dagger{{- if .Values.volumeMountsPostfix }}-{{- .Values.volumeMountsPostfix }}{{- end }}
+            {{- end }}
             {{- if .Values.engine.config }}
             - name: dagger-engine-config
               mountPath: /etc/dagger/engine.toml
@@ -83,12 +100,11 @@ spec:
             {{- end }}
       terminationGracePeriodSeconds: {{ .Values.engine.terminationGracePeriodSeconds }}
       volumes:
-        - name: varlibdagger
+        {{- if .Values.engine.hostPath.runVolume.enabled }}
+        - name: run
           hostPath:
-            path: /var/lib/dagger
-        - name: varrundagger
-          hostPath:
-            path: /var/run/dagger
+            path: /run/dagger
+        {{- end }}
         {{- if .Values.engine.config }}
         - name: dagger-engine-config
           configMap:
@@ -97,4 +113,17 @@ spec:
               - key: engine.toml
                 path: engine.toml
         {{- end }}
-{{- end }}
+  {{- if .Values.engine.statefulSet.persistentVolumeClaim.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      {{- with .Values.engine.statefulSet.persistentVolumeClaim.storageClassName }}
+      storageClassName: {{ . }}
+      {{- end }}
+      accessModes:
+        {{- toYaml .Values.engine.statefulSet.persistentVolumeClaim.accessModes | nindent 8 }}
+      resources:
+        {{- toYaml .Values.engine.statefulSet.persistentVolumeClaim.resources | nindent 8 }}
+  {{- end }}
+{{- end }} 

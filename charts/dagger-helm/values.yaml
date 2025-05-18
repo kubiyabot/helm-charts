@@ -20,29 +20,53 @@ engine:
   #
   args: []
 
+  ### Use StatefulSet instead of DaemonSet for better management
+  kind: StatefulSet
+  
+  ### StatefulSet specific configuration
+  statefulSet:
+    # PVC retention policy (applies to all PVCs)
+    # Only available in Kubernetes 1.23+
+    persistentVolumeClaimRetentionPolicy:
+      # Options: Delete, Retain
+      whenDeleted: Retain
+      # Options: Delete, Retain
+      whenScaled: Retain
+
+    # Use PersistentVolumeClaim for data volume
+    persistentVolumeClaim:
+      enabled: true
+      # PVC specifications
+      storageClassName: ""
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+
+    # Controls how pods are created during initial scale up,
+    # when replacing pods, and when scaling down.
+    # Options: OrderedReady, Parallel (default: OrderedReady)
+    podManagementPolicy: OrderedReady
+
   ### Pod securityContext configuration
   securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    fsGroup: 2000
+    runAsNonRoot: false # Cannot be true for Dagger due to cgroup management
+    runAsUser: 0        # Needed for cgroup access
+    fsGroup: 1001
     fsGroupChangePolicy: "OnRootMismatch"
-    # Legacy less secure settings (not recommended):
-    # runAsUser: 0
-    # runAsGroup: 1001
-    # fsGroup: 1001
+    # Note: We need root access for the dagger engine to work properly
+    # because it needs to manage cgroups and other system resources
 
   ### Container securityContext configuration
   containerSecurityContext:
-    allowPrivilegeEscalation: false
+    privileged: true        # Required for container runtime
     capabilities:
-      drop:
-        - ALL
-    readOnlyRootFilesystem: true
-    # Legacy less secure settings (not recommended):
-    # privileged: true
-    # capabilities:
-    #   add:
-    #     - ALL
+      add:
+        - ALL               # Required for container runtime
+    readOnlyRootFilesystem: false # Cannot be true as container needs to write to system directories
+    # Note: Container runtimes like Dagger require privileged access
+    # Reference: https://github.com/moby/moby/blob/38805f20f9bcc5e87869d6c79d432b166e1c88b4/hack/dind
 
   resources:
     limits: {}
@@ -104,6 +128,25 @@ engine:
     annotations: []
 
   existingServiceAccount: {} # name: "default"
+
+  ### Configure lifecycle hooks for the Dagger Engine
+  lifecycle:
+    # PreStop hook executed before container termination
+    preStop:
+      exec:
+        command: ["/bin/sh", "-c", "sleep 10"]  # Graceful shutdown delay
+
+  ### HostPath Volume configuration - only used for DaemonSet
+  hostPath:
+    # Use hostPath for data volume (for DaemonSet only)
+    dataVolume:
+      # When disabled, PVC will be used if configured above
+      enabled: false
+
+    # Use hostPath for run volume
+    runVolume:
+      # When disabled, no run volume will be mounted
+      enabled: true
 
     # Extras added to "fork" of dagger subchart to support kubiya-runner
 additionalResources:
