@@ -298,6 +298,8 @@ workflowEngine:
   env:
     KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools/dags"
     TOOL_MANAGER_URL: http://tool-manager.{{ .Release.Namespace }}
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
   volumeMounts:
     - mountPath: /opt/
       name: nats-creds-volume
