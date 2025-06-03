@@ -1,0 +1,80 @@
+# Example configuration for enabling the cache registry component
+# This shows how to configure the Docker registry that caches tool images
+
+cacheRegistry:
+  enabled: true
+  
+  # Persistent Volume configuration
+  pv:
+    name: "docker-registry-pv"
+    size: "50Gi"  # Adjust size based on your needs
+    reclaimPolicy: "Retain"
+    # Use hostPath for local development/testing
+    hostPath: "/var/lib/registry"
+    # For production, consider using a storage class
+    # storageClass: "fast-ssd"
+  
+  # Persistent Volume Claim configuration
+  pvc:
+    name: "docker-registry-pvc"
+    size: "50Gi"
+    # storageClass: "fast-ssd"  # Optional: specify storage class
+    
+  # Deployment configuration
+  deployment:
+    name: "cache-registry"
+    replicas: 1
+    selector: "cache-registry"
+    image:
+      repository: "registry"
+      tag: "2"
+      pullPolicy: "IfNotPresent"
+    
+    # Resource configuration - adjust based on your load
+    resources:
+      limits:
+        cpu: "1"
+        memory: "1Gi"
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+    
+    # Health check configuration
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /v2/
+        port: 5000
+        scheme: HTTPS
+      initialDelaySeconds: 30
+      periodSeconds: 30
+    
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /v2/
+        port: 5000
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    
+    # Optional: Add node selector for specific nodes
+    # nodeSelector:
+    #   registry: "true"
+    
+    # Optional: Add affinity rules
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #       - matchExpressions:
+    #         - key: "node-role.kubernetes.io/worker"
+    #           operator: In
+    #           values: ["true"]
+  
+  # Service configuration
+  service:
+    name: "cache-registry-svc"
+    type: "ClusterIP"
+    port: 443
+    targetPort: 5000 

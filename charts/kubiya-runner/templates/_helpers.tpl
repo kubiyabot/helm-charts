@@ -148,6 +148,21 @@ Kubiya Operator Selector labels
 app.kubernetes.io/kubiya-runner-component: image-updater
 {{- end }}
 
+{{/*
+Cache Registry labels
+*/}}
+{{- define "cache-registry.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/kubiya-runner-component: cache-registry
+{{- end }}
+
+{{/*
+Cache Registry Selector labels
+*/}}
+{{- define "cache-registry.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
+app.kubernetes.io/kubiya-runner-component: cache-registry
+{{- end }}
 
 # Service Accounts names for all kubiya runner components.
 # If create is set to true, name of the service account is value of .name, or, if .name not provided will be set to component name.
