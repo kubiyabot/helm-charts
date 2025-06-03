@@ -1,0 +1,84 @@
+{{- if .Values.cacheRegistry.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cacheRegistry.deployment.name | default "cache-registry" }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cache-registry.labels" . | nindent 4 }}
+    app.kubernetes.io/name: cache-registry
+    app.kubernetes.io/component: registry
+spec:
+  replicas: {{ .Values.cacheRegistry.deployment.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ .Values.cacheRegistry.deployment.selector | default "cache-registry" }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.cacheRegistry.deployment.selector | default "cache-registry" }}
+        {{- include "cache-registry.labels" . | nindent 8 }}
+        app.kubernetes.io/name: cache-registry
+        app.kubernetes.io/component: registry
+    spec:
+      {{- with .Values.cacheRegistry.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.cacheRegistry.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: registry
+          image: {{ .Values.cacheRegistry.deployment.image.repository | default "registry" }}:{{ .Values.cacheRegistry.deployment.image.tag | default "2" }}
+          imagePullPolicy: {{ .Values.cacheRegistry.deployment.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+          env:
+            - name: REGISTRY_HTTP_ADDR
+              value: "0.0.0.0:5000"
+            - name: REGISTRY_HTTP_TLS_CERTIFICATE
+              value: "/certs/tls.crt"
+            - name: REGISTRY_HTTP_TLS_KEY
+              value: "/certs/tls.key"
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+            {{- with .Values.cacheRegistry.deployment.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+            - name: registry-storage
+              mountPath: /var/lib/registry
+            - name: registry-cert
+              mountPath: /certs
+            {{- with .Values.cacheRegistry.deployment.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.cacheRegistry.deployment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.cacheRegistry.deployment.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.cacheRegistry.deployment.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.cacheRegistry.deployment.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.cacheRegistry.deployment.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: registry-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.cacheRegistry.pvc.name | default "docker-registry-pvc" }}
+        - name: registry-cert
+          secret:
+            secretName: {{ .Values.cacheRegistry.deployment.tlsSecretName | default "registry-tls-secret" }}
+        {{- with .Values.cacheRegistry.deployment.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }} 

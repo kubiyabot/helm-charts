@@ -261,6 +261,88 @@ toolManager:
         name: nats-creds-volume
       - mountPath: /tmp/kubiya_shared_tools
         name: shared-volume
+# Cache Registry component config - Docker registry for caching tool images
+cacheRegistry:
+  enabled: true
+  # PersistentVolume configuration
+  pv:
+    name: "docker-registry-pv"
+    size: "20Gi"
+    reclaimPolicy: "Retain"
+    # For hostPath storage (default for local development)
+    hostPath: "/var/lib/registry"
+    # Alternatively, use storageClass for dynamic provisioning
+    # storageClass: "standard"
+    # Or provide custom volumeSource configuration
+    # volumeSource:
+    #   nfs:
+    #     server: "nfs-server.example.com"
+    #     path: "/path/to/registry"
+  # PersistentVolumeClaim configuration  
+  pvc:
+    name: "docker-registry-pvc"
+    size: "20Gi"
+    # Optional: specify storage class for dynamic provisioning
+    # storageClass: "standard"
+    # Optional: bind to specific PV
+    # volumeName: "docker-registry-pv"
+  # Deployment configuration
+  deployment:
+    name: "cache-registry"
+    replicas: 1
+    selector: "cache-registry"
+    image:
+      repository: "registry"
+      tag: "2"
+      pullPolicy: "IfNotPresent"
+    # TLS secret name for registry certificates
+    tlsSecretName: "registry-tls-secret"
+    # Node selector for deployment
+    nodeSelector: {}
+    # Affinity settings
+    affinity: {}
+    # Additional environment variables
+    env: {}
+    # Additional volume mounts
+    volumeMounts: []
+    # Additional volumes
+    volumes: []
+    # Resource limits and requests
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+    # Liveness probe configuration
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /v2/
+        port: 5000
+        scheme: HTTPS
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
+    # Readiness probe configuration
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /v2/
+        port: 5000
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+  # Service configuration
+  service:
+    name: "cache-registry-svc"
+    type: "ClusterIP"
+    port: 443
+    targetPort: 5000
+    # Additional service ports
+    additionalPorts: []
 # Kubiya workflow engine component config
 workflowEngine:
   replicas: 1

@@ -1,0 +1,23 @@
+{{- if .Values.cacheRegistry.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.cacheRegistry.pvc.name | default "docker-registry-pvc" }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cache-registry.labels" . | nindent 4 }}
+    app.kubernetes.io/name: cache-registry
+    app.kubernetes.io/component: registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.cacheRegistry.pvc.size | default "20Gi" }}
+  {{- if .Values.cacheRegistry.pvc.storageClass }}
+  storageClassName: {{ .Values.cacheRegistry.pvc.storageClass }}
+  {{- end }}
+  {{- if .Values.cacheRegistry.pvc.volumeName }}
+  volumeName: {{ .Values.cacheRegistry.pvc.volumeName }}
+  {{- end }}
+{{- end }} 

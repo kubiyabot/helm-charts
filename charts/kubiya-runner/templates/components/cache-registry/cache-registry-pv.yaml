@@ -1,0 +1,27 @@
+{{- if .Values.cacheRegistry.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.cacheRegistry.pv.name | default "docker-registry-pv" }}
+  labels:
+    {{- include "cache-registry.labels" . | nindent 4 }}
+    app.kubernetes.io/name: cache-registry
+    app.kubernetes.io/component: registry
+spec:
+  capacity:
+    storage: {{ .Values.cacheRegistry.pv.size | default "20Gi" }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: {{ .Values.cacheRegistry.pv.reclaimPolicy | default "Retain" }}
+  {{- if .Values.cacheRegistry.pv.storageClass }}
+  storageClassName: {{ .Values.cacheRegistry.pv.storageClass }}
+  {{- end }}
+  {{- if .Values.cacheRegistry.pv.hostPath }}
+  hostPath:
+    path: {{ .Values.cacheRegistry.pv.hostPath }}
+  {{- else }}
+  {{- with .Values.cacheRegistry.pv.volumeSource }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
+{{- end }} 
