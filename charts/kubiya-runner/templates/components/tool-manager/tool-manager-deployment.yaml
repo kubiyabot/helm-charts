@@ -12,9 +12,21 @@ spec:
       {{- include "tool-manager.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        {{- with .Values.toolManager.extraPodsAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         {{- include "tool-manager.labels" . | nindent 8 }}
     spec:
+      {{- with .Values.toolManager.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.toolManager.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "kubiya-runner.serviceAccountName.toolManager" . }}
       containers:
         - name: tool-manager
@@ -54,6 +66,14 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.toolManager.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.toolManager.livenessProbe.httpGet.path }}
+              port: {{ .Values.toolManager.service.targetPort }}
+            initialDelaySeconds: {{ .Values.toolManager.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.toolManager.livenessProbe.periodSeconds }}
+          {{- end }}
 
         - name: kubiya-sdk-server
           image: "{{ .Values.toolManager.sdkServer.image.repository }}:{{ .Values.toolManager.sdkServer.image.tag }}"
@@ -64,8 +84,7 @@ spec:
           {{- end }}
           command: {{ .Values.toolManager.sdkServer.command | toYaml | nindent 10 }}
           env:
-            {{- with .Values.toolManager.sdkServer.env }}
-            {{- range $key, $value := . }}
+            {{- range $key, $value := .Values.toolManager.sdkServer.env.defaults }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
               valueFrom:
@@ -74,12 +93,29 @@ spec:
               value: {{ tpl (toString $value) $ | quote }}
               {{- end }}
             {{- end }}
+            {{- range $key, $value := .Values.toolManager.sdkServer.env.custom }}
+            - name: {{ $key }}
+              {{- if kindIs "map" $value }}
+              valueFrom:
+                {{- toYaml $value | nindent 16 }}
+              {{- else }}
+              value: {{ tpl (toString $value) $ | quote }}
+              {{- end }}
             {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.sdkServer.containerPort }}
           {{- with .Values.toolManager.sdkServer.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.toolManager.sdkServer.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.toolManager.sdkServer.livenessProbe.httpGet.path }}
+              port: {{ .Values.toolManager.sdkServer.containerPort }}
+            initialDelaySeconds: {{ .Values.toolManager.sdkServer.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.toolManager.sdkServer.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.toolManager.sdkServer.livenessProbe.timeoutSeconds }}
           {{- end }}
       {{- with .Values.toolManager.volumes }}
       volumes:

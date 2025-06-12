@@ -35,7 +35,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
@@ -46,7 +45,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl (toString $value) $ | quote }}
@@ -73,7 +71,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
@@ -84,7 +81,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl (toString $value) $ | quote }}
@@ -106,7 +102,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
@@ -117,7 +112,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl (toString $value) $ | quote }}
@@ -141,7 +135,6 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl $value $ | quote }}
@@ -152,28 +145,12 @@ spec:
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ tpl (toString $value) $ | quote }}
               {{- end }}
             {{- end }}
             {{- end }}
-            - name: OKTA_BASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: opawatchdog-secrets
-                  key: OKTA_BASE_URL
-            - name: OKTA_TOKEN_ENDPOINT
-              valueFrom:
-                secretKeyRef:
-                  name: opawatchdog-secrets
-                  key: OKTA_TOKEN_ENDPOINT
-            - name: OKTA_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: opawatchdog-secrets
-                  key: OKTA_CLIENT_ID
           volumeMounts:
             - name: private-key-volume
               mountPath: /etc/okta/private.pem

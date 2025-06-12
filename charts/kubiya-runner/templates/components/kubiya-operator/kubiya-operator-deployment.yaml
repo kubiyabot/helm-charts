@@ -16,18 +16,36 @@ spec:
       labels:
         {{- include "kubiya-operator.labels" . | indent 8 }}
     spec:
+      {{- with .Values.kubiyaOperator.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kubiyaOperator.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "kubiya-runner.serviceAccountName.operator" . | indent 8}}
       containers:
         - name: kubiya-operator
           image: "{{ .Values.kubiyaOperator.image.repository }}:{{ .Values.kubiyaOperator.image.tag }}"
           imagePullPolicy: {{ .Values.kubiyaOperator.image.pullPolicy | quote }}
-          ports:
-            - containerPort: {{ .Values.kubiyaOperator.ports.containerPort }}
+          {{- with .Values.kubiyaOperator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.kubiyaOperator.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.kubiyaOperator.livenessProbe.httpGet.path }}
+              port: {{ .Values.kubiyaOperator.ports.containerPort }}
+            initialDelaySeconds: {{ .Values.kubiyaOperator.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.kubiyaOperator.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.kubiyaOperator.livenessProbe.timeoutSeconds }}
+          {{- end }}
           env:
             {{- range $key, $value := .Values.kubiyaOperator.env.defaults }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ $value | quote }}
@@ -36,7 +54,6 @@ spec:
             {{- range $key, $value := .Values.kubiyaOperator.env.custom }}
             - name: {{ $key }}
               {{- if kindIs "map" $value }}
-              valueFrom:
                 {{- toYaml $value | nindent 14 }}
               {{- else }}
               value: {{ $value | quote }}

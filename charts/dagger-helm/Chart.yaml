@@ -1,0 +1,33 @@
+apiVersion: v2
+name: dagger-helm
+description: A Helm chart for Dagger - a programmable CI/CD engine that runs your pipelines in containers
+type: application
+version: 0.3.1
+appVersion: "0.11.6"
+
+maintainers:
+- name: Costa
+  email: costa@kubiya.ai
+- name: Sergey Demyachonok
+  email: sergey.demyachonok@kubiya.ai
+
+keywords:
+- dagger
+- ci
+- cd
+- pipeline
+- container
+
+home: https://github.com/kubiyabot/kubiya-helm-charts/tree/main/charts/dagger-helm
+sources:
+- https://github.com/dagger/dagger
+- https://github.com/kubiyabot/kubiya-helm-charts
+
+annotations:
+  artifacthub.io/changes: |
+    - Initial release of dagger-helm chart
+    - Added support for kubiya-runner integration
+    - Enhanced volume management capabilities
+    - Added nodeSelector support for dagger engine DaemonSet
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/prerelease: "true"

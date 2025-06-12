@@ -2,6 +2,7 @@
 # This supports shell glob matching, relative path matching, and
 # negation (prefixed with !). Only one pattern per line.
 .DS_Store
+charts/.DS_Store
 # Common VCS dirs
 .git/
 .gitignore
@@ -25,16 +26,13 @@
 # Helm lint/test
 .helm-lint.yaml
 .helm-test.yaml
-*.tgz
-charts/*/charts
-charts/*/tmpcharts
-charts/*/requirements.lock
 
 # Development artifacts
 TODO.md
 README-old.md
 NOTES.txt
 values.schema.json
-
-# Debug
-_debug*.yaml
+_docs/*
+_docs/
+_debug_values_overrides.yaml
+_deploymentX-values-overrides.yaml

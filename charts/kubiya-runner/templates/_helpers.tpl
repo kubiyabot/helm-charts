@@ -1,4 +1,3 @@
-
 {{/*
 Expand the name of the chart.
 */}}
@@ -74,7 +73,7 @@ Agent Manager labels
 */}}
 {{- define "agent-manager.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
-app.kubernetes.io/component: agent-manager
+app.kubernetes.io/kubiya-runner-component: agent-manager
 {{- end }}
 
 {{/*
@@ -82,7 +81,7 @@ Agent Manager Selector labels
 */}}
 {{- define "agent-manager.selectorLabels" }}
 {{ include "kubiya-runner-common.selectorLabels" . }}
-app.kubernetes.io/component: agent-manager
+app.kubernetes.io/kubiya-runner-component: agent-manager
 {{- end }}
 
 {{/*
@@ -90,7 +89,7 @@ Tool Manager labels
 */}}
 {{- define "tool-manager.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
-app.kubernetes.io/component: tool-manager
+app.kubernetes.io/kubiya-runner-component: tool-manager
 {{- end }}
 
 {{/*
@@ -98,7 +97,23 @@ Selector labels
 */}}
 {{- define "tool-manager.selectorLabels" }}
 {{ include "kubiya-runner-common.selectorLabels" . }}
-app.kubernetes.io/component: tool-manager
+app.kubernetes.io/kubiya-runner-component: tool-manager
+{{- end }}
+
+{{/*
+Workflow Engine labels
+*/}}
+{{- define "workflow-engine.labels" }}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/kubiya-runner-component: workflow-engine
+{{- end }}
+
+{{/*
+Workflow Engine Selector labels
+*/}}
+{{- define "workflow-engine.selectorLabels" }}
+{{ include "kubiya-runner-common.selectorLabels" . }}
+app.kubernetes.io/kubiya-runner-component: workflow-engine
 {{- end }}
 
 {{/*
@@ -106,7 +121,7 @@ Kubiya Operator labels
 */}}
 {{- define "kubiya-operator.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
-app.kubernetes.io/component: kubiya-operator
+app.kubernetes.io/kubiya-runner-component: kubiya-operator
 {{- end }}
 
 {{/*
@@ -114,7 +129,7 @@ Kubiya Operator Selector labels
 */}}
 {{- define "kubiya-operator.selectorLabels" }}
 {{ include "kubiya-runner-common.selectorLabels" . }}
-app.kubernetes.io/component: kubiya-operator
+app.kubernetes.io/kubiya-runner-component: kubiya-operator
 {{- end }}
 
 {{/*
@@ -122,7 +137,7 @@ Kubiya Operator labels
 */}}
 {{- define "image-updater.labels" }}
 {{ include "kubiya-runner-common.labels" . }}
-app.kubernetes.io/component: image-updater
+app.kubernetes.io/kubiya-runner-component: image-updater
 {{- end }}
 
 {{/*
@@ -130,24 +145,9 @@ Kubiya Operator Selector labels
 */}}
 {{- define "image-updater.selectorLabels" }}
 {{ include "kubiya-runner-common.selectorLabels" . }}
-app.kubernetes.io/component: image-updater
+app.kubernetes.io/kubiya-runner-component: image-updater
 {{- end }}
 
-{{/*
-Dagger extras labels
-*/}}
-{{- define "dagger-extras.labels" }}
-{{ include "kubiya-runner-common.labels" . }}
-app.kubernetes.io/component: dagger
-{{- end }}
-
-{{/*
-Otel-collector extras labels
-*/}}
-{{- define "otel-collector-extras.labels" }}
-{{ include "kubiya-runner-common.labels" . }}
-app.kubernetes.io/component: otel-collector
-{{- end }}
 
 # Service Accounts names for all kubiya runner components.
 # If create is set to true, name of the service account is value of .name, or, if .name not provided will be set to component name.
@@ -164,6 +164,14 @@ app.kubernetes.io/component: otel-collector
 {{- default (printf "%s-tool-manager" (include "kubiya-runner.name" .)) .Values.toolManager.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.toolManager.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{- define "kubiya-runner.serviceAccountName.workflowEngine" -}}
+{{- if .Values.workflowEngine.serviceAccount.create }}
+{{- default (printf "%s-workflow-engine" (include "kubiya-runner.name" .)) .Values.workflowEngine.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.workflowEngine.serviceAccount.name }}
 {{- end }}
 {{- end }}
 

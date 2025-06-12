@@ -42,7 +42,7 @@ values:
   # Default values that should be present
   required:
   - organization
-  - kubiyaAgentUUID
+  - uuid
   - nats.jwt
   - nats.secondJwt
   # Value constraints
@@ -50,7 +50,7 @@ values:
     organization:
       type: string
       minLength: 1
-    kubiyaAgentUUID:
+    uuid:
       type: string
       pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
     # daggerAdditionalResources.port:

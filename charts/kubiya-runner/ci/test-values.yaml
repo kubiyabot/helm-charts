@@ -1,5 +1,5 @@
 organization: "test-org"
-kubiyaAgentUUID: "test-uuid"
+uuid: "test-uuid"
 
 # Minimal configuration for CI testing
 dagger:

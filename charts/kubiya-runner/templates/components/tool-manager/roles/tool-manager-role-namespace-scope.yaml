@@ -1,0 +1,15 @@
+# Enabled by default, role with permisson set enough for tool-manager operation within it's release namespace scope.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "kubiya-runner.name" . }}-tool-manager-namespace-scope
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "tool-manager.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "secrets", "deployments", "pvcs", "services", "configmaps", "jobs"]
+    verbs: ["get", "list", "create", "update", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["pods", "secrets", "deployments", "configmaps", "jobs"]
+    verbs: ["get", "list", "create", "update", "delete"]
