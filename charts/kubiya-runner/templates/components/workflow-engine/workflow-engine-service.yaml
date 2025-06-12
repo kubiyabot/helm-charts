@@ -4,16 +4,12 @@ metadata:
   name: workflow-engine
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "workflow-engine.labels" . | nindent 4 }}
-    {{- if .Values.workflowEngine.otelCollectorMetricsScrapeAppName }}
-    kubiya.io/metrics-name: {{ .Values.workflowEngine.otelCollectorMetricsScrapeAppName }}
-    {{- end }}
+    {{- include "workflow-engine.labels" . | indent 4 }}
 spec:
-  type: {{ .Values.workflowEngine.service.type }}
-  ports:
-    - port: {{ .Values.workflowEngine.service.port }}
-      targetPort: {{ .Values.workflowEngine.ports.containerPort }}
-      protocol: TCP
-      name: http
   selector:
-    {{- include "workflow-engine.selectorLabels" . | nindent 4 }} 
+    {{- include "workflow-engine.selectorLabels" . | indent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.workflowEngine.service.port }}
+      targetPort: {{ .Values.workflowEngine.service.targetPort }}
+  type: {{ .Values.workflowEngine.service.type }}

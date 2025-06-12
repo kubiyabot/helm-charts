@@ -6,10 +6,10 @@ metadata:
   labels:
     {{- include "tool-manager.labels" . | indent 4 }}
 spec:
+  type: {{ .Values.toolManager.service.type | quote }}
   selector:
     {{- include "tool-manager.selectorLabels" . | indent 4 }}
   ports:
     - name: http
       port: {{ .Values.toolManager.service.port }}
-      targetPort: {{ .Values.toolManager.containerPort }}
-  type: {{ .Values.toolManager.service.type | quote }}
+      targetPort: {{ .Values.toolManager.service.targetPort }}

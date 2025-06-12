@@ -88,7 +88,7 @@ agentManager:
   service:
     port: 80
     targetPort: 8080
-    serviceType: "ClusterIP"
+    tyoe: "ClusterIP"
   serviceAccount:
     create: true
     name: "" # Leave empty when create is true to use the default generated name
@@ -140,7 +140,6 @@ toolManager:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
     tag: v0.3.24
-  otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
     targetPort: 3001
@@ -277,10 +276,9 @@ workflowEngine:
   ports:
     containerPort: 8080
   service:
-    type: ClusterIP
     port: 80
     targetPort: 8080
-  otelCollectorMetricsScrapeAppName: workflow-engine
+    type: ClusterIP
   livenessProbe:
     enabled: false
     httpGet:
