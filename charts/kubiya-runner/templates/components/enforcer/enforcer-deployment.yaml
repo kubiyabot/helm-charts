@@ -18,115 +18,10 @@ spec:
     spec:
       serviceAccountName: {{ include "kubiya-runner.serviceAccountName.enforcer" . }}
       volumes:
-        - name: private-key-volume
-          secret:
-            secretName: opawatchdog-secrets
-        {{- if .Values.enforcer.postgres.persistence.enabled }}
-        - name: postgres-data
-          persistentVolumeClaim:
-            claimName: enforcer-postgres-data
+        {{- with .Values.enforcer.volumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
       containers:
-        - name: broadcast-kubiya
-          image: "{{ .Values.enforcer.postgres.image.repository }}:{{ .Values.enforcer.postgres.image.tag }}"
-          imagePullPolicy: {{ .Values.enforcer.postgres.image.pullPolicy }}
-          env:
-            {{- with .Values.enforcer.postgres.env.defaults }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl $value $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-            {{- with .Values.enforcer.postgres.env.custom }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-          ports:
-            - containerPort: 5432
-          {{- with .Values.enforcer.postgres.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- if .Values.enforcer.postgres.persistence.enabled }}
-          volumeMounts:
-            - name: postgres-data
-              mountPath: /var/lib/postgresql/data
-          {{- end }}
-
-        - name: opa-server-kubiya
-          image: "{{ .Values.enforcer.opalServer.image.repository }}:{{ .Values.enforcer.opalServer.image.tag }}"
-          imagePullPolicy: {{ .Values.enforcer.opalServer.image.pullPolicy }}
-          env:
-            {{- with .Values.enforcer.opalServer.env.defaults }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl $value $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-            {{- with .Values.enforcer.opalServer.env.custom }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-          ports:
-            - containerPort: 7002
-          {{- with .Values.enforcer.opalServer.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-
-        - name: opal-client-kubiya
-          image: "{{ .Values.enforcer.opalClient.image.repository }}:{{ .Values.enforcer.opalClient.image.tag }}"
-          imagePullPolicy: {{ .Values.enforcer.opalClient.image.pullPolicy }}
-          env:
-            {{- with .Values.enforcer.opalClient.env.defaults }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl $value $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-            {{- with .Values.enforcer.opalClient.env.custom }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-          ports:
-            - containerPort: 7000
-            - containerPort: 8181
-          command: ["sh", "-c", "./wait-for.sh localhost:7002 --timeout=20 -- ./start.sh"]
-          {{- with .Values.enforcer.opalClient.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-
         - name: enforcer
           image: "{{ .Values.enforcer.image.repository }}:{{ .Values.enforcer.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.image.pullPolicy }}
@@ -151,14 +46,14 @@ spec:
               {{- end }}
             {{- end }}
             {{- end }}
-          volumeMounts:
-            - name: private-key-volume
-              mountPath: /etc/okta/private.pem
-              subPath: private.pem
           ports:
             - containerPort: 5001
           {{- with .Values.enforcer.resources }}
           resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.enforcer.volumeMounts }}
+          volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
 {{- end }} 

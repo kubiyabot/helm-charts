@@ -511,7 +511,7 @@ alloy:
       memory: 128Mi
 
 enforcer:
-  enabled: true
+  enabled: false
   
   # Enforcer component configuration
   replicas: 1
@@ -543,135 +543,20 @@ enforcer:
   # Environment variables for enforcer container
   env:
     # Default required env vars
-    defaults:
-      OKTA_PRIVATE_KEY: /etc/okta/private.pem
-      IDP_PROVIDER_NAME: okta
+    defaults: 
+      KUBIYA_USER_ORG: "{{ .Values.organization }}"
+      KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
     # Custom additional env vars
-    custom:
-      OKTA_BASE_URL:
-        valueFrom:
-          secretKeyRef:
-            name: opawatchdog-secrets
-            key: OKTA_BASE_URL
-      OKTA_TOKEN_ENDPOINT:
-        valueFrom:
-          secretKeyRef:
-            name: opawatchdog-secrets
-            key: OKTA_TOKEN_ENDPOINT
-      OKTA_CLIENT_ID:
-        valueFrom:
-          secretKeyRef:
-            name: opawatchdog-secrets
-            key: OKTA_CLIENT_ID
+    custom: {}
 
-  # PostgreSQL configuration  
-  postgres:
-    image:
-      repository: postgres
-      tag: alpine
-      pullPolicy: IfNotPresent
-    database: postgres
-    username: postgres
-    password: postgres
-    resources:
-      limits:
-        cpu: 500m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    persistence:
-      enabled: true
-      size: 1Gi
-      storageClass: ""
-    env:
-      # Default required env vars  
-      defaults:
-        POSTGRES_DB:
-          valueFrom:
-            secretKeyRef:
-              name: opawatchdog-secrets
-              key: POSTGRES_DB
-        POSTGRES_USER:
-          valueFrom:
-            secretKeyRef:
-              name: opawatchdog-secrets
-              key: POSTGRES_USER
-        POSTGRES_PASSWORD:
-          valueFrom:
-            secretKeyRef:
-              name: opawatchdog-secrets
-              key: POSTGRES_PASSWORD
-      # Custom additional env vars
-      custom: {}
-
-  # OPAL Server configuration
-  opalServer:
-    image:
-      repository: permitio/opal-server
-      tag: latest
-      pullPolicy: IfNotPresent
-    workers: 4
-    policyRepoPollingInterval: "30"
-    healthCheckEnabled: "true"
-    resources:
-      limits:
-        cpu: 500m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    env:
-      defaults:
-        OPAL_BROADCAST_URI: "postgres://{{ .Values.enforcer.postgres.username }}:{{ .Values.enforcer.postgres.password }}@localhost:5432/{{ .Values.enforcer.postgres.database }}"
-        UVICORN_NUM_WORKERS: "4"
-        OPAL_OPA_HEALTH_CHECK_POLICY_ENABLED: "true"
-        OPAL_POLICY_REPO_SSH_KEY:
-          valueFrom:
-            secretKeyRef:
-              name: opawatchdog-secrets
-              key: GIT_DEPLOY_KEY
-        OPAL_POLICY_REPO_URL:
-          valueFrom:
-            secretKeyRef:
-              name: opawatchdog-secrets
-              key: OPAL_POLICY_REPO_URL
-        OPAL_POLICY_REPO_MAIN_BRANCH:
-          valueFrom:
-            secretKeyRef:
-              name: opawatchdog-secrets
-              key: OPAL_POLICY_REPO_MAIN_BRANCH
-        OPAL_POLICY_REPO_POLLING_INTERVAL: "30"
-        OPAL_DATA_CONFIG_SOURCES: '{"config":{"entries":[{"url":"http://localhost:7002/policy-data","topics":["policy_data"],"dst_path":"/static"}]}}'
-        OPAL_LOG_FORMAT_INCLUDE_PID: "true"
-      custom: {}
-
-  # OPAL Client configuration  
-  opalClient:
-    image:
-      repository: permitio/opal-client
-      tag: latest
-      pullPolicy: IfNotPresent
-    resources:
-      limits:
-        cpu: 500m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    env:
-      defaults:
-        OPAL_SERVER_URL: http://localhost:7002
-        OPAL_LOG_FORMAT_INCLUDE_PID: "true"
-        OPAL_INLINE_OPA_LOG_FORMAT: http
-      custom: {}
-
-  # These should be provided by the user
-  secrets:
-    gitDeployKey: ""
-    opalPolicyRepoUrl: ""
-    opalPolicyRepoMainBranch: ""
-    oktaBaseUrl: ""
-    oktaTokenEndpoint: ""
-    oktaClientId: ""
-    privatePemKey: ""
+  volumeMounts:
+    - name: runner-secret-volume
+      mountPath: "/etc/nats"
+      readOnly: true
+  volumes:
+    - name: runner-secret-volume
+      secret:
+        secretName: kubiya-runner-nats-creds-runner
+        items:
+          - key: nats.creds
+            path: nats.creds
