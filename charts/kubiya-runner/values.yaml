@@ -525,7 +525,7 @@ enforcer:
   image:
     repository: ghcr.io/kubiyabot/opawatchdog
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   service:
     port: 5001
