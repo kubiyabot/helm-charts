@@ -559,7 +559,6 @@ You can add custom environment variables to any component without modifying the 
 ```yaml
 # custom-values.yaml
 enforcer:
-  postgres:
     env:
       custom:
         MY_CUSTOM_VAR: "custom_value"
@@ -633,4 +632,3 @@ agentManager:
 - All components support both simple values and valueFrom references
 - Template interpolation is available in both default and custom variables
 - Environment variables can reference other values using the standard Helm templating syntax
-

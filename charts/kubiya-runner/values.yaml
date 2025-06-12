@@ -424,6 +424,7 @@ dagger:
   ## Affinity settings for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   affinity: {}
+
 # ---------------------------------------- Telemetry Components Configuration ---------------------------------------- 
 
 # kube-state-metrics subchart configuration
