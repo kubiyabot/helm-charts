@@ -371,11 +371,7 @@ dagger:
           - workers
     config: |
       insecure-entitlements = ["security.insecure"]
-      [registry."ghcr.io"]
-        http = true
       [registry."ttl.sh"]
-        http = true
-      [registry."docker.io"]
         http = true
       [registry."cache-registry-svc.kubiya"]
       [log]
