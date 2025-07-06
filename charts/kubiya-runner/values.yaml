@@ -139,7 +139,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: 0.3.30
+    tag: 0.3.32
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
