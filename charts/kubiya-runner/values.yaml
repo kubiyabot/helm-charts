@@ -273,7 +273,7 @@ workflowEngine:
   image:
     repository: ghcr.io/kubiyabot/workflow-engine
     pullPolicy: IfNotPresent
-    tag: v1.0.4
+    tag: v1.0.5
   ports:
     containerPort: 8080
   service:
