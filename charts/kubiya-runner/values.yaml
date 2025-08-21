@@ -350,8 +350,8 @@ dagger:
   volumeMountsPostfix: "{{ .Values.uuid }}"
   engine:
     # Configure as StatefulSet with 2 replicas instead of DaemonSet
-    kind: "StatefulSet"
-    replicaCount: 2
+    # kind: "StatefulSet"
+    # replicaCount: 2 # https://github.com/dagger/dagger/blob/main/helm/dagger/templates/engine-statefulset.yaml#L11-L14
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
     # which is used by tool-manager.
     labels:
