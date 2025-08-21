@@ -349,6 +349,9 @@ dagger:
   # Override fullname for dagger engine deployment to be able to use kustomize patch
   volumeMountsPostfix: "{{ .Values.uuid }}"
   engine:
+    # Configure as StatefulSet with 2 replicas instead of DaemonSet
+    kind: "StatefulSet"
+    replicaCount: 2
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
     # which is used by tool-manager.
     labels:
@@ -357,7 +360,7 @@ dagger:
       name: "kubiya-runner-dagger-helm"
       create: true
     image:
-      ref: ghcr.io/kubiyabot/kubiya-registry:v0.1.1
+      ref: ghcr.io/kubiyabot/kubiya-registry:v0.2.1
     args:
       - --oci-max-parallelism
       - num-cpu
@@ -387,8 +390,19 @@ dagger:
       requests:
         cpu: 100m
         memory: 128Mi
+    # StatefulSet volume configuration - handled by upstream chart with volumeMountsPostfix
+    hostPath:
+      dataVolume:
+        enabled: true
+      runVolume:
+        enabled: true
+    statefulSet:
+      persistentVolumeClaim:
+        enabled: false
   magicache:
     enabled: false
+  # Note: Some additionalResources features may not be available in upstream v0.18.16
+  # The service creation will be handled by the upstream chart's native service capabilities
   additionalResources:
     role:
       create: false
