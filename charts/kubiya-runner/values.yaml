@@ -390,12 +390,14 @@ dagger:
       requests:
         cpu: 100m
         memory: 128Mi
-    # StatefulSet volume configuration - handled by upstream chart with volumeMountsPostfix
+    # StatefulSet volume configuration  
     hostPath:
       dataVolume:
         enabled: true
+        path: "/var/lib/dagger-{{ .Values.uuid }}"
       runVolume:
         enabled: true
+        path: "/run/dagger-{{ .Values.uuid }}"
     statefulSet:
       persistentVolumeClaim:
         enabled: false
