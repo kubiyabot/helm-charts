@@ -84,7 +84,7 @@ agentManager:
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
-    tag: v0.2.2
+    tag: v0.3.9
   service:
     port: 80
     targetPort: 8080
@@ -139,7 +139,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: 0.3.38
+    tag: 0.4.0
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
@@ -273,7 +273,7 @@ workflowEngine:
   image:
     repository: ghcr.io/kubiyabot/workflow-engine
     pullPolicy: IfNotPresent
-    tag: v1.43.31
+    tag: v1.44.0
   ports:
     containerPort: 8080
   service:
