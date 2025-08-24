@@ -1,3 +1,4 @@
+{{- if eq .Values.engine.kind "DaemonSet" -}}
 ---
 apiVersion: apps/v1
 kind: DaemonSet
