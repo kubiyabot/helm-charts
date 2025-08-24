@@ -2,6 +2,9 @@ nameOverride: ""
 fullnameOverride: ""
 volumeMountsPostfix: "" # needed for kubiya-runner to mount different volumes for different agents
 engine:
+  ### Engine deployment type: DaemonSet or StatefulSet
+  kind: DaemonSet
+  
   ### Customize your Dagger Engine
   #   https://github.com/moby/buildkit/blob/5997099827e676c4b6ce5774c98ade2483e0afe7/cmd/buildkitd/config/config.go
   #
