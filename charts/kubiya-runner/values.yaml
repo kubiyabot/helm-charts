@@ -198,6 +198,7 @@ toolManager:
     KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
     KUBIYA_GROUP_NAME: "{{ .Values.organization }}.{{ .Values.runner_name }}"
     KUBIYA_SHARED_STORAGE_BUCKET: "workspaces"
+    KUBIYA_WORKSPACES_DIR: "/opt/workspaces"
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
   resources:
@@ -214,6 +215,8 @@ toolManager:
       name: shared-volume
     - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
       name: registry-certs
+    - mountPath: /opt/workspaces
+      name: workspaces-volume
   command:
     - "/bin/bash"
     - "-c"
@@ -265,8 +268,6 @@ toolManager:
         name: nats-creds-volume
       - mountPath: /tmp/kubiya_shared_tools
         name: shared-volume
-      - mountPath: /opt/workspaces
-        name: workspaces-volume
 # Kubiya workflow engine component config
 workflowEngine:
   replicas: 1
