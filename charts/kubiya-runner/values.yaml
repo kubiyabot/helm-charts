@@ -84,7 +84,7 @@ agentManager:
   image:
     repository: ghcr.io/kubiyabot/agent-manager
     pullPolicy: IfNotPresent
-    tag: v0.3.9
+    tag: v0.4.2
   service:
     port: 80
     targetPort: 8080
@@ -139,7 +139,7 @@ toolManager:
   image:
     repository: ghcr.io/kubiyabot/tool-manager
     pullPolicy: IfNotPresent
-    tag: 7495b440ec8c2856e26ddd26719bdd55a44ab168
+    tag: 0.5.4
   otelCollectorMetricsScrapeAppName: tool-manager
   service:
     port: 80
@@ -176,6 +176,8 @@ toolManager:
       secret:
         secretName: registry-tls-secret
         defaultMode: 420
+    - name: workspaces-volume
+      emptyDir: {}
   containerPort: 3001
   env:
     KUBIYA_WORKFLOWS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
@@ -185,6 +187,7 @@ toolManager:
     KUBIYA_TOOL_TIMEOUT: 5m
     KUBIYA_LONG_RUNNING_TOOL_TIMEOUT: 168h
     KUBIYA_NATS_CREDS: "/opt/nats.creds"
+    NATS_CREDS: "/opt/nats.creds"
     KUBIYA_USER_ORG: "{{ .Values.organization }}"
     # TODO: FIX AFTER MERGE
     KUBIYA_AGENT_UUID: "{{ .Values.uuid }}"
@@ -194,6 +197,8 @@ toolManager:
     KUBIYA_IMAGE_REGISTRY_ADDRESS: "cache-registry-svc.kubiya"
     KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
     KUBIYA_GROUP_NAME: "{{ .Values.organization }}.{{ .Values.runner_name }}"
+    KUBIYA_SHARED_STORAGE_BUCKET: "workspaces"
+    KUBIYA_WORKSPACES_DIR: "/opt/workspaces"
   # Explicit resources are mandatory. See README.md or more info.
   # Particular values below should be reviewed and set based on real usage statistics for particular runner (deployment) or average.
   resources:
@@ -210,6 +215,8 @@ toolManager:
       name: shared-volume
     - mountPath: /etc/docker/certs.d/cache-registry-svc.kubiya
       name: registry-certs
+    - mountPath: /opt/workspaces
+      name: workspaces-volume
   command:
     - "/bin/bash"
     - "-c"
@@ -273,7 +280,7 @@ workflowEngine:
   image:
     repository: ghcr.io/kubiyabot/workflow-engine
     pullPolicy: IfNotPresent
-    tag: v1.44.0
+    tag: v1.46.1
   ports:
     containerPort: 8080
   service:
