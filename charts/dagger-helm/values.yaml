@@ -77,6 +77,29 @@ engine:
   #   You may want to adjust this to fit your workloads so that the Engine stops quicker.
   terminationGracePeriodSeconds: 300
 
+  ### HostPath configuration (used by both DaemonSet and StatefulSet)
+  #   For StatefulSet with PVC, set both to false
+  # hostPath:
+  #   dataVolume:
+  #     enabled: true
+  #   runVolume:
+  #     enabled: true
+
+  ### StatefulSet specific configuration (only used when kind: StatefulSet)
+  # statefulSet:
+  #   persistentVolumeClaim:
+  #     enabled: true
+  #     accessModes:
+  #       - ReadWriteOnce
+  #     resources:
+  #       requests:
+  #         storage: 10Gi
+  #     # storageClassName: default
+  #   persistentVolumeClaimRetentionPolicy:
+  #     whenDeleted: Delete
+  #     whenScaled: Delete
+  #   podManagementPolicy: Parallel
+
   newServiceAccount:
     # name: "dagger-helm"
     create: false
