@@ -356,8 +356,6 @@ dagger:
   # Override fullname for dagger engine deployment to be able to use kustomize patch
   volumeMountsPostfix: "{{ .Values.uuid }}"
   engine:
-    # Use StatefulSet as default instead of DaemonSet for better persistence
-    kind: StatefulSet
     # Labels for selecting dagger pods for additional dagger headless service (for discovery and load balancing)
     # which is used by tool-manager.
     labels:
@@ -396,25 +394,6 @@ dagger:
       requests:
         cpu: 100m
         memory: 128Mi
-    # Disable hostPath when using StatefulSet
-    hostPath:
-      dataVolume:
-        enabled: false
-      runVolume:
-        enabled: false
-    # StatefulSet configuration for persistent storage
-    statefulSet:
-      persistentVolumeClaim:
-        enabled: true
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 50Gi
-      persistentVolumeClaimRetentionPolicy:
-        whenDeleted: Retain
-        whenScaled: Retain
-      podManagementPolicy: Parallel
   magicache:
     enabled: false
   additionalResources:

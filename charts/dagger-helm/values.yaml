@@ -66,38 +66,16 @@ engine:
         - -exc
         - |-
           dagger core version
-    initialDelaySeconds: 20
-    timeoutSeconds: 15
-    periodSeconds: 10
+    initialDelaySeconds: 5
+    timeoutSeconds: 14
+    periodSeconds: 15
     successThreshold: 1
-    failureThreshold: 5
+    failureThreshold: 10
     
   ### The Engine may need to finish operations in flight, or sync its state to a remote destination.
   #   We give it ample time by setting this value to 5 mins by default.
   #   You may want to adjust this to fit your workloads so that the Engine stops quicker.
   terminationGracePeriodSeconds: 300
-
-  ### HostPath configuration (used by DaemonSet, disabled for StatefulSet with PVC)
-  hostPath:
-    dataVolume:
-      enabled: true  # Set to false when using StatefulSet with PVC
-    runVolume:
-      enabled: true  # Set to false when using StatefulSet with PVC
-
-  ### StatefulSet specific configuration (only used when kind: StatefulSet)
-  statefulSet:
-    persistentVolumeClaim:
-      enabled: true
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 50Gi
-      # storageClassName: default
-    persistentVolumeClaimRetentionPolicy:
-      whenDeleted: Delete
-      whenScaled: Delete
-    podManagementPolicy: Parallel
 
   newServiceAccount:
     # name: "dagger-helm"
