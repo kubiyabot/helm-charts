@@ -1,6 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
+  "title": "Kubiya Runner Helm Chart Values",
+  "description": "JSON Schema for Kubiya Runner Helm chart values.yaml",
   "required": [
     "organization",
     "uuid",
@@ -9,48 +11,111 @@
   "properties": {
     "organization": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Runner organization name"
     },
     "uuid": {
       "type": "string",
-      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "description": "Runner UUID"
+    },
+    "runnerNameOverride": {
+      "type": "string",
+      "description": "Override for runner name. Must match JWT encoded name."
+    },
+    "nameOverride": {
+      "type": "string",
+      "description": "Override for chart name"
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "description": "Override for full resource names"
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Optional secret for pulling images from private registries"
     },
     "nats": {
       "type": "object",
-      "required": ["jwt", "secondJwt", "subject"],
+      "required": ["jwt", "secondJwt", "subject", "serverUrl"],
       "properties": {
         "jwt": {
-          "type": "string"
+          "type": "string",
+          "description": "NATS JWT token"
         },
         "secondJwt": {
-          "type": "string"
+          "type": "string",
+          "description": "NATS secondary JWT token"
         },
         "subject": {
-          "type": "string"
+          "type": "string",
+          "description": "NATS subject for metrics"
         },
         "serverUrl": {
           "type": "string",
-          "default": "tls://connect.ngs.global"
-        },
-        "org": {
-          "type": "string"
+          "default": "tls://connect.ngs.global",
+          "description": "NATS server URL"
         }
       }
     },
     "registryTls": {
       "type": "object",
+      "required": ["crt", "key"],
       "properties": {
         "crt": {
-          "type": "string"
+          "type": "string",
+          "description": "TLS certificate for private registry"
         },
         "key": {
-          "type": "string"
+          "type": "string",
+          "description": "TLS private key for private registry"
+        }
+      }
+    },
+    "kubiyaOperator": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Kubiya Operator component"
+        },
+        "fullAccess": {
+          "type": "boolean",
+          "default": false,
+          "description": "Grant full access to operator"
+        },
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Number of operator replicas"
+        }
+      }
+    },
+    "agentManager": {
+      "type": "object",
+      "properties": {
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2,
+          "description": "Number of agent manager replicas"
         }
       }
     },
     "toolManager": {
       "type": "object",
       "properties": {
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3,
+          "description": "Number of tool manager replicas"
+        },
         "resources": {
           "type": "object",
           "required": ["limits", "requests"],
@@ -64,11 +129,12 @@
                     { "type": "string" },
                     { "type": "integer" }
                   ],
-                  "description": "CPU limit for the tool manager. Can be a string or an integer."
+                  "description": "CPU limit for the tool manager"
                 },
                 "memory": {
                   "type": "string",
-                  "pattern": "^[0-9]+(Ki|Mi|Gi)$"
+                  "pattern": "^[0-9]+(Ki|Mi|Gi)$",
+                  "description": "Memory limit for the tool manager"
                 }
               }
             },
@@ -78,13 +144,137 @@
               "properties": {
                 "cpu": {
                   "type": "string",
-                  "pattern": "^[0-9]+m?$|^[0-9]+\\.[0-9]+$"
+                  "pattern": "^[0-9]+m?$|^[0-9]+\\.[0-9]+$",
+                  "description": "CPU request for the tool manager"
                 },
                 "memory": {
                   "type": "string",
-                  "pattern": "^[0-9]+(Ki|Mi|Gi)$"
+                  "pattern": "^[0-9]+(Ki|Mi|Gi)$",
+                  "description": "Memory request for the tool manager"
                 }
               }
+            }
+          }
+        },
+        "adminClusterRole": {
+          "type": "object",
+          "properties": {
+            "create": {
+              "type": "boolean",
+              "default": false,
+              "description": "Set to true to create the ClusterRole and ClusterRoleBinding"
+            }
+          }
+        }
+      }
+    },
+    "workflowEngine": {
+      "type": "object",
+      "properties": {
+        "replicas": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Number of workflow engine replicas"
+        }
+      }
+    },
+    "imageUpdater": {
+      "type": "object",
+      "properties": {
+        "cronJob": {
+          "type": "object",
+          "properties": {
+            "create": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable image updater cron job"
+            },
+            "schedule": {
+              "type": "string",
+              "default": "0 * * * *",
+              "description": "Cron schedule expression"
+            },
+            "suspend": {
+              "type": "boolean",
+              "default": false,
+              "description": "Suspend cron job execution"
+            }
+          }
+        }
+      }
+    },
+    "dagger": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Dagger subchart"
+        },
+        "engine": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["StatefulSet", "DaemonSet"],
+              "default": "StatefulSet",
+              "description": "Kubernetes workload type for Dagger engine"
+            }
+          }
+        }
+      }
+    },
+    "kubestatemetrics": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable kube-state-metrics subchart"
+        }
+      }
+    },
+    "alloy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Grafana Alloy subchart"
+        },
+        "scrapeIntervals": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "string",
+              "pattern": "^[0-9]+[smh]$",
+              "default": "60s",
+              "description": "Default scrape interval"
+            },
+            "runnerExporters": {
+              "type": "string",
+              "pattern": "^[0-9]+[smh]$",
+              "default": "60s",
+              "description": "Runner exporters scrape interval"
+            },
+            "alloyExporter": {
+              "type": "string",
+              "pattern": "^[0-9]+[smh]$",
+              "default": "60s",
+              "description": "Alloy exporter scrape interval"
+            },
+            "blackboxExporter": {
+              "type": "string",
+              "pattern": "^[0-9]+[smh]$",
+              "default": "60s",
+              "description": "Blackbox exporter scrape interval"
+            },
+            "kubeStateMetrics": {
+              "type": "string",
+              "pattern": "^[0-9]+[smh]$",
+              "default": "60s",
+              "description": "Kube-state-metrics scrape interval"
             }
           }
         }

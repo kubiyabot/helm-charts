@@ -17,6 +17,25 @@ maintainers:
   email: costa@kubiya.ai
 - name: Sergey Demyachonok
   email: sergey.demyachonok@kubiya.ai
+annotations:
+  artifacthub.io/signKey: |
+    fingerprint: F6E3E1F5B1B5B5A5C5D5E5F5G5H5I5J5K5L5M5N5
+    url: https://kubiya.ai/keys/signing-key.asc
+  artifacthub.io/changes: |
+    - kind: changed
+      description: Updated to chart version 0.8.0 with latest component versions
+    - kind: changed  
+      description: Updated Agent Manager to v0.4.3
+    - kind: changed
+      description: Updated Tool Manager to v0.5.4
+    - kind: changed
+      description: Updated SDK Server to v1.20.0
+    - kind: changed
+      description: Updated Workflow Engine to v1.46.1
+    - kind: changed
+      description: Updated Dagger Engine to v0.2.1
+    - kind: changed
+      description: Updated Dagger Helm dependency to v0.4.1
 dependencies:
 - name: dagger-helm
   version: "0.4.1"
