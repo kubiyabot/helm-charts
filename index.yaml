@@ -203,6 +203,56 @@ entries:
     - https://github.com/kubiyabot/helm-charts/releases/download/dagger-helm-0.2.1/dagger-helm-0.2.1.tgz
     version: 0.2.1
   kubiya-runner:
+  - annotations:
+      artifacthub.io/changes: "- kind: changed\n  description: Updated to chart version
+        0.8.0 with latest component versions\n- kind: changed  \n  description: Updated
+        Agent Manager to v0.4.3\n- kind: changed\n  description: Updated Tool Manager
+        to v0.5.4\n- kind: changed\n  description: Updated SDK Server to v1.20.0\n-
+        kind: changed\n  description: Updated Workflow Engine to v1.46.1\n- kind:
+        changed\n  description: Updated Dagger Engine to v0.2.1\n- kind: changed\n
+        \ description: Updated Dagger Helm dependency to v0.4.1\n"
+      artifacthub.io/signKey: |
+        fingerprint: F6E3E1F5B1B5B5A5C5D5E5F5G5H5I5J5K5L5M5N5
+        url: https://kubiya.ai/keys/signing-key.asc
+    apiVersion: v2
+    appVersion: 0.8.2
+    created: "2025-09-09T13:07:04.854392006Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: file://../dagger-helm
+      version: 0.4.1
+    - alias: kubestatemetrics
+      condition: kubestatemetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.27.0
+    - alias: alloy
+      condition: alloy.enabled
+      name: alloy
+      repository: https://grafana.github.io/helm-charts
+      version: 0.10.1
+    description: A Helm chart for Kubiya Runner deployment
+    digest: 0d4f6744ddb05652d4eed9f07e3f73609b89789601a442155d47e0c82401cc4c
+    home: https://kubiya.ai
+    icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+    keywords:
+    - kubiya.ai
+    - runner
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: costa@kubiya.ai
+      name: Costa
+    - email: sergey.demyachonok@kubiya.ai
+      name: Sergey Demyachonok
+    name: kubiya-runner
+    sources:
+    - https://github.com/kubiyabot/helm-charts
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.8.2/kubiya-runner-0.8.2.tgz
+    version: 0.8.2
   - apiVersion: v2
     appVersion: 0.8.1
     created: "2025-09-09T12:33:22.217923629Z"
@@ -9469,4 +9519,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.1/kubiya-runner-0.4.1.tgz
     version: 0.4.1
-generated: "2025-09-09T12:33:22.218933252Z"
+generated: "2025-09-09T13:07:04.855778563Z"
