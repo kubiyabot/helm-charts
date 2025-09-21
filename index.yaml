@@ -215,6 +215,56 @@ entries:
         fingerprint: F6E3E1F5B1B5B5A5C5D5E5F5G5H5I5J5K5L5M5N5
         url: https://kubiya.ai/keys/signing-key.asc
     apiVersion: v2
+    appVersion: 0.8.5
+    created: "2025-09-21T14:44:45.632785429Z"
+    dependencies:
+    - alias: dagger
+      condition: dagger.enabled
+      name: dagger-helm
+      repository: file://../dagger-helm
+      version: 0.4.1
+    - alias: kubestatemetrics
+      condition: kubestatemetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.27.0
+    - alias: alloy
+      condition: alloy.enabled
+      name: alloy
+      repository: https://grafana.github.io/helm-charts
+      version: 0.10.1
+    description: A Helm chart for Kubiya Runner deployment
+    digest: 3a5fc2ddc3691a858618021daa7869bcd3ecc35393798bdd772870b6fd765acf
+    home: https://kubiya.ai
+    icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
+    keywords:
+    - kubiya.ai
+    - runner
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: costa@kubiya.ai
+      name: Costa
+    - email: sergey.demyachonok@kubiya.ai
+      name: Sergey Demyachonok
+    name: kubiya-runner
+    sources:
+    - https://github.com/kubiyabot/helm-charts
+    type: application
+    urls:
+    - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.8.5/kubiya-runner-0.8.5.tgz
+    version: 0.8.5
+  - annotations:
+      artifacthub.io/changes: "- kind: changed\n  description: Updated to chart version
+        0.8.0 with latest component versions\n- kind: changed  \n  description: Updated
+        Agent Manager to v0.4.3\n- kind: changed\n  description: Updated Tool Manager
+        to v0.5.4\n- kind: changed\n  description: Updated SDK Server to v1.20.0\n-
+        kind: changed\n  description: Updated Workflow Engine to v1.46.1\n- kind:
+        changed\n  description: Updated Dagger Engine to v0.2.1\n- kind: changed\n
+        \ description: Updated Dagger Helm dependency to v0.4.1\n"
+      artifacthub.io/signKey: |
+        fingerprint: F6E3E1F5B1B5B5A5C5D5E5F5G5H5I5J5K5L5M5N5
+        url: https://kubiya.ai/keys/signing-key.asc
+    apiVersion: v2
     appVersion: 0.8.4
     created: "2025-09-18T08:34:39.790159568Z"
     dependencies:
@@ -9619,4 +9669,4 @@ entries:
     urls:
     - https://github.com/kubiyabot/helm-charts/releases/download/kubiya-runner-0.4.1/kubiya-runner-0.4.1.tgz
     version: 0.4.1
-generated: "2025-09-18T08:34:39.791249377Z"
+generated: "2025-09-21T14:44:45.633322324Z"
