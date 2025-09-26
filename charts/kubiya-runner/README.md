@@ -123,13 +123,13 @@ The Workflow Engine is responsible for managing and executing workflows in the K
 ```
 ## Dependencies & Compatibility Matrix
 
-This chart (as of version 0.6.x) is tested to be compatible with the following versions of container images and Helm dependencies.
+This chart (as of version 0.8.0) is tested to be compatible with the following versions of container images and Helm dependencies.
 
 ### Helm Dependencies
 
 | Chart              | Version | App Version |
 |--------------------|---------|-------------|
-| dagger-helm        | 0.3.0   | 0.11.6      |
+| dagger-helm        | 0.4.1   | 0.11.6      |
 | kube-state-metrics | 5.27.0  | 2.14.0      |
 | alloy              | 0.10.1  | v1.5.1      |
 
@@ -137,13 +137,13 @@ This chart (as of version 0.6.x) is tested to be compatible with the following v
 
 | Component          | Image                                                 | Version/Tag |
 |--------------------|-------------------------------------------------------|-------------|
-| Agent Manager      | ghcr.io/kubiyabot/agent-manager                       | v0.1.14     |
+| Agent Manager      | ghcr.io/kubiyabot/agent-manager                       | v0.4.3      |
 | Kubiya Operator    | ghcr.io/kubiyabot/kubiya-operator                     | runner_v2   |
-| Tool Manager       | ghcr.io/kubiyabot/tool-manager                        | v0.3.17     |
-| SDK Server         | ghcr.io/kubiyabot/sdk-py                              | v1.18.1     |
-| Workflow Engine    | ghcr.io/kubiyabot/workflow-engine                     | main        |
+| Tool Manager       | ghcr.io/kubiyabot/tool-manager                        | 0.5.4       |
+| SDK Server         | ghcr.io/kubiyabot/sdk-py                              | v1.20.0     |
+| Workflow Engine    | ghcr.io/kubiyabot/workflow-engine                     | v1.46.1     |
 | Image Updater      | ghcr.io/kubiyabot/kubernetes                          | 1.32.0      |
-| Dagger Engine      | ghcr.io/kubiyabot/kubiya-registry                     | v0.1.1      |
+| Dagger Engine      | ghcr.io/kubiyabot/kubiya-registry                     | v0.2.1      |
 | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | v2.14.0     |
 | Grafana Alloy      | grafana/alloy                                         | v1.5.1      |
 

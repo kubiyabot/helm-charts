@@ -2,8 +2,8 @@ apiVersion: v2
 name: kubiya-runner
 description: A Helm chart for Kubiya Runner deployment
 type: application
-version: 0.7.1
-appVersion: "0.7.1"
+version: 0.9.0
+appVersion: "0.9.0"
 kubeVersion: ">=1.19.0-0" 
 home: https://kubiya.ai
 icon: https://raw.githubusercontent.com/kubiyabot/helm-charts/main/charts/kubiya-runner/icon.png
@@ -17,9 +17,28 @@ maintainers:
   email: costa@kubiya.ai
 - name: Sergey Demyachonok
   email: sergey.demyachonok@kubiya.ai
+annotations:
+  artifacthub.io/signKey: |
+    fingerprint: F6E3E1F5B1B5B5A5C5D5E5F5G5H5I5J5K5L5M5N5
+    url: https://kubiya.ai/keys/signing-key.asc
+  artifacthub.io/changes: |
+    - kind: changed
+      description: Updated to chart version 0.8.0 with latest component versions
+    - kind: changed  
+      description: Updated Agent Manager to v0.4.3
+    - kind: changed
+      description: Updated Tool Manager to v0.5.4
+    - kind: changed
+      description: Updated SDK Server to v1.20.0
+    - kind: changed
+      description: Updated Workflow Engine to v1.46.1
+    - kind: changed
+      description: Updated Dagger Engine to v0.2.1
+    - kind: changed
+      description: Updated Dagger Helm dependency to v0.4.1
 dependencies:
 - name: dagger-helm
-  version: "0.3.1"
+  version: "0.4.1"
   repository: "file://../dagger-helm"
   alias: dagger
   condition: dagger.enabled
