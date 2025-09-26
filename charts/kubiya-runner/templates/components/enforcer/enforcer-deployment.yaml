@@ -26,24 +26,10 @@ spec:
           image: "{{ .Values.enforcer.image.repository }}:{{ .Values.enforcer.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.image.pullPolicy }}
           env:
-            {{- with .Values.enforcer.env.defaults }}
+            {{- with .Values.enforcer.sdkServer.env }}
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
               value: {{ tpl $value $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
-            {{- with .Values.enforcer.env.custom }}
-            {{- range $key, $value := . }}
-            - name: {{ $key | quote }}
-              {{- if kindIs "map" $value }}
-                {{- toYaml $value | nindent 14 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
             {{- end }}
             {{- end }}
           ports:

@@ -68,14 +68,10 @@ kubiyaOperator:
   ports:
     containerPort: 80
   env:
-    # Default required env vars
-    defaults:
-      NATS_SERVER: "{{ .Values.nats.serverUrl }}"
-      NATS_SUBJECT: "{{ .Values.nats.subject }}"
-      NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
-      NAMESPACE: "{{ .Release.Namespace }}"
-    # Custom additional env vars
-    custom: {}
+    NATS_SERVER: "{{ .Values.nats.serverUrl }}"
+    NATS_SUBJECT: "{{ .Values.nats.subject }}"
+    NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
+    NAMESPACE: "{{ .Release.Namespace }}"
 
 # Kubiya agent manager component config
 agentManager:
@@ -130,13 +126,9 @@ agentManager:
       name: nats-creds-volume
       readOnly: true
   env:
-    # Default required env vars
-    defaults:
-      TOOL_MANAGER_URL: "http://tool-manager.{{ .Release.Namespace }}:{{ .Values.toolManager.service.port }}"
-      KUBIYA_NATS_CREDS: "/nats/nats.creds"
-      ENVIRONMENT: "production"
-    # Custom additional env vars  
-    custom: {}
+    TOOL_MANAGER_URL: "http://tool-manager.{{ .Release.Namespace }}:{{ .Values.toolManager.service.port }}"
+    KUBIYA_NATS_CREDS: "/nats/nats.creds"
+    ENVIRONMENT: "production"
 # Kubiya tool manager component config
 toolManager:
   ## Node labels for pod assignment
@@ -263,18 +255,14 @@ toolManager:
       periodSeconds: 30
       timeoutSeconds: 5
     env:
-      # Default required env vars
-      defaults:
-        KUBIYA_NATS_CREDS: "/opt/nats.creds"
-        KUBIYA_USER_ORG: "{{ .Values.organization }}"
-        KUBIYA_AGENT_UUID: "{{ .Values.uuid }}"
-        GIT_SHA: git-sha-placeholder
-        KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
-        KUBIYA_TOOL_TIMEOUT: 5m
-        KUBIYA_LONG_RUNNING_TOOL_TIMEOUT: 168h
-        KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
-      # Custom additional env vars
-      custom: {}
+      KUBIYA_NATS_CREDS: "/opt/nats.creds"
+      KUBIYA_USER_ORG: "{{ .Values.organization }}"
+      KUBIYA_AGENT_UUID: "{{ .Values.uuid }}"
+      GIT_SHA: git-sha-placeholder
+      KUBIYA_SERVICE_ACCOUNT: "{{ .Values.toolManager.serviceAccount.name }}"
+      KUBIYA_TOOL_TIMEOUT: 5m
+      KUBIYA_LONG_RUNNING_TOOL_TIMEOUT: 168h
+      KUBIYA_TOOLS_SHARED_VOLUME: "/tmp/kubiya_shared_tools"
     volumeMounts:
       - mountPath: /opt/
         name: nats-creds-volume
@@ -563,12 +551,8 @@ enforcer:
 
   # Environment variables for enforcer container
   env:
-    # Default required env vars
-    defaults: 
-      KUBIYA_USER_ORG: "{{ .Values.organization }}"
-      KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
-    # Custom additional env vars
-    custom: {}
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
 
   volumeMounts:
     - name: runner-secret-volume

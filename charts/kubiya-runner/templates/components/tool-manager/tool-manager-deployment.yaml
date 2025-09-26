@@ -38,23 +38,11 @@ spec:
           {{- end }}
           command: {{ .Values.toolManager.command | toYaml | nindent 10 }}
           env:
-            {{- range $key, $value := .Values.toolManager.env.defaults }}
-            - name: {{ $key }}
-              {{- if kindIs "map" $value }}
-              valueFrom:
-                {{- toYaml $value | nindent 16 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
+            {{- with .Values.toolManager.sdkServer.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
             {{- end }}
-            {{- range $key, $value := .Values.toolManager.env.custom }}
-            - name: {{ $key }}
-              {{- if kindIs "map" $value }}
-              valueFrom:
-                {{- toYaml $value | nindent 16 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
             {{- end }}
             {{- if .Values.enforcer.enabled }}
             - name: KUBIYA_AUTH_SERVER_URL
@@ -84,23 +72,11 @@ spec:
           {{- end }}
           command: {{ .Values.toolManager.sdkServer.command | toYaml | nindent 10 }}
           env:
-            {{- range $key, $value := .Values.toolManager.sdkServer.env.defaults }}
-            - name: {{ $key }}
-              {{- if kindIs "map" $value }}
-              valueFrom:
-                {{- toYaml $value | nindent 16 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
-            {{- end }}
-            {{- range $key, $value := .Values.toolManager.sdkServer.env.custom }}
-            - name: {{ $key }}
-              {{- if kindIs "map" $value }}
-              valueFrom:
-                {{- toYaml $value | nindent 16 }}
-              {{- else }}
-              value: {{ tpl (toString $value) $ | quote }}
-              {{- end }}
+            {{- with .Values.toolManager.sdkServer.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}  
             {{- end }}
           ports:
             - containerPort: {{ .Values.toolManager.sdkServer.containerPort }}
