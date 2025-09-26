@@ -1,0 +1,17 @@
+{{- if .Values.enforcer.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: enforcer
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "enforcer.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.enforcer.service.type }}
+  ports:
+    - name: enforcer
+      port: {{ .Values.enforcer.service.port }}
+      targetPort: {{ .Values.enforcer.service.targetPort }}
+  selector:
+    {{- include "enforcer.selectorLabels" . | nindent 4 }}
+{{- end }} 

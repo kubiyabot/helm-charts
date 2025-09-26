@@ -190,3 +190,27 @@ app.kubernetes.io/kubiya-runner-component: image-updater
 {{- default "default" .Values.imageUpdater.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Enforcer labels
+*/}}
+{{- define "enforcer.labels" -}}
+{{ include "kubiya-runner-common.labels" . }}
+app.kubernetes.io/component: enforcer
+{{- end }}
+
+{{/*
+Enforcer Selector labels
+*/}}
+{{- define "enforcer.selectorLabels" -}}
+{{ include "kubiya-runner-common.selectorLabels" . }}
+app.kubernetes.io/component: enforcer
+{{- end }}
+
+{{- define "kubiya-runner.serviceAccountName.enforcer" -}}
+{{- if .Values.enforcer.serviceAccount.create }}
+{{- default (printf "%s-enforcer" (include "kubiya-runner.name" .)) .Values.enforcer.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.enforcer.serviceAccount.name }}
+{{- end }}
+{{- end }}
