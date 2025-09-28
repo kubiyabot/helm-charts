@@ -517,3 +517,6 @@ alloy:
     requests:
       cpu: 100m
       memory: 128Mi
+enforcer:
+  image:
+    tag: v0.0.7
