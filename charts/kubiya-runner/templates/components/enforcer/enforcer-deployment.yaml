@@ -26,7 +26,7 @@ spec:
           image: "{{ .Values.enforcer.image.repository }}:{{ .Values.enforcer.image.tag }}"
           imagePullPolicy: {{ .Values.enforcer.image.pullPolicy }}
           env:
-            {{- with .Values.enforcer.sdkServer.env }}
+            {{- with .Values.enforcer.env }}
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               value: {{ tpl $value $ | quote }}
