@@ -72,6 +72,7 @@ kubiyaOperator:
     NATS_SUBJECT: "{{ .Values.nats.subject }}"
     NATS_CREDENTIAL_FILE: "/etc/nats/nats.creds"
     NAMESPACE: "{{ .Release.Namespace }}"
+
 # Kubiya agent manager component config
 agentManager:
   replicas: 2
@@ -189,7 +190,6 @@ toolManager:
     KUBIYA_NATS_CREDS: "/opt/nats.creds"
     NATS_CREDS: "/opt/nats.creds"
     KUBIYA_USER_ORG: "{{ .Values.organization }}"
-    # TODO: FIX AFTER MERGE
     KUBIYA_AGENT_UUID: "{{ .Values.uuid }}"
     KUBIYA_DAGGER_ENGINE_SERVICE_URL: "tcp://{{ .Values.dagger.additionalResources.service.name }}:{{ .Values.dagger.additionalResources.service.port }}"
     KUBIYA_SDK_SERVER_URL: "http://127.0.0.1:8000"
@@ -432,6 +432,7 @@ dagger:
   ## Affinity settings for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   affinity: {}
+
 # ---------------------------------------- Telemetry Components Configuration ---------------------------------------- 
 
 # kube-state-metrics subchart configuration
@@ -517,6 +518,50 @@ alloy:
     requests:
       cpu: 100m
       memory: 128Mi
+
 enforcer:
+  enabled: false
+  
+  # Enforcer component configuration
+  replicas: 1
+  
+  serviceAccount:
+    create: true
+    name: "" # Leave empty to use generated name
+    automountServiceAccountToken: true
+
   image:
+    repository: ghcr.io/kubiyabot/opawatchdog
     tag: v0.0.7
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 5001
+    targetPort: 5001
+    type: ClusterIP
+    
+  # Resources for enforcer container
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Environment variables for enforcer container
+  env:
+    KUBIYA_USER_ORG: "{{ .Values.organization }}"
+    KUBIYA_RUNNER_NAME: "{{ .Values.runner_name }}"
+
+  volumeMounts:
+    - name: runner-secret-volume
+      mountPath: "/etc/nats"
+      readOnly: true
+  volumes:
+    - name: runner-secret-volume
+      secret:
+        secretName: kubiya-runner-nats-creds-runner
+        items:
+          - key: nats.creds
+            path: nats.creds

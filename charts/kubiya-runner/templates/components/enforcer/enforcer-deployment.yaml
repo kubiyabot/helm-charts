@@ -1,0 +1,45 @@
+{{- if .Values.enforcer.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enforcer
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "enforcer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.enforcer.replicas }}
+  selector:
+    matchLabels:
+      {{- include "enforcer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "enforcer.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "kubiya-runner.serviceAccountName.enforcer" . }}
+      volumes:
+        {{- with .Values.enforcer.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: enforcer
+          image: "{{ .Values.enforcer.image.repository }}:{{ .Values.enforcer.image.tag }}"
+          imagePullPolicy: {{ .Values.enforcer.image.pullPolicy }}
+          env:
+            {{- with .Values.enforcer.env }}
+            {{- range $key, $value := . }}
+            - name: {{ $key | quote }}
+              value: {{ tpl $value $ | quote }}
+            {{- end }}
+            {{- end }}
+          ports:
+            - containerPort: 5001
+          {{- with .Values.enforcer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- with .Values.enforcer.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }} 
