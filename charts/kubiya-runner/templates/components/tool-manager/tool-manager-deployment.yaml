@@ -38,7 +38,7 @@ spec:
           {{- end }}
           command: {{ .Values.toolManager.command | toYaml | nindent 10 }}
           env:
-            {{- with .Values.toolManager.sdkServer.env }}
+            {{- with .Values.toolManager.env }}
             {{- range $key, $value := . }}
             - name: {{ $key | quote }}
               value: {{ tpl $value $ | quote }}
