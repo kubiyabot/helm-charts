@@ -18,6 +18,7 @@ A Helm chart for deploying the Kubiya Runner.
     - [Tool Manager](#tool-manager)
     - [Workflow Engine](#workflow-engine)
     - [Image Updater](#image-updater)
+    - [LiteLLM Gateway](#litellm-gateway)
   - [Dependencies \& Compatibility Matrix](#dependencies--compatibility-matrix)
     - [Helm Dependencies](#helm-dependencies)
     - [Container Images](#container-images)
@@ -120,17 +121,49 @@ The Workflow Engine is responsible for managing and executing workflows in the K
 - Checks for updates of latest stable image versions via CronJob (hourly by default).
 - Automatic updates for runner components (agent-manager, tool-manager, sdk-server) from stable release JSON file hosted in [S3 bucket](https://kubiya-cli.s3.amazonaws.com/stable/kubiya_versions.json).
 ```
+
+### LiteLLM Gateway
+
+The LiteLLM Gateway is an optional component that provides a unified interface for calling multiple LLM APIs using the OpenAI format. This component is disabled by default.
+
+- Provides OpenAI-compatible API for multiple LLM providers
+- Stores model configurations in NATS Key-Value store
+- Uses NATS credentials for secure communication
+- Integrates with the agent-manager service account
+
+**Configuration:**
+
+To enable LiteLLM in your deployment, set `litellm.enabled: true` in your values file and configure the following key parameters:
+
+```yaml
+litellm:
+  enabled: true
+  image:
+    repository: ghcr.io/kubiyabot/lite-llm-gateaway
+    tag: "0.0.12"
+  env:
+    - name: STORE_MODEL_IN_NATS_KV
+      value: "true"
+    - name: KUBIYA_ORGANIZATION
+      value: "your-org-name"
+    - name: MASTER_KEY
+      value: "your-master-key"
+```
+
+**Note:** LiteLLM uses the same NATS credentials as other Kubiya components and shares the agent-manager service account for Kubernetes API access.
+
 ## Dependencies & Compatibility Matrix
 
 This chart (as of version 0.8.0) is tested to be compatible with the following versions of container images and Helm dependencies.
 
 ### Helm Dependencies
 
-| Chart              | Version | App Version |
-|--------------------|---------|-------------|
-| dagger-helm        | 0.4.1   | 0.11.6      |
-| kube-state-metrics | 5.27.0  | 2.14.0      |
-| alloy              | 0.10.1  | v1.5.1      |
+| Chart              | Version | App Version | Enabled by Default |
+|--------------------|---------|-------------|--------------------|
+| dagger-helm        | 0.4.1   | 0.11.6      | Yes                |
+| kube-state-metrics | 5.27.0  | 2.14.0      | Yes                |
+| alloy              | 0.10.1  | v1.5.1      | Yes                |
+| litellm            | 1.72.2  | v1.72.2     | No                 |
 
 ### Container Images
 
@@ -142,6 +175,7 @@ This chart (as of version 0.8.0) is tested to be compatible with the following v
 | SDK Server         | ghcr.io/kubiyabot/sdk-py                              | v1.20.0     |
 | Workflow Engine    | ghcr.io/kubiyabot/workflow-engine                     | v1.46.1     |
 | Image Updater      | ghcr.io/kubiyabot/kubernetes                          | 1.32.0      |
+| LiteLLM Gateway    | ghcr.io/kubiyabot/lite-llm-gateaway                   | 0.0.12      |
 | Dagger Engine      | ghcr.io/kubiyabot/kubiya-registry                     | v0.2.1      |
 | Kube State Metrics | registry.k8s.io/kube-state-metrics/kube-state-metrics | v2.14.0     |
 | Grafana Alloy      | grafana/alloy                                         | v1.5.1      |

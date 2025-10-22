@@ -555,3 +555,78 @@ enforcer:
         items:
           - key: nats.creds
             path: nats.creds
+# LiteLLM gateway component configuration
+litellm:
+  enabled: false
+  # LiteLLM subchart configuration
+  replicaCount: 1
+  image:
+    repository: ghcr.io/kubiyabot/lite-llm-gateaway
+    tag: "0.0.12"
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+  # Use the agent-manager service account like in your dev deployment
+  serviceAccount:
+    create: false
+    name: "kubiya-runner-agent-manager"
+  # LiteLLM command configuration
+  command:
+    - litellm
+    - --port
+    - "8000"
+    - --num_workers
+    - "1"
+  # Environment variables for LiteLLM
+  env:
+    - name: STORE_MODEL_IN_NATS_KV
+      value: "true"
+    - name: KUBIYA_NATS_CREDS
+      value: /nats/nats.creds
+    - name: KUBIYA_ORGANIZATION
+      value: "{{ .Values.organization }}"
+    - name: MASTER_KEY
+      value: "fAt1ccvliT7iz9UZ4W369wxwuuRj657Q2DbGkEfquwQ="
+  # Volume mounts for NATS credentials
+  volumeMounts:
+    - mountPath: /nats/
+      name: nats-creds-volume
+      readOnly: true
+  volumes:
+    - name: nats-creds-volume
+      secret:
+        defaultMode: 420
+        items:
+          - key: nats.creds
+            path: nats.creds
+        secretName: kubiya-runner-nats-creds-customer
+  # Health probes configuration
+  livenessProbe:
+    httpGet:
+      path: /health/liveliness
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /health/readiness
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  startupProbe:
+    httpGet:
+      path: /health/readiness
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 30
+  resources: {}
+  # Disable the subchart's default database deployment
+  db:
+    deployStandalone: false
+  redis:
+    enabled: false
