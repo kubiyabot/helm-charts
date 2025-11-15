@@ -557,4 +557,4 @@ enforcer:
             path: nats.creds
 groundingMcp:
   image:
-    tag: v0.0.4
+    tag: v0.0.5
