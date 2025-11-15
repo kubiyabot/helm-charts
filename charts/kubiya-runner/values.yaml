@@ -555,3 +555,6 @@ enforcer:
         items:
           - key: nats.creds
             path: nats.creds
+groundingMcp:
+  image:
+    tag: v0.0.3
