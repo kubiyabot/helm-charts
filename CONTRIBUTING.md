@@ -50,3 +50,7 @@ By participating in this project, you agree to abide by the [Contributor Covenan
 By contributing to this repository, you agree that your contributions will be licensed under its Apache 2.0 License.
 
 Thank you for contributing to Kubiya Helm Charts!
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the same license as the project.
