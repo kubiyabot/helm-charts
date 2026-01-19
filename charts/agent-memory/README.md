@@ -1,10 +1,10 @@
-# Context Graph API Helm Chart
+# Agent Memory Helm Chart
 
-A Helm chart for deploying the Context Graph API service - a **cognitive memory and knowledge graph service** for AI agents.
+A Helm chart for deploying the Kubiya Agent Memory service (formerly Context Graph) - a **cognitive memory and knowledge graph service** for AI agents.
 
 ## Overview
 
-The Context Graph API provides long-term memory and knowledge management capabilities for AI agents:
+The Agent Memory service provides long-term memory and knowledge management capabilities for AI agents:
 
 - **Knowledge Graph** - Neo4j-based graph database for entity relationships
 - **Semantic Search** - Vector similarity search using pgvector embeddings
@@ -24,7 +24,7 @@ Key capabilities:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                      CONTEXT GRAPH API                         │
+│                        AGENT MEMORY                            │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │                   REST API (8000)                         │  │
 │  │                                                           │  │
@@ -59,19 +59,19 @@ Key capabilities:
 ### Development Environment
 
 ```bash
-helm install context-graph-api ./helm/context-graph-api \
-  --values ./helm/context-graph-api/values.yaml \
-  --namespace context-graph-api \
+helm install agent-memory ./agent-memory \
+  --values ./agent-memory/values.yaml \
+  --namespace kubiya \
   --create-namespace
 ```
 
 ### Production Environment
 
 ```bash
-helm upgrade --install context-graph-api ./helm/context-graph-api \
-  --values ./helm/context-graph-api/values.yaml \
-  --values ./helm/context-graph-api/values-prod.yaml \
-  --namespace context-graph-api \
+helm upgrade --install agent-memory ./agent-memory \
+  --values ./agent-memory/values.yaml \
+  --values ./agent-memory/values-prod.yaml \
+  --namespace kubiya \
   --create-namespace
 ```
 
@@ -92,7 +92,7 @@ global:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `name` | Service name | `context-graph-api` |
+| `name` | Service name | `agent-memory` |
 | `replicaCount` | Number of replicas | `2` |
 | `image.repository` | Image repository | `ghcr.io/kubiyabot/context-graph-api` |
 | `image.tag` | Image tag (defaults to appVersion) | `latest` |
@@ -101,7 +101,7 @@ global:
 | `command` | Override container command | `[]` |
 | `serviceAccount.create` | Create service account | `true` |
 | `serviceAccount.annotations` | Service account annotations | `{}` |
-| `serviceAccount.name` | Service account name | `context-graph-api` |
+| `serviceAccount.name` | Service account name | `""` |
 | `podAnnotations` | Pod annotations | Prometheus scraping |
 | `podSecurityContext` | Pod security context | `{}` |
 | `securityContext` | Container security context | `{}` |
@@ -118,7 +118,7 @@ global:
 | `readinessProbe.*` | Readiness probe config | See values.yaml |
 | `ingress.enabled` | Enable ingress | `false` |
 | `ingress.className` | Ingress class name | `nginx` |
-| `ingress.host` | Ingress host | `context-graph-api.example.com` |
+| `ingress.host` | Ingress host | `agent-memory.example.com` |
 | `ingress.tlsSecretName` | TLS secret name | `""` |
 | `autoscaling.enabled` | Enable HPA | `true` |
 | `autoscaling.minReplicas` | HPA min replicas | `2` |
@@ -150,7 +150,7 @@ Environment variables are sourced from three places:
 | `DATA_ROOT_DIRECTORY` | `/tmp/cognee/data` | Cognee framework convention |
 | `SYSTEM_ROOT_DIRECTORY` | `/tmp/cognee/system` | Cognee framework convention |
 | `CACHE_ROOT_DIRECTORY` | `/tmp/cognee/cache` | Cognee framework convention |
-| `API_TITLE` | `"Context Graph API"` | Static metadata (ConfigMap) |
+| `API_TITLE` | `"Agent Memory API"` | Static metadata (ConfigMap) |
 | `API_DESCRIPTION` | Service description | Static metadata (ConfigMap) |
 | `API_VERSION` | Chart appVersion | Static metadata (ConfigMap) |
 | `CONTROL_PLANE_API_BASE` | Auto-configured | Smart default from release name |
@@ -168,14 +168,14 @@ See [Environment Variables Reference](#environment-variables-reference) section 
 
 ## Dependencies
 
-The Context Graph API requires the following external services:
+The Agent Memory service requires the following external services:
 
-| Service               | Purpose                              | Required      |
-| --------------------- | ------------------------------------ | ------------- |
-| PostgreSQL (pgvector) | Vector embeddings storage            | Yes           |
-| Neo4j                 | Knowledge graph storage              | No (optional) |
-| LLM Provider          | Embeddings and LLM calls via LiteLLM | Yes           |
-| Control Plane API     | Authentication and org context       | No            |
+| Service | Purpose | Required |
+|---------|---------|----------|
+| PostgreSQL (pgvector) | Vector embeddings storage | Yes |
+| Neo4j | Knowledge graph storage | No (optional) |
+| LLM Provider | Embeddings and LLM calls via LiteLLM | Yes |
+| Agent Orchestrator API | Authentication and org context | No |
 
 ## Secrets Management
 
@@ -184,7 +184,7 @@ The Context Graph API requires the following external services:
 The production configuration expects secrets to be created separately. Create a secret with the following command:
 
 ```bash
-kubectl create secret generic context-graph-api-secrets \
+kubectl create secret generic agent-memory-secrets \
   --namespace kubiya \
   --from-literal=NEO4J_URI="bolt://neo4j:7687" \
   --from-literal=NEO4J_USERNAME="neo4j" \
@@ -198,7 +198,7 @@ kubectl create secret generic context-graph-api-secrets \
   --from-literal=DB_USERNAME="postgres" \
   --from-literal=DB_PASSWORD="your_password" \
   --from-literal=KUBIYA_API_BASE="https://api.kubiya.ai" \
-  --from-literal=CONTROL_PLANE_API_BASE="http://control-plane-api:80" \
+  --from-literal=CONTROL_PLANE_API_BASE="http://agent-orchestrator-api:80" \
   --from-literal=LLM_PROVIDER="custom" \
   --from-literal=LLM_MODEL="openai/gpt-4" \
   --from-literal=LLM_API_KEY="your_litellm_api_key" \
@@ -212,49 +212,49 @@ kubectl create secret generic context-graph-api-secrets \
 
 ### Environment Variables Reference
 
-| Variable                 | Description                  | Required |
-| ------------------------ | ---------------------------- | -------- |
-| `NEO4J_URI`              | Neo4j connection URI         | No       |
-| `NEO4J_USERNAME`         | Neo4j username               | No       |
-| `NEO4J_PASSWORD`         | Neo4j password               | No       |
-| `SQL_DATABASE_URL`       | PostgreSQL connection string | Yes      |
-| `DB_PROVIDER`            | Database provider (postgres) | Yes      |
-| `DB_HOST`                | PostgreSQL host              | Yes      |
-| `DB_PORT`                | PostgreSQL port              | Yes      |
-| `DB_NAME`                | Database name (memories)     | Yes      |
-| `DB_USERNAME`            | PostgreSQL username          | Yes      |
-| `DB_PASSWORD`            | PostgreSQL password          | Yes      |
-| `LLM_PROVIDER`           | LLM provider type            | Yes      |
-| `LLM_MODEL`              | LLM model name               | Yes      |
-| `LLM_API_KEY`            | LLM API key                  | Yes      |
-| `LLM_ENDPOINT`           | LLM API endpoint             | Yes      |
-| `EMBEDDING_PROVIDER`     | Embedding provider type      | Yes      |
-| `EMBEDDING_MODEL`        | Embedding model name         | Yes      |
-| `EMBEDDING_API_KEY`      | Embedding API key            | Yes      |
-| `EMBEDDING_ENDPOINT`     | Embedding API endpoint       | Yes      |
-| `EMBEDDING_DIMENSIONS`   | Embedding vector dimensions  | Yes      |
-| `KUBIYA_API_BASE`        | Kubiya API base URL          | No       |
-| `CONTROL_PLANE_API_BASE` | Control Plane API URL        | Auto     |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEO4J_URI` | Neo4j connection URI | No |
+| `NEO4J_USERNAME` | Neo4j username | No |
+| `NEO4J_PASSWORD` | Neo4j password | No |
+| `SQL_DATABASE_URL` | PostgreSQL connection string | Yes |
+| `DB_PROVIDER` | Database provider (postgres) | Yes |
+| `DB_HOST` | PostgreSQL host | Yes |
+| `DB_PORT` | PostgreSQL port | Yes |
+| `DB_NAME` | Database name (memories) | Yes |
+| `DB_USERNAME` | PostgreSQL username | Yes |
+| `DB_PASSWORD` | PostgreSQL password | Yes |
+| `LLM_PROVIDER` | LLM provider type | Yes |
+| `LLM_MODEL` | LLM model name | Yes |
+| `LLM_API_KEY` | LLM API key | Yes |
+| `LLM_ENDPOINT` | LLM API endpoint | Yes |
+| `EMBEDDING_PROVIDER` | Embedding provider type | Yes |
+| `EMBEDDING_MODEL` | Embedding model name | Yes |
+| `EMBEDDING_API_KEY` | Embedding API key | Yes |
+| `EMBEDDING_ENDPOINT` | Embedding API endpoint | Yes |
+| `EMBEDDING_DIMENSIONS` | Embedding vector dimensions | Yes |
+| `KUBIYA_API_BASE` | Kubiya API base URL | No |
+| `CONTROL_PLANE_API_BASE` | Agent Orchestrator API URL | Auto |
 
 ### Cognee Cloud (Alternative to Self-Hosted)
 
 Instead of running Neo4j + pgvector yourself, you can use Cognee Cloud:
 
-| Variable                | Description          | Required |
-| ----------------------- | -------------------- | -------- |
-| `COGNEE_CLOUD_API_KEY`  | Cognee Cloud API key | No       |
-| `COGNEE_CLOUD_API_BASE` | Cognee Cloud API URL | No       |
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `COGNEE_CLOUD_API_KEY` | Cognee Cloud API key | No |
+| `COGNEE_CLOUD_API_BASE` | Cognee Cloud API URL | No |
 
 With Cognee Cloud, you only need PostgreSQL for metadata - no Neo4j or vector database setup required.
 
 ### Intelligent Search Configuration
 
-| Variable                     | Description                           | Default                  |
-| ---------------------------- | ------------------------------------- | ------------------------ |
-| `LITELLM_DEFAULT_MODEL`      | Default model for intelligent search  | `kubiya/claude-sonnet-4` |
-| `SEARCH_STRATEGY`            | Agent runtime: `claude_sdk` or `agno` | `claude_sdk`             |
-| `SEARCH_SESSION_TTL_MINUTES` | Multi-turn session TTL                | `30`                     |
-| `COGNEE_LOG_LEVEL`           | Cognee internal log level             | `WARNING`                |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `LITELLM_DEFAULT_MODEL` | Default model for intelligent search | `kubiya/claude-sonnet-4` |
+| `SEARCH_STRATEGY` | Agent runtime: `claude_sdk` or `agno` | `claude_sdk` |
+| `SEARCH_SESSION_TTL_MINUTES` | Multi-turn session TTL | `30` |
+| `COGNEE_LOG_LEVEL` | Cognee internal log level | `WARNING` |
 
 ## Health Checks
 
@@ -287,10 +287,10 @@ prometheus.io/path: "/metrics"
 To upgrade an existing release:
 
 ```bash
-helm upgrade context-graph-api ./helm/context-graph-api \
-  --values ./helm/context-graph-api/values.yaml \
-  --values ./helm/context-graph-api/values-prod.yaml \
-  --namespace context-graph-api
+helm upgrade agent-memory ./agent-memory \
+  --values ./agent-memory/values.yaml \
+  --values ./agent-memory/values-prod.yaml \
+  --namespace kubiya
 ```
 
 ## Uninstalling
@@ -298,7 +298,7 @@ helm upgrade context-graph-api ./helm/context-graph-api \
 To uninstall/delete the deployment:
 
 ```bash
-helm uninstall context-graph-api --namespace context-graph-api
+helm uninstall agent-memory --namespace kubiya
 ```
 
 ## Values Files
@@ -314,10 +314,10 @@ PDBs are enabled by default and created when `replicaCount > 1`. They use `maxUn
 
 **WARNING: Common PDB Pitfalls**
 
-| Misconfiguration               | Problem                                                                                |
-| ------------------------------ | -------------------------------------------------------------------------------------- |
-| `minAvailable >= replicaCount` | Pods become undrainable. Node upgrades will hang.                                      |
-| `replicaCount: 1` with PDB     | PDB is useless (math requires 2+ replicas). Template auto-disables.                    |
+| Misconfiguration | Problem |
+|------------------|---------|
+| `minAvailable >= replicaCount` | Pods become undrainable. Node upgrades will hang. |
+| `replicaCount: 1` with PDB | PDB is useless (math requires 2+ replicas). Template auto-disables. |
 | PDB + HPA + Cluster Autoscaler | Can deadlock if `minAvailable` equals HPA `minReplicas`. Use `maxUnavailable` instead. |
 
 **Safe configuration:**

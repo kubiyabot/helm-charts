@@ -60,7 +60,7 @@ spec:
               {{- end }}
             {{- end }}
             {{- /* 2. Smart Service Discovery Defaults */ -}}
-            {{- $_ := set $defaultEnv "GRAPH_API_URL" (printf "http://%s-context-graph:80" .Release.Name) -}}
+            {{- $_ := set $defaultEnv "GRAPH_API_URL" (printf "http://%s-agent-memory:80" .Release.Name) -}}
             {{- $_ := set $defaultEnv "LITELLM_API_BASE" (printf "http://%s-litellm:4000" .Release.Name) -}}
             {{- /* 3. Merge with Values.env (Values.env takes precedence) */ -}}
             {{- $finalEnv := merge (deepCopy .Values.env) $defaultEnv -}}
@@ -77,7 +77,7 @@ spec:
             {{- end }}
             {{- with .Values.envFrom }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

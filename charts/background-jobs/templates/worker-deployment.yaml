@@ -1,17 +1,17 @@
-{{- if .Values.api.enabled -}}
+{{- if .Values.worker.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "temporal-worker.fullname" . }}-api
+  name: {{ include "temporal-worker.fullname" . }}-worker
   labels:
     {{- include "temporal-worker.labels" . | nindent 4 }}
-    app.kubernetes.io/component: api
+    app.kubernetes.io/component: worker
 spec:
-  replicas: {{ .Values.api.replicaCount }}
+  replicas: {{ .Values.worker.replicaCount }}
   selector:
     matchLabels:
       {{- include "temporal-worker.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: api
+      app.kubernetes.io/component: worker
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,7 +20,7 @@ spec:
       {{- end }}
       labels:
         {{- include "temporal-worker.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: api
+        app.kubernetes.io/component: worker
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -30,34 +30,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}-api
+        - name: {{ .Chart.Name }}-worker
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["uvicorn", "temporal_app.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
-          ports:
-            - name: http
-              containerPort: {{ .Values.api.service.targetPort }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-            initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds | default 30 }}
-            periodSeconds: {{ .Values.api.livenessProbe.periodSeconds | default 10 }}
-            timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds | default 5 }}
-            failureThreshold: {{ .Values.api.livenessProbe.failureThreshold | default 3 }}
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: http
-            initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds | default 10 }}
-            periodSeconds: {{ .Values.api.readinessProbe.periodSeconds | default 5 }}
-            timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds | default 3 }}
-            failureThreshold: {{ .Values.api.readinessProbe.failureThreshold | default 3 }}
+          command: ["python", "-m", "temporal_app.worker"]
           resources:
-            {{- toYaml .Values.api.resources | nindent 12 }}
+            {{- toYaml .Values.worker.resources | nindent 12 }}
           env:
             # Hardcoded (static, framework requirement)
             - name: PYTHONUNBUFFERED
@@ -74,8 +54,8 @@ spec:
               {{- end }}
             {{- end }}
             {{- /* 2. Smart Service Discovery Defaults */ -}}
-            {{- $_ := set $defaultEnv "CONTROL_PLANE_API_URL" (printf "http://%s-control-plane-api:80" .Release.Name) -}}
-            {{- $_ := set $defaultEnv "GRAPH_API_URL" (printf "http://%s-context-graph:80" .Release.Name) -}}
+            {{- $_ := set $defaultEnv "CONTROL_PLANE_API_URL" (printf "http://%s-agent-orchestrator-api:80" .Release.Name) -}}
+            {{- $_ := set $defaultEnv "GRAPH_API_URL" (printf "http://%s-agent-memory:80" .Release.Name) -}}
             {{- $_ := set $defaultEnv "LITELLM_API_BASE" (printf "http://%s-litellm:4000" .Release.Name) -}}
             {{- /* 3. Merge with Values.env (Values.env takes precedence) */ -}}
             {{- $finalEnv := merge (deepCopy .Values.env) $defaultEnv -}}
@@ -93,9 +73,9 @@ spec:
             {{- with .Values.envFrom }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            {{- with .Values.api.envFrom }}
+            {{- with .Values.worker.envFrom }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

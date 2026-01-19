@@ -1,10 +1,10 @@
-# Temporal Worker Helm Chart
+# Background Jobs Helm Chart
 
-A Helm chart for deploying the Kubiya Temporal Worker service - a **background job processor and Temporal API bridge**.
+A Helm chart for deploying the Kubiya Background Jobs service (formerly Temporal Worker) - a **background job processor and Temporal API bridge**.
 
 ## Overview
 
-The Temporal Worker serves two key purposes:
+The Background Jobs service serves two key purposes:
 
 - **REST API Bridge** - Exposes REST endpoints for managing Temporal workflows, enabling HTTP-based workflow control
 - **Background Job Processing** - Executes long-running workflows that call back to the Control Plane API
@@ -19,7 +19,7 @@ Key capabilities:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                      TEMPORAL WORKER                           │
+│                        BACKGROUND JOBS                         │
 ├──────────────────────────────┬─────────────────────────────────┤
 │         API SERVER           │           WORKER                │
 │  ┌────────────────────────┐  │  ┌───────────────────────────┐  │
@@ -37,7 +37,7 @@ Key capabilities:
         │                                      │
         ▼                                      ▼
 ┌───────────────────┐              ┌───────────────────┐
-│     Temporal      │              │   Control Plane   │
+│     Temporal      │              │   Agent Orchestrator  │
 │     Server        │              │       API         │
 └───────────────────┘              └───────────────────┘
 ```
@@ -60,7 +60,7 @@ The application is split into two distinct deployment components to allow for in
 
 ```bash
 # Install from OCI Registry
-helm upgrade --install temporal-worker oci://ghcr.io/kubiyabot/charts/temporal-worker \
+helm upgrade --install background-jobs oci://ghcr.io/kubiyabot/charts/background-jobs \
   --version 0.1.0 \
   --namespace kubiya \
   --create-namespace
@@ -111,7 +111,7 @@ global:
 | `api.envFrom` | API-specific secrets | `[]` |
 | `api.ingress.enabled` | Enable ingress | `false` |
 | `api.ingress.className` | Ingress class | `nginx` |
-| `api.ingress.host` | Ingress host | `control-plane-temporal.example.com` |
+| `api.ingress.host` | Ingress host | `background-jobs.example.com` |
 | `api.pdb.enabled` | Enable PDB | `true` |
 | `api.pdb.maxUnavailable` | PDB max unavailable | `1` |
 | `worker.enabled` | Enable Worker deployment | `true` |
@@ -166,28 +166,28 @@ worker:
 
 ## Dependencies
 
-The Temporal Worker requires the following external services:
+The Background Jobs service requires the following external services:
 
 | Service | Purpose | Required |
 |---------|---------|----------|
 | Temporal Server | Workflow orchestration backend | Yes |
-| Control Plane API | Agent execution callbacks | Yes |
+| Agent Orchestrator API | Agent execution callbacks | Yes |
 | LiteLLM Proxy | LLM access for workflow activities | No |
-| Context Graph API | Memory/knowledge graph access | No |
+| Agent Memory API | Memory/knowledge graph access | No |
 
 ## Required Secrets
 
 This chart expects secrets to be created externally and referenced via `envFrom`. Create a secret with the following keys:
 
 ```bash
-kubectl create secret generic temporal-worker-secrets \
+kubectl create secret generic background-jobs-secrets \
   --namespace kubiya \
   --from-literal=TEMPORAL_HOST="temporal-frontend:7233" \
   --from-literal=TEMPORAL_NAMESPACE="default" \
   --from-literal=TEMPORAL_API_KEY="your-temporal-api-key" \
   --from-literal=KUBIYA_API_KEY="your-kubiya-api-key" \
-  --from-literal=CONTROL_PLANE_API_URL="http://control-plane-api:80" \
-  --from-literal=GRAPH_API_URL="http://context-graph-api:80" \
+  --from-literal=CONTROL_PLANE_API_URL="http://agent-orchestrator-api:80" \
+  --from-literal=GRAPH_API_URL="http://agent-memory:80" \
   --from-literal=LITELLM_API_BASE="http://litellm:4000" \
   --from-literal=LITELLM_API_KEY="your-litellm-api-key"
 ```
@@ -200,8 +200,8 @@ kubectl create secret generic temporal-worker-secrets \
 | `TEMPORAL_NAMESPACE` | Temporal namespace | Yes |
 | `TEMPORAL_API_KEY` | Temporal Cloud API key (if using cloud) | No |
 | `KUBIYA_API_KEY` | Internal Kubiya API key | Yes |
-| `CONTROL_PLANE_API_URL` | Control Plane API URL for callbacks | Auto |
-| `GRAPH_API_URL` | Context Graph API URL | Auto |
+| `CONTROL_PLANE_API_URL` | Agent Orchestrator API URL for callbacks | Auto |
+| `GRAPH_API_URL` | Agent Memory API URL | Auto |
 | `LITELLM_API_BASE` | LiteLLM proxy base URL | Auto |
 | `LITELLM_API_KEY` | LiteLLM API key | No |
 
@@ -224,7 +224,7 @@ Then reference it in your values:
 ```yaml
 envFrom:
   - secretRef:
-      name: temporal-worker-secrets
+      name: background-jobs-secrets
 ```
 
 Component-specific secrets can also be added via `api.envFrom` or `worker.envFrom`.

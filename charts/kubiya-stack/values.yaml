@@ -13,8 +13,8 @@ global:
 # 1. Kubiya Components
 # ==============================================================================
 
-# Control Plane - Core API & Worker
-control-plane:
+# Agent Orchestrator (formerly Control Plane)
+agent-orchestrator:
   enabled: true
   api:
     enabled: true
@@ -24,8 +24,8 @@ control-plane:
     replicaCount: 2
   # OTEL config (derived from release name by default)
   otel:
-    serviceName: ""  # Default: kubiya-stack-control-plane
-    resourceAttributes: ""  # Default: service.name=kubiya-stack-control-plane
+    serviceName: ""  # Default: kubiya-stack-agent-orchestrator
+    resourceAttributes: ""  # Default: service.name=kubiya-stack-agent-orchestrator
   # Environment variables
   # Note: PYTHONUNBUFFERED, OTEL_SERVICE_NAME, OTEL_RESOURCE_ATTRIBUTES are hardcoded/derived
   # Note: ENVIRONMENT, LOG_LEVEL, GRAPH_API_URL, LITELLM_API_BASE handled by global defaults
@@ -33,9 +33,9 @@ control-plane:
     WEBSOCKET_ENABLED: "true"
   envFrom: []
 
-# Temporal Worker - Background job processor
+# Background Jobs (formerly Temporal Worker)
 # Executes background workflows and long-running tasks
-temporal-worker:
+background-jobs:
   enabled: true
   api:
     enabled: true
@@ -51,9 +51,9 @@ temporal-worker:
     # Note: LOG_LEVEL, ENVIRONMENT, URLs handled by global defaults
   envFrom: []
 
-# Context Graph - Knowledge and memory service
+# Agent Memory (formerly Context Graph)
 # Requires Neo4j when enabled
-context-graph:
+agent-memory:
   enabled: false  # Disabled by default to save resources
   # Important: If enabled, you must also enable neo4j below OR provide external NEO4J_URI
   # Note: PORT, PYTHONUNBUFFERED, *_ROOT_DIRECTORY are hardcoded in templates
@@ -73,7 +73,7 @@ litellm:
 # ==============================================================================
 
 # PostgreSQL
-# Required by: control-plane, context-graph
+# Required by: agent-orchestrator, agent-memory
 postgresql:
   enabled: true
   image:
@@ -96,7 +96,7 @@ postgresql:
           CREATE EXTENSION IF NOT EXISTS vector;
 
 # Redis
-# Required by: control-plane
+# Required by: agent-orchestrator
 redis:
   enabled: true
   architecture: standalone
@@ -104,8 +104,8 @@ redis:
     enabled: false
 
 # Neo4j
-# Required by: context-graph (ONLY)
-# If context-graph.enabled is false, this can be false.
+# Required by: agent-memory (ONLY)
+# If agent-memory.enabled is false, this can be false.
 neo4j:
   enabled: false
   neo4j:

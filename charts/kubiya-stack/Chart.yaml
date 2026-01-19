@@ -7,20 +7,23 @@ appVersion: "1.0.0"
 
 dependencies:
   # --- Core Components ---
-  - name: control-plane
+  - name: agent-orchestrator
     version: "0.1.0"
-    repository: "file://../control-plane"
-    condition: control-plane.enabled
+    repository: "file://../agent-orchestrator"
+    alias: agent-orchestrator
+    condition: agent-orchestrator.enabled
 
-  - name: temporal-worker
+  - name: background-jobs
     version: "0.1.0"
-    repository: "file://../temporal-worker"
-    condition: temporal-worker.enabled
+    repository: "file://../background-jobs"
+    alias: background-jobs
+    condition: background-jobs.enabled
 
-  - name: context-graph
+  - name: agent-memory
     version: "0.1.0"
-    repository: "file://../context-graph"
-    condition: context-graph.enabled
+    repository: "file://../agent-memory"
+    alias: agent-memory
+    condition: agent-memory.enabled
 
   # --- AI Gateway ---
   - name: litellm-helm

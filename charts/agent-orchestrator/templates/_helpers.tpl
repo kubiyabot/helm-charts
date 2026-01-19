@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "temporal-worker.name" -}}
+{{- define "agent-orchestrator.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "temporal-worker.fullname" -}}
+{{- define "agent-orchestrator.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "temporal-worker.chart" -}}
+{{- define "agent-orchestrator.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "temporal-worker.labels" -}}
-helm.sh/chart: {{ include "temporal-worker.chart" . }}
-{{ include "temporal-worker.selectorLabels" . }}
+{{- define "agent-orchestrator.labels" -}}
+helm.sh/chart: {{ include "agent-orchestrator.chart" . }}
+{{ include "agent-orchestrator.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,18 +45,37 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "temporal-worker.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "temporal-worker.name" . }}
+{{- define "agent-orchestrator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "agent-orchestrator.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "temporal-worker.serviceAccountName" -}}
+{{- define "agent-orchestrator.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "temporal-worker.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "agent-orchestrator.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+Legacy helpers for backwards compatibility (renamed from control-plane)
+*/}}
+{{- define "control-plane.fullname" -}}
+{{ include "agent-orchestrator.fullname" . }}
+{{- end }}
+
+{{- define "control-plane.labels" -}}
+{{ include "agent-orchestrator.labels" . }}
+{{- end }}
+
+{{- define "control-plane.selectorLabels" -}}
+{{ include "agent-orchestrator.selectorLabels" . }}
+{{- end }}
+
+{{- define "control-plane.serviceAccountName" -}}
+{{ include "agent-orchestrator.serviceAccountName" . }}
 {{- end }}

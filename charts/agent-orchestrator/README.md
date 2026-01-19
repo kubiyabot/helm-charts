@@ -1,10 +1,10 @@
-# Control Plane Helm Chart
+# Agent Orchestrator Helm Chart
 
-A Helm chart for deploying the Kubiya Control Plane service - a **multi-tenant AI agent orchestration platform**.
+A Helm chart for deploying the Kubiya Agent Orchestrator service (formerly Control Plane) - a **multi-tenant AI agent orchestration platform**.
 
 ## Overview
 
-The Control Plane is the brain of the Kubiya platform, providing:
+The Agent Orchestrator is the brain of the Kubiya platform, providing:
 
 - **Agent Management** - Create, configure, and manage AI agents
 - **Team Orchestration** - Coordinate multiple agents working together
@@ -19,7 +19,7 @@ The Control Plane is the brain of the Kubiya platform, providing:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                       CONTROL PLANE                            │
+│                      AGENT ORCHESTRATOR                        │
 ├──────────────────────────────┬─────────────────────────────────┤
 │         API SERVER           │           WORKER                │
 │  ┌────────────────────────┐  │  ┌───────────────────────────┐  │
@@ -59,14 +59,14 @@ The application is split into two distinct deployment components:
 ## Installation
 
 ```bash
-helm install control-plane ./control-plane \
+helm install agent-orchestrator ./agent-orchestrator \
   --namespace kubiya \
   --create-namespace
 ```
 
 ## Dependencies
 
-The Control Plane requires the following external services:
+The Agent Orchestrator requires the following external services:
 
 | Service               | Purpose                                       | Required |
 | --------------------- | --------------------------------------------- | -------- |
@@ -80,7 +80,7 @@ The Control Plane requires the following external services:
 This chart expects secrets to be created externally and referenced via `envFrom`. Create a secret with the following keys:
 
 ```bash
-kubectl create secret generic control-plane-secrets \
+kubectl create secret generic agent-orchestrator-secrets \
   --namespace kubiya \
   --from-literal=DATABASE_URL="postgresql://user:password@host:5432/agent_control_plane" \
   --from-literal=REDIS_URL="redis://redis:6379/0" \
@@ -104,7 +104,7 @@ kubectl create secret generic control-plane-secrets \
 | `TEMPORAL_NAMESPACE` | Temporal namespace                | Yes      |
 | `OPENAI_API_KEY`     | OpenAI API key (or LiteLLM key)   | Yes      |
 | `KUBIYA_API_KEY`     | Internal Kubiya API key           | No       |
-| `GRAPH_API_URL`      | Context Graph API URL             | Auto     |
+| `GRAPH_API_URL`      | Agent Memory API URL              | Auto     |
 | `LITELLM_API_BASE`   | LiteLLM proxy base URL            | Auto     |
 | `WEBSOCKET_ENABLED`  | Enable WebSocket support          | No       |
 
@@ -112,7 +112,7 @@ kubectl create secret generic control-plane-secrets \
 
 ### NATS Event Bus (Optional)
 
-For high-performance event delivery, the Control Plane supports NATS as an optional event bus provider:
+For high-performance event delivery, the Agent Orchestrator supports NATS as an optional event bus provider:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -130,14 +130,14 @@ All providers run in parallel; at least one must succeed.
 
 ### Observability (OpenTelemetry)
 
-The Control Plane supports distributed tracing via OpenTelemetry. Add these to your secrets to enable:
+The Agent Orchestrator supports distributed tracing via OpenTelemetry. Add these to your secrets to enable:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `OTEL_ENABLED` | Enable OpenTelemetry tracing | `true` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLP collector endpoint (e.g., `http://otel-collector:4317`) | None (tracing disabled if not set) |
 | `OTEL_EXPORTER_OTLP_PROTOCOL` | Export protocol: `grpc` or `http` | `grpc` |
-| `OTEL_SERVICE_NAME` | Service name in traces | `agent-control-plane` |
+| `OTEL_SERVICE_NAME` | Service name in traces | `agent-orchestrator` |
 | `OTEL_RESOURCE_ATTRIBUTES` | Additional attributes (e.g., `deployment.environment=production`) | `""` |
 | `OTEL_TRACES_SAMPLER` | Sampling strategy | `parentbased_always_on` |
 | `OTEL_TRACES_SAMPLER_ARG` | Sampler argument (e.g., `0.1` for 10% sampling) | None |
@@ -154,7 +154,7 @@ The Control Plane supports distributed tracing via OpenTelemetry. Add these to y
 env:
   OTEL_ENABLED: "true"
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-  OTEL_SERVICE_NAME: "control-plane"
+  OTEL_SERVICE_NAME: "agent-orchestrator"
   OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=production,service.version=1.0.0"
   OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
   OTEL_TRACES_SAMPLER_ARG: "0.1"  # 10% sampling
@@ -165,7 +165,7 @@ Then reference it in your values:
 ```yaml
 envFrom:
   - secretRef:
-      name: control-plane-secrets
+      name: agent-orchestrator-secrets
 ```
 
 ## Configuration
@@ -215,7 +215,7 @@ global:
 | `api.readinessProbe.*` | Readiness probe config | See values.yaml |
 | `api.ingress.enabled` | Enable ingress | `false` |
 | `api.ingress.className` | Ingress class | `nginx` |
-| `api.ingress.host` | Ingress host | `control-plane.example.com` |
+| `api.ingress.host` | Ingress host | `agent-orchestrator.example.com` |
 | `api.autoscaling.enabled` | Enable HPA | `false` |
 | `api.autoscaling.minReplicas` | HPA min replicas | `2` |
 | `api.autoscaling.maxReplicas` | HPA max replicas | `10` |
@@ -242,8 +242,8 @@ Environment variables are sourced from three places:
 | Variable | Value | Reason |
 |----------|-------|--------|
 | `PYTHONUNBUFFERED` | `"1"` | Python framework requirement |
-| `OTEL_SERVICE_NAME` | Derived from release | `{{ .Release.Name }}-control-plane` |
-| `OTEL_RESOURCE_ATTRIBUTES` | Derived from release | `service.name={{ .Release.Name }}-control-plane` |
+| `OTEL_SERVICE_NAME` | Derived from release | `{{ .Release.Name }}-agent-orchestrator` |
+| `OTEL_RESOURCE_ATTRIBUTES` | Derived from release | `service.name={{ .Release.Name }}-agent-orchestrator` |
 
 **2. Configurable via `env` in values.yaml:**
 
@@ -271,7 +271,7 @@ otel:
 Or via `--set`:
 
 ```bash
-helm install control-plane ./control-plane \
+helm install agent-orchestrator ./agent-orchestrator \
   --set otel.serviceName="my-service" \
   --set otel.resourceAttributes="service.name=my-service,env=prod"
 ```
@@ -334,12 +334,12 @@ Enabled by default to spread replicas across nodes. One node failure won't take 
 ## Upgrading
 
 ```bash
-helm upgrade control-plane ./control-plane \
+helm upgrade agent-orchestrator ./agent-orchestrator \
   --namespace kubiya
 ```
 
 ## Uninstalling
 
 ```bash
-helm uninstall control-plane --namespace kubiya
+helm uninstall agent-orchestrator --namespace kubiya
 ```
