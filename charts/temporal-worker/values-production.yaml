@@ -1,0 +1,44 @@
+# Production values for temporal-worker
+
+image:
+  repository: 564407622114.dkr.ecr.eu-west-1.amazonaws.com/control-plane-temporal
+  pullPolicy: IfNotPresent
+  tag: "f3060f7e73afb3c051f2b55229dd7624f993c399"
+
+imagePullSecrets:
+  - name: my-ecr-registry-prod
+
+# API Service Configuration
+api:
+  enabled: true
+  replicaCount: 2
+  ingress:
+    enabled: true
+    host: control-plane-temporal.kubiya.ai
+    tlsSecretName: control-plane-temporal-tls
+
+# Worker Configuration
+worker:
+  enabled: true
+  replicaCount: 2
+
+# Production Environment Variables
+env:
+  TEMPORAL_NAMESPACE: "agent-control-plane.lpagu"
+  TASK_QUEUE: "background-jobs"
+  MAX_CONCURRENT_ACTIVITIES: "20"
+  MAX_CONCURRENT_WORKFLOW_TASKS: "20"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  ENVIRONMENT: "production"
+
+# Global envFrom - applied to all components (API and Worker)
+envFrom:
+  - secretRef:
+      name: control-plane-temporal-secrets
+  - secretRef:
+      name: control-plane-api-secrets
+  - secretRef:
+      name: nats-cloud-gateway-secret
+  - secretRef:
+      name: nats-cloud-gw-creds

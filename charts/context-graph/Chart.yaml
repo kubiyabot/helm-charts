@@ -1,0 +1,7 @@
+apiVersion: v2
+name: context-graph
+description: A Helm chart for the Kubiya Context Graph API
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+# Note: Neo4j is provided by the parent kubiya-stack chart, not as a sub-dependency here

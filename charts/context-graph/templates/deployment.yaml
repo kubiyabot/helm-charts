@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "context-graph.fullname" . }}
+  labels:
+    {{- include "context-graph.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "context-graph.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "context-graph.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "context-graph.serviceAccountName" . }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ include "context-graph-api.name" . }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.command }}
+        command:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 30 }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default 5 }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold | default 3 }}
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 10 }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 5 }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default 3 }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold | default 3 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        env:
+          # Hardcoded (static, framework requirements)
+          - name: PORT
+            value: {{ .Values.service.targetPort | quote }}
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: DATA_ROOT_DIRECTORY
+            value: "/tmp/cognee/data"
+          - name: SYSTEM_ROOT_DIRECTORY
+            value: "/tmp/cognee/system"
+          - name: CACHE_ROOT_DIRECTORY
+            value: "/tmp/cognee/cache"
+          # Global Defaults
+          {{- if .Values.global }}
+          {{- if .Values.global.environment }}
+          - name: ENVIRONMENT
+            value: {{ .Values.global.environment | quote }}
+          {{- end }}
+          {{- if .Values.global.logLevel }}
+          - name: LOG_LEVEL
+            value: {{ .Values.global.logLevel | quote }}
+          {{- end }}
+          {{- end }}
+          # Smart Defaults
+          - name: CONTROL_PLANE_API_BASE
+            value: "http://{{ .Release.Name }}-control-plane-api:80"
+          {{- with .Values.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        envFrom:
+          {{- if .Values.global }}
+          {{- if .Values.global.existingSecret }}
+          - secretRef:
+              name: {{ .Values.global.existingSecret }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

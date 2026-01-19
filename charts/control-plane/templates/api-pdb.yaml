@@ -1,0 +1,19 @@
+{{- if and .Values.api.enabled .Values.api.pdb.enabled (gt (int .Values.api.replicaCount) 1) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "control-plane.fullname" . }}-api
+  labels:
+    {{- include "control-plane.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  {{- if .Values.api.pdb.minAvailable }}
+  minAvailable: {{ .Values.api.pdb.minAvailable }}
+  {{- else }}
+  maxUnavailable: {{ .Values.api.pdb.maxUnavailable | default 1 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "control-plane.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+{{- end }}

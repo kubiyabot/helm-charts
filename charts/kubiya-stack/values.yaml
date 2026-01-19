@@ -1,0 +1,117 @@
+# Kubiya Stack Values
+
+# Global settings
+global:
+  environment: "production"
+  logLevel: "INFO"
+  existingSecret: "kubiya-stack-secrets"
+  security:
+    # Required for non-Bitnami images like pgvector
+    allowInsecureImages: true
+
+# ==============================================================================
+# 1. Kubiya Components
+# ==============================================================================
+
+# Control Plane - Core API & Worker
+control-plane:
+  enabled: true
+  api:
+    enabled: true
+    replicaCount: 2
+  worker:
+    enabled: true
+    replicaCount: 2
+  # OTEL config (derived from release name by default)
+  otel:
+    serviceName: ""  # Default: kubiya-stack-control-plane
+    resourceAttributes: ""  # Default: service.name=kubiya-stack-control-plane
+  # Environment variables
+  # Note: PYTHONUNBUFFERED, OTEL_SERVICE_NAME, OTEL_RESOURCE_ATTRIBUTES are hardcoded/derived
+  # Note: ENVIRONMENT, LOG_LEVEL, GRAPH_API_URL, LITELLM_API_BASE handled by global defaults
+  env:
+    WEBSOCKET_ENABLED: "true"
+  envFrom: []
+
+# Temporal Worker - Background job processor
+# Executes background workflows and long-running tasks
+temporal-worker:
+  enabled: true
+  api:
+    enabled: true
+  worker:
+    enabled: true
+  # Inter-service URLs
+  env:
+    TEMPORAL_NAMESPACE: "default"
+    TASK_QUEUE: "background-jobs"
+    MAX_CONCURRENT_ACTIVITIES: "10"
+    MAX_CONCURRENT_WORKFLOW_TASKS: "10"
+    LOG_FORMAT: "json"
+    # Note: LOG_LEVEL, ENVIRONMENT, URLs handled by global defaults
+  envFrom: []
+
+# Context Graph - Knowledge and memory service
+# Requires Neo4j when enabled
+context-graph:
+  enabled: false  # Disabled by default to save resources
+  # Important: If enabled, you must also enable neo4j below OR provide external NEO4J_URI
+  # Note: PORT, PYTHONUNBUFFERED, *_ROOT_DIRECTORY are hardcoded in templates
+  env: []
+  # Note: ENVIRONMENT, LOG_LEVEL, CONTROL_PLANE_API_BASE handled by global defaults
+  envFrom: []
+
+# LiteLLM - AI Gateway / Proxy
+# Multi-provider LLM access (OpenAI, Claude, etc.)
+litellm:
+  enabled: false
+  # See official LiteLLM chart values for config
+  # master_key: "sk-..."
+
+# ==============================================================================
+# 2. Infrastructure Dependencies
+# ==============================================================================
+
+# PostgreSQL
+# Required by: control-plane, context-graph
+postgresql:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: ankane/pgvector
+    tag: v0.5.1
+  global:
+    postgresql:
+      auth:
+        database: agent_control_plane
+        username: postgres
+        password: "change-me"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    initdb:
+      scripts:
+        enable_vector.sql: |
+          CREATE EXTENSION IF NOT EXISTS vector;
+
+# Redis
+# Required by: control-plane
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+
+# Neo4j
+# Required by: context-graph (ONLY)
+# If context-graph.enabled is false, this can be false.
+neo4j:
+  enabled: false
+  neo4j:
+    edition: community
+    acceptLicenseAgreement: "yes"
+    password: "change-me"
+    env:
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+      NEO4J_PLUGINS: '["apoc"]'

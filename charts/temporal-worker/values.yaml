@@ -1,0 +1,123 @@
+# Default values for temporal-worker
+
+image:
+  repository: control-plane-temporal
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+# API Service Configuration
+api:
+  enabled: true
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  # Probe timing (endpoints hardcoded: /health, /ready)
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  # API-specific envFrom (merged with global envFrom)
+  envFrom: []
+  # Ingress Configuration
+  ingress:
+    enabled: false
+    className: nginx
+    host: control-plane-temporal.example.com
+    tlsSecretName: ""
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: external-nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/rate-limit: "100"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/upstream-keepalive-timeout: "3600"
+  # Pod Disruption Budget (only created if replicaCount > 1)
+  # WARNING: Do not set minAvailable >= replicaCount (makes pods undrainable)
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1  # Alternative to maxUnavailable (use one, not both)
+
+# Worker Configuration
+worker:
+  enabled: true
+  replicaCount: 1
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  # Worker-specific envFrom (merged with global envFrom)
+  envFrom: []
+  # Pod Disruption Budget (only created if replicaCount > 1)
+  # WARNING: Do not set minAvailable >= replicaCount (makes pods undrainable)
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1  # Alternative to maxUnavailable (use one, not both)
+
+# Common Environment Variables
+env:
+  TEMPORAL_NAMESPACE: "default"
+  TASK_QUEUE: "background-jobs"
+  MAX_CONCURRENT_ACTIVITIES: "10"
+  MAX_CONCURRENT_WORKFLOW_TASKS: "10"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  ENVIRONMENT: "production"
+
+# Global envFrom - applied to all components (API and Worker)
+envFrom:
+  - secretRef:
+      name: control-plane-temporal-secrets
+
+nodeSelector: {}
+tolerations: []
+
+# Pod anti-affinity to spread replicas across nodes
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - temporal-worker
+        topologyKey: kubernetes.io/hostname

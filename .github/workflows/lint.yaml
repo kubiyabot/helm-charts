@@ -34,6 +34,8 @@ jobs:
         run: |
           helm repo add grafana https://grafana.github.io/helm-charts
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add neo4j https://helm.neo4j.com/neo4j
           helm repo update
 
       - name: Update Helm Dependencies
@@ -48,6 +50,28 @@ jobs:
         run: |
           for chart in charts/*; do
             if [ -d "$chart" ]; then
+              echo "=== Linting $chart ==="
               helm lint "$chart"
+
+              # Lint with test values if they exist
+              if [ -f "$chart/ci/test-values.yaml" ]; then
+                echo "=== Linting $chart with test values ==="
+                helm lint "$chart" -f "$chart/ci/test-values.yaml"
+              fi
+            fi
+          done
+
+      - name: Template Helm Charts
+        run: |
+          for chart in charts/*; do
+            if [ -d "$chart" ]; then
+              echo "=== Templating $chart ==="
+              # Use test values if available
+              if [ -f "$chart/ci/test-values.yaml" ]; then
+                helm template test "$chart" -f "$chart/ci/test-values.yaml" > /dev/null
+              else
+                helm template test "$chart" > /dev/null
+              fi
+              echo "✓ $chart templates successfully"
             fi
           done

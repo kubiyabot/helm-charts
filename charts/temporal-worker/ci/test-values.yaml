@@ -1,0 +1,46 @@
+# Minimal CI test configuration for temporal-worker chart
+# Used by: helm lint, helm template, CI pipelines
+
+# Reduced replicas for testing
+api:
+  enabled: true
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: false
+
+worker:
+  enabled: true
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Disable autoscaling for tests
+autoscaling:
+  enabled: false
+
+# Disable default affinity for single-node test clusters
+affinity: {}
+
+# Test environment variables
+env:
+  LOG_LEVEL: "DEBUG"
+  ENVIRONMENT: "test"
+
+# Reference to test secrets
+envFrom:
+  - secretRef:
+      name: temporal-worker-test-secrets

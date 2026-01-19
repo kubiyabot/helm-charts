@@ -43,12 +43,17 @@ _old_template/
 
 # Rendered debug files
 render.yaml
+rendered.yaml
+rendered_with_graph.yaml
+debug_rendered.yaml
 
 # Debug values & templates
 _values-debug.yaml
 _debug/
 _debug_values_overrides.yaml
 
+# Work in progress documentation
+_docs_wip/
 
 # Added by Maturity Check
 .terraform/

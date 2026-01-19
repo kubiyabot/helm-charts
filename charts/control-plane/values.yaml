@@ -1,0 +1,142 @@
+# Default values for control-plane
+
+image:
+  repository: ghcr.io/kubiyabot/control-plane
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Prometheus scraping annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
+
+podSecurityContext: {}
+securityContext: {}
+
+# OpenTelemetry Configuration (derived from chart name by default, override here)
+# See README for full OTEL configuration via secrets
+otel:
+  serviceName: ""  # Default: {{ .Release.Name }}-control-plane
+  resourceAttributes: ""  # Default: service.name={{ .Release.Name }}-control-plane
+
+# Shared Environment Variables (map format)
+# Note: PYTHONUNBUFFERED is hardcoded in templates (always "1" for Python)
+# Note: OTEL_SERVICE_NAME and OTEL_RESOURCE_ATTRIBUTES are derived from otel.* above
+env:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  WEBSOCKET_ENABLED: "true"
+
+# Environment from ConfigMaps/Secrets
+envFrom: []
+
+# API Configuration
+api:
+  enabled: true
+  replicaCount: 2
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 7777
+    # WebSocket session affinity (recommended for sticky sessions)
+    sessionAffinity: ClientIP
+    sessionAffinityConfig:
+      clientIP:
+        timeoutSeconds: 10800  # 3 hours
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  # Probe timing (endpoints hardcoded to /api/health)
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  # Ingress configuration
+  ingress:
+    enabled: false
+    className: nginx
+    host: control-plane.example.com
+    additionalHosts: []  # Additional hosts for multi-domain ingress
+    tlsSecretName: ""
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: external-nginx
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/rate-limit: "100"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/upstream-keepalive-timeout: "3600"
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+  # Pod Disruption Budget (only created if replicaCount > 1)
+  # WARNING: Do not set minAvailable >= replicaCount (makes pods undrainable)
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1  # Alternative to maxUnavailable (use one, not both)
+
+# Worker Configuration
+worker:
+  enabled: true
+  replicaCount: 2
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 75
+  # Pod Disruption Budget (only created if replicaCount > 1)
+  # WARNING: Do not set minAvailable >= replicaCount (makes pods undrainable)
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1  # Alternative to maxUnavailable (use one, not both)
+
+nodeSelector: {}
+tolerations: []
+
+# Pod anti-affinity to spread replicas across nodes
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - control-plane
+        topologyKey: kubernetes.io/hostname

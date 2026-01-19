@@ -1,0 +1,16 @@
+{{- if .Values.configMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "context-graph-api.fullname" . }}
+  labels:
+    {{- include "context-graph-api.labels" . | nindent 4 }}
+data:
+  # Hardcoded API metadata (static)
+  API_TITLE: "Context Graph API"
+  API_DESCRIPTION: "API for querying Neo4j context graphs with org and integration namespaces"
+  API_VERSION: {{ .Chart.AppVersion | quote }}
+  {{- with .Values.configMap.data }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end }}

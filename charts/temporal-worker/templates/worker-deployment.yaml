@@ -1,0 +1,91 @@
+{{- if .Values.worker.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "temporal-worker.fullname" . }}-worker
+  labels:
+    {{- include "temporal-worker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+spec:
+  replicas: {{ .Values.worker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "temporal-worker.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "temporal-worker.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "temporal-worker.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-worker
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "-m", "temporal_app.worker"]
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+          env:
+            # Hardcoded (static, framework requirement)
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            {{- /* Construct the default environment dictionary */ -}}
+            {{- $defaultEnv := dict -}}
+            {{- /* 1. Global Defaults */ -}}
+            {{- if .Values.global }}
+              {{- if .Values.global.environment }}
+                {{- $_ := set $defaultEnv "ENVIRONMENT" .Values.global.environment -}}
+              {{- end }}
+              {{- if .Values.global.logLevel }}
+                {{- $_ := set $defaultEnv "LOG_LEVEL" .Values.global.logLevel -}}
+              {{- end }}
+            {{- end }}
+            {{- /* 2. Smart Service Discovery Defaults */ -}}
+            {{- $_ := set $defaultEnv "CONTROL_PLANE_API_URL" (printf "http://%s-control-plane-api:80" .Release.Name) -}}
+            {{- $_ := set $defaultEnv "GRAPH_API_URL" (printf "http://%s-context-graph:80" .Release.Name) -}}
+            {{- $_ := set $defaultEnv "LITELLM_API_BASE" (printf "http://%s-litellm:4000" .Release.Name) -}}
+            {{- /* 3. Merge with Values.env (Values.env takes precedence) */ -}}
+            {{- $finalEnv := merge (deepCopy .Values.env) $defaultEnv -}}
+            {{- range $key, $val := $finalEnv }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.global }}
+            {{- if .Values.global.existingSecret }}
+            - secretRef:
+                name: {{ .Values.global.existingSecret }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.worker.envFrom }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

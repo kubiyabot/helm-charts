@@ -1,0 +1,44 @@
+# Minimal CI test configuration for context-graph chart
+# Used by: helm lint, helm template, CI pipelines
+
+# Reduced replicas for testing
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: false
+
+# Disable autoscaling for tests
+autoscaling:
+  enabled: false
+
+# Disable default affinity for single-node test clusters
+affinity: {}
+
+# Test environment variables
+env:
+  - name: LOG_LEVEL
+    value: "DEBUG"
+  - name: ENVIRONMENT
+    value: "test"
+  - name: PORT
+    value: "8000"
+
+# Disable configMap for tests (use defaults)
+configMap:
+  enabled: false
+
+# Reference to test secrets
+envFrom:
+  - secretRef:
+      name: context-graph-test-secrets

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: control-plane
+description: The Core API and Worker components for Kubiya Agent Control Plane
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

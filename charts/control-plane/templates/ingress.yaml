@@ -1,0 +1,49 @@
+{{- if and .Values.api.enabled .Values.api.ingress.enabled -}}
+{{- $fullName := printf "%s-api" (include "control-plane.fullname" .) -}}
+{{- $svcPort := .Values.api.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "control-plane.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+  {{- with .Values.api.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.api.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  tls:
+    - hosts:
+        - {{ .Values.api.ingress.host | quote }}
+        {{- range .Values.api.ingress.additionalHosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .Values.api.ingress.tlsSecretName | default (printf "%s-tls" $fullName) }}
+  rules:
+    - host: {{ .Values.api.ingress.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+    {{- range .Values.api.ingress.additionalHosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+    {{- end }}
+{{- end }}

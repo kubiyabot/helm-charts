@@ -1,0 +1,46 @@
+apiVersion: v2
+name: kubiya-stack
+description: The All-in-One Helm Chart for the Kubiya Agent Platform.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  # --- Core Components ---
+  - name: control-plane
+    version: "0.1.0"
+    repository: "file://../control-plane"
+    condition: control-plane.enabled
+
+  - name: temporal-worker
+    version: "0.1.0"
+    repository: "file://../temporal-worker"
+    condition: temporal-worker.enabled
+
+  - name: context-graph
+    version: "0.1.0"
+    repository: "file://../context-graph"
+    condition: context-graph.enabled
+
+  # --- AI Gateway ---
+  - name: litellm-helm
+    version: "0.1.604"
+    repository: "oci://ghcr.io/berriai"
+    alias: litellm
+    condition: litellm.enabled
+
+  # --- Infrastructure ---
+  - name: postgresql
+    version: "16.4.16"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    condition: postgresql.enabled
+
+  - name: redis
+    version: "20.6.1"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    condition: redis.enabled
+
+  - name: neo4j
+    version: "5.26.0"
+    repository: "https://helm.neo4j.com/neo4j"
+    condition: neo4j.enabled

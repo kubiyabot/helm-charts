@@ -1,0 +1,117 @@
+# Minimal CI test configuration for kubiya-stack umbrella chart
+# Used by: helm lint, helm template, CI pipelines
+
+# Global test settings
+global:
+  security:
+    allowInsecureImages: true
+
+# Control Plane - minimal config
+control-plane:
+  api:
+    enabled: true
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    ingress:
+      enabled: false
+  worker:
+    enabled: true
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  autoscaling:
+    enabled: false
+  affinity: {}
+  envFrom:
+    - secretRef:
+        name: control-plane-test-secrets
+
+# Temporal Worker - minimal config
+temporal-worker:
+  api:
+    enabled: true
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    ingress:
+      enabled: false
+  worker:
+    enabled: true
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  autoscaling:
+    enabled: false
+  affinity: {}
+  envFrom:
+    - secretRef:
+        name: temporal-worker-test-secrets
+
+# Context Graph - disabled by default, can enable for full stack test
+context-graph:
+  enabled: false
+
+# PostgreSQL - minimal config
+postgresql:
+  enabled: true
+  auth:
+    username: test
+    password: test
+    database: test
+  primary:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      enabled: false
+
+# Redis - minimal config
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    persistence:
+      enabled: false
+  replica:
+    replicaCount: 0
+
+# Neo4j - disabled for minimal tests
+neo4j:
+  enabled: false
+
+# LiteLLM - disabled for minimal tests
+litellm:
+  enabled: false

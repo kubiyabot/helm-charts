@@ -1,0 +1,6 @@
+apiVersion: v2
+name: temporal-worker
+description: A Helm chart for the Kubiya Control Plane Temporal Service
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

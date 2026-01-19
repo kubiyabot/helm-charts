@@ -1,0 +1,88 @@
+# Production environment values for context-graph-api
+
+name: context-graph-api
+replicaCount: 2
+
+image:
+  repository: 564407622114.dkr.ecr.eu-west-1.amazonaws.com/context-graph-api
+  pullPolicy: IfNotPresent
+  tag: "v0.1.17"
+
+# Override Dockerfile CMD to use single worker for proper OTEL SDK initialization
+command:
+  - opentelemetry-instrument
+  - uvicorn
+  - app.main:context_graph_api
+  - --host
+  - "0.0.0.0"
+  - --port
+  - "8000"
+
+imagePullSecrets:
+  - name: my-ecr-registry-prod
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 95
+  targetMemoryUtilizationPercentage: 95
+
+env:
+  - name: ENVIRONMENT
+    value: "production"
+  - name: LOG_LEVEL
+    value: "INFO"
+  - name: PORT
+    value: "8000"
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: DATA_ROOT_DIRECTORY
+    value: "/tmp/cognee/data"
+  - name: SYSTEM_ROOT_DIRECTORY
+    value: "/tmp/cognee/system"
+  - name: CACHE_ROOT_DIRECTORY
+    value: "/tmp/cognee/cache"
+
+ingress:
+  enabled: true
+  host: graph.kubiya.ai
+  tlsSecretName: context-graph-api-prod-tls
+
+envFrom:
+  - secretRef:
+      name: context-graph-api-secrets
+  - secretRef:
+      name: airflow-secret
+
+secret:
+  enabled: false
+
+configMap:
+  enabled: true
+  data:
+    API_TITLE: "Context Graph API"
+    API_DESCRIPTION: "API for querying Neo4j context graphs with org and integration namespaces"
+    API_VERSION: "1.0.0"
+
+service:
+  targetPort: 8000
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - context-graph-api
+        topologyKey: kubernetes.io/hostname
+
+nodeSelector: {}
+tolerations: []

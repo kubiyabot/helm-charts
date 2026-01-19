@@ -1,0 +1,128 @@
+# Default values for context-graph-api
+
+name: context-graph-api
+replicaCount: 2
+
+image:
+  repository: 564407622114.dkr.ecr.eu-west-1.amazonaws.com/context-graph-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Override container command (optional)
+command: []
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: context-graph-api
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8000"
+  prometheus.io/path: "/metrics"
+
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  annotations: {}
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Probe timing (endpoint hardcoded to /health)
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: nginx
+  host: context-graph-api.example.com
+  tlsSecretName: ""
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: external-nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget (only created if replicaCount > 1)
+# WARNING: Do not set minAvailable >= replicaCount (makes pods undrainable)
+pdb:
+  enabled: true
+  maxUnavailable: 1
+  # minAvailable: 1  # Alternative to maxUnavailable (use one, not both)
+
+# Environment Variables (list format)
+# Note: PORT, PYTHONUNBUFFERED, *_ROOT_DIRECTORY are hardcoded in templates
+env:
+  - name: ENVIRONMENT
+    value: "production"
+  - name: LOG_LEVEL
+    value: "INFO"
+
+# Environment variables from ConfigMap and Secrets
+envFrom:
+  - configMapRef:
+      name: context-graph-api-config
+  - secretRef:
+      name: context-graph-api-secrets
+
+# ConfigMap for API metadata
+# Note: API_TITLE, API_DESCRIPTION, API_VERSION are hardcoded in template
+configMap:
+  enabled: true
+  data: {}  # Add custom config here if needed
+
+# Secret creation disabled by default - create secrets externally
+secret:
+  enabled: false
+  data: {}
+
+nodeSelector: {}
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - context-graph-api
+          topologyKey: kubernetes.io/hostname
