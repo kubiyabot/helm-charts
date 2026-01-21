@@ -1,0 +1,55 @@
+image:
+  repository: ghcr.io/m1k1o/neko/firefox
+  tag: latest  # latest stable compatible with Stunner
+  pullPolicy: IfNotPresent
+
+turn:
+  url: "turn:stunner-ip-address:3478"
+  # If secretName is set, username and credential are looked up from the secret.
+  # Otherwise, they are taken from the values below.
+  # username: "<example username>"
+  # credential: "<example password>"
+  secretName: "neko-secrets"
+  usernameKey: TURN_USERNAME
+  credentialKey: TURN_PASSWORD
+
+auth:
+  # If secretName is set, adminPass and userPass are looked up from the secret.
+  # Otherwise, they are taken from the values below.
+  # adminPass: "<example password>"
+  # userPass: "<example password>"
+  secretName: "neko-secrets"
+  adminPassKey: NEKO_PASSWORD_ADMIN
+  userPassKey: NEKO_PASSWORD
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  host: neko.example.com
+  # tls: true
+  # annotations:
+  #   kubernetes.io/ingress.class: external-nginx
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  #   nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+  #   nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  #   nginx.ingress.kubernetes.io/websocket-services: "neko"
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+shmSize: 2Gi

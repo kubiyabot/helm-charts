@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "neko.fullname" . }}
+  labels:
+    {{- include "neko.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "neko.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "neko.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "neko.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export NEKO_ICESERVERS=$(printf '[{"urls":["%s"],"username":"%s","credential":"%s"}]' "$TURN_URL" "$TURN_USERNAME" "$TURN_CREDENTIAL")
+              exec /usr/bin/supervisord -c /etc/neko/supervisord.conf
+          env:
+            - name: NEKO_NAT1TO1
+              value: "true"
+            - name: NEKO_PASSWORD
+              {{- if .Values.auth.secretName }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.auth.secretName }}
+                  key: {{ .Values.auth.userPassKey }}
+              {{- else }}
+              value: {{ .Values.auth.userPass | quote }}
+              {{- end }}
+            - name: NEKO_PASSWORD_ADMIN
+              {{- if .Values.auth.secretName }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.auth.secretName }}
+                  key: {{ .Values.auth.adminPassKey }}
+              {{- else }}
+              value: {{ .Values.auth.adminPass | quote }}
+              {{- end }}
+            - name: TURN_URL
+              value: {{ .Values.turn.url | quote }}
+            - name: TURN_USERNAME
+              {{- if .Values.turn.secretName }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.turn.secretName }}
+                  key: {{ .Values.turn.usernameKey }}
+              {{- else }}
+              value: {{ .Values.turn.username | quote }}
+              {{- end }}
+            - name: TURN_CREDENTIAL
+              {{- if .Values.turn.secretName }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.turn.secretName }}
+                  key: {{ .Values.turn.credentialKey }}
+              {{- else }}
+              value: {{ .Values.turn.credential | quote }}
+              {{- end }}
+            - name: NEKO_WEBRTC_ICELITE
+              value: "false"
+            - name: NEKO_BIND
+              value: ":{{ .Values.service.targetPort }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: {{ .Values.shmSize }}
