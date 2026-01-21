@@ -83,18 +83,18 @@ graph TB
     end
 
     subgraph Stack["Kubiya Stack"]
-        subgraph ControlPlane["Control Plane"]
-            CP_API[Control Plane API<br/>Port: 7777]
-            CP_WORKER[Control Plane Worker]
+        subgraph ControlPlane["Agent Orchestrator"]
+            CP_API[Agent Orchestrator API<br/>Port: 7777]
+            CP_WORKER[Agent Orchestrator Worker]
         end
 
-        subgraph TemporalWorker["Temporal Worker"]
-            TW_API[Temporal Worker API<br/>Port: 8000]
-            TW_WORKER[Temporal Worker]
+        subgraph TemporalWorker["Background Jobs"]
+            TW_API[Background Jobs API<br/>Port: 8000]
+            TW_WORKER[Background Jobs]
         end
 
-        subgraph ContextGraph["Context Graph"]
-            CG_API[Context Graph API<br/>Port: 8000]
+        subgraph ContextGraph["Agent Memory"]
+            CG_API[Agent Memory API<br/>Port: 8000]
         end
 
         LITELLM[LiteLLM Proxy<br/>Port: 4000]
@@ -145,10 +145,10 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant User
-    participant CP as Control Plane API
+    participant CP as Agent Orchestrator API
     participant Worker as CP Worker
     participant TC as Temporal Cloud
-    participant CG as Context Graph
+    participant CG as Agent Memory
     participant Redis
     participant PG as PostgreSQL
     participant LLM as LiteLLM
@@ -185,14 +185,15 @@ sequenceDiagram
 
 | Component | Chart | Description | Dependencies |
 |-----------|-------|-------------|--------------|
-| **Control Plane** | `control-plane` | Multi-tenant API and worker for AI agent orchestration. Handles agent CRUD, team management, job scheduling, workflow orchestration, real-time event streaming, and policy enforcement. | PostgreSQL, Redis |
-| **Temporal Worker** | `temporal-worker` | REST API for workflow management + Temporal worker for long-running background tasks. Executes workflows that interact with Control Plane. | Temporal Cloud |
-| **Context Graph** | `context-graph` | Cognitive memory and knowledge graph service. Provides semantic search, memory storage, knowledge extraction, and dataset management for agents. | Neo4j, PostgreSQL |
+| **Agent Orchestrator** | `agent-orchestrator` | Multi-tenant API and worker for AI agent orchestration. Handles agent CRUD, team management, job scheduling, workflow orchestration, real-time event streaming, and policy enforcement. | PostgreSQL, Redis |
+| **Background Jobs** | `background-jobs` | REST API for workflow management + Temporal worker for long-running background tasks. Executes workflows that interact with Agent Orchestrator. | Temporal Cloud |
+| **Agent Memory** | `agent-memory` | Cognitive memory and knowledge graph service. Provides semantic search, memory storage, knowledge extraction, and dataset management for agents. | Neo4j, PostgreSQL |
+| **Policy Enforcer (optional)** | `policy-enforcer` | OPA Watchdog service for pre-execution policy evaluation and governance. | None |
 | **LiteLLM** | `litellm` | AI Gateway/Proxy for unified LLM access. Routes requests to OpenAI, Claude, and other providers. | None |
 
-### Control Plane Capabilities
+### Agent Orchestrator Capabilities
 
-The Control Plane is the core of the platform with 30+ API routers:
+The Agent Orchestrator is the core of the platform with 30+ API routers:
 
 - **Agent Management** - Create, configure, and manage AI agents
 - **Team Orchestration** - Coordinate multiple agents for complex tasks
@@ -203,9 +204,9 @@ The Control Plane is the core of the platform with 30+ API routers:
 - **Policy Enforcement** - OPA-based tool usage policies
 - **Analytics** - Execution metrics and performance monitoring
 
-### Context Graph Capabilities
+### Agent Memory Capabilities
 
-The Context Graph provides cognitive capabilities:
+The Agent Memory provides cognitive capabilities:
 
 - **Knowledge Graph** - Neo4j-based entity and relationship storage
 - **Semantic Search** - AI-powered similarity search across memories
@@ -220,7 +221,7 @@ The Context Graph provides cognitive capabilities:
 |-----------|-------|---------|
 | **PostgreSQL** | `bitnami/postgresql` | Primary database with pgvector extension for embeddings. Uses Row-Level Security (RLS) for multi-tenant isolation. |
 | **Redis** | `bitnami/redis` | Cache, pub/sub for real-time events, session storage. **Recommended even for small deployments** - enables real-time streaming with 70% latency improvement over HTTP polling. |
-| **Neo4j** | `neo4j/neo4j` | Knowledge graph database (required only if context-graph enabled) |
+| **Neo4j** | `neo4j/neo4j` | Knowledge graph database (required only if agent-memory enabled) |
 
 ## Quick Start
 
@@ -237,14 +238,14 @@ helm install kubiya oci://ghcr.io/kubiyabot/charts/kubiya-stack \
   --create-namespace
 ```
 
-### 2. Minimal Installation (Control Plane Only)
+### 2. Minimal Installation (Agent Orchestrator Only)
 
 ```bash
 helm install kubiya oci://ghcr.io/kubiyabot/charts/kubiya-stack \
   --version 0.1.0 \
   --namespace kubiya \
-  --set temporal-worker.enabled=false \
-  --set context-graph.enabled=false \
+  --set background-jobs.enabled=false \
+  --set agent-memory.enabled=false \
   --set litellm.enabled=false
 ```
 
@@ -259,7 +260,7 @@ helm install kubiya oci://ghcr.io/kubiyabot/charts/kubiya-stack \
   --set postgresql.enabled=false \
   --set redis.enabled=false \
   --set neo4j.enabled=false \
-  --set context-graph.enabled=true
+  --set agent-memory.enabled=true
 ```
 
 ## Configuration
@@ -275,13 +276,15 @@ global:
   existingSecret: "my-shared-secrets"  # Optional: secret injected into all components
   security:
     allowInsecureImages: true  # Required for pgvector image
+  policyEnforcer:
+    enabled: false  # Enables ENFORCER_SERVICE_URL defaults for agent-orchestrator
 ```
 
 ### Component Toggle
 
 ```yaml
 # Core (required)
-control-plane:
+agent-orchestrator:
   enabled: true
   api:
     enabled: true
@@ -290,8 +293,8 @@ control-plane:
     enabled: true
     replicaCount: 2
 
-# Temporal Worker (recommended)
-temporal-worker:
+# Background Jobs (recommended)
+background-jobs:
   enabled: true
   api:
     enabled: true
@@ -299,12 +302,27 @@ temporal-worker:
     enabled: true
 
 # Memory/Knowledge (optional)
-context-graph:
+agent-memory:
   enabled: false  # Enable if you need agent memory
+
+# Policy Enforcement (optional)
+policy-enforcer:
+  enabled: false
 
 # AI Gateway (optional)
 litellm:
   enabled: false  # Enable for multi-LLM support
+```
+
+### Policy Enforcement Integration
+
+When `policy-enforcer.enabled` and `global.policyEnforcer.enabled` are true, the
+Agent Orchestrator automatically defaults `ENFORCER_SERVICE_URL` to the in-cluster service:
+
+```yaml
+agent-orchestrator:
+  env:
+    ENFORCER_SERVICE_URL: "http://kubiya-policy-enforcer:5001"  # override if needed
 ```
 
 ### Infrastructure
@@ -329,7 +347,7 @@ redis:
   auth:
     enabled: false
 
-# Neo4j (only if context-graph enabled)
+# Neo4j (only if agent-memory enabled)
 neo4j:
   enabled: false
   neo4j:
@@ -344,7 +362,7 @@ neo4j:
 For production workloads, increase worker replicas to handle concurrent agent executions:
 
 ```yaml
-control-plane:
+agent-orchestrator:
   worker:
     replicaCount: 4  # Recommended for production
     resources:
@@ -358,10 +376,10 @@ control-plane:
 
 ### WebSocket & Real-time Streaming
 
-Control Plane uses WebSocket for real-time execution streaming. Ensure proper configuration:
+Agent Orchestrator uses WebSocket for real-time execution streaming. Ensure proper configuration:
 
 ```yaml
-control-plane:
+agent-orchestrator:
   api:
     service:
       sessionAffinity: ClientIP  # Required for WebSocket sticky sessions
@@ -374,7 +392,7 @@ control-plane:
         nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 ```
 
-These settings are **already configured by default** in the control-plane chart.
+These settings are **already configured by default** in the agent-orchestrator chart.
 
 ### Jobs and Temporal Configuration
 
@@ -390,7 +408,7 @@ Ensure these secrets are set:
 
 ### LiteLLM Integration
 
-Control Plane integrates with LiteLLM for multi-provider LLM access:
+Agent Orchestrator integrates with LiteLLM for multi-provider LLM access:
 
 ```yaml
 # Environment variables for LiteLLM
@@ -405,36 +423,36 @@ LITELLM_MODELS_CACHE_TTL: "300"           # 5-minute cache (default)
 - 5-minute cache with graceful degradation
 - Model validation before agent creation
 
-### Context Graph Integration
+### Agent Memory Integration
 
-Control Plane proxies requests to Context Graph for memory features:
+Agent Orchestrator proxies requests to Agent Memory for memory features:
 
 ```yaml
 # Environment variables
-CONTEXT_GRAPH_API_BASE: "http://context-graph:8000"  # Internal service
+CONTEXT_GRAPH_API_BASE: "http://agent-memory:8000"  # Internal service
 CONTEXT_GRAPH_API_TIMEOUT: "30"                      # Request timeout
 ```
 
-**Proxy Routes**: Control Plane exposes `/api/v1/context-graph/*` endpoints that forward to Context Graph service. This enables:
+**Proxy Routes**: Agent Orchestrator exposes `/api/v1/agent-memory/*` endpoints that forward to Agent Memory service. This enables:
 - Built-in "Contextual Awareness" skill
 - Memory recall during agent execution
 - Knowledge graph queries
 
 ### Observability (OpenTelemetry)
 
-Control Plane supports distributed tracing via OpenTelemetry:
+Agent Orchestrator supports distributed tracing via OpenTelemetry:
 
 ```yaml
-control-plane:
+agent-orchestrator:
   env:
     OTEL_ENABLED: "true"
     OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
-    OTEL_SERVICE_NAME: "control-plane"
+    OTEL_SERVICE_NAME: "agent-orchestrator"
     OTEL_TRACES_SAMPLER: "parentbased_traceidratio"
     OTEL_TRACES_SAMPLER_ARG: "0.1"  # 10% sampling in production
 ```
 
-See [control-plane README](./charts/control-plane/README.md#observability-opentelemetry) for full configuration options.
+See [agent-orchestrator README](./charts/agent-orchestrator/README.md#observability-opentelemetry) for full configuration options.
 
 ### High Availability
 
@@ -453,7 +471,7 @@ All charts include PDBs (enabled by default, created when `replicaCount > 1`) us
 **Safe configuration:**
 
 ```yaml
-control-plane:
+agent-orchestrator:
   api:
     replicaCount: 3
     pdb:
@@ -479,10 +497,10 @@ This chart does **not** include vendor-specific secret management. Create secret
 
 ### Required Secrets
 
-#### Control Plane
+#### Agent Orchestrator
 
 ```bash
-kubectl create secret generic control-plane-secrets \
+kubectl create secret generic agent-orchestrator-secrets \
   --namespace kubiya \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
   --from-literal=REDIS_URL="redis://redis:6379/0" \
@@ -493,20 +511,20 @@ kubectl create secret generic control-plane-secrets \
   --from-literal=TEMPORAL_API_KEY="your-temporal-api-key"
 ```
 
-#### Temporal Worker (if enabled)
+#### Background Jobs (if enabled)
 
 ```bash
-kubectl create secret generic temporal-worker-secrets \
+kubectl create secret generic background-jobs-secrets \
   --namespace kubiya \
   --from-literal=TEMPORAL_HOST="your-namespace.tmprl.cloud:7233" \
   --from-literal=TEMPORAL_API_KEY="your-temporal-api-key" \
   --from-literal=KUBIYA_API_KEY="your-internal-api-key"
 ```
 
-#### Context Graph (if enabled)
+#### Agent Memory (if enabled)
 
 ```bash
-kubectl create secret generic context-graph-secrets \
+kubectl create secret generic agent-memory-secrets \
   --namespace kubiya \
   --from-literal=NEO4J_URI="bolt://neo4j:7687" \
   --from-literal=NEO4J_PASSWORD="your-neo4j-password" \
@@ -517,28 +535,28 @@ kubectl create secret generic context-graph-secrets \
 ### Reference Secrets in Values
 
 ```yaml
-control-plane:
+agent-orchestrator:
   envFrom:
     - secretRef:
-        name: control-plane-secrets
+        name: agent-orchestrator-secrets
 
-temporal-worker:
+background-jobs:
   envFrom:
     - secretRef:
-        name: temporal-worker-secrets
+        name: background-jobs-secrets
 
-context-graph:
+agent-memory:
   envFrom:
     - secretRef:
-        name: context-graph-secrets
+        name: agent-memory-secrets
 ```
 
 ## Ingress Configuration
 
-### Control Plane API
+### Agent Orchestrator API
 
 ```yaml
-control-plane:
+agent-orchestrator:
   api:
     ingress:
       enabled: true
@@ -548,10 +566,10 @@ control-plane:
         cert-manager.io/cluster-issuer: letsencrypt-prod
 ```
 
-### Temporal Worker API
+### Background Jobs API
 
 ```yaml
-temporal-worker:
+background-jobs:
   api:
     ingress:
       enabled: true
@@ -559,10 +577,10 @@ temporal-worker:
       tlsSecretName: jobs-tls
 ```
 
-### Context Graph API
+### Agent Memory API
 
 ```yaml
-context-graph:
+agent-memory:
   ingress:
     enabled: true
     host: graph.kubiya.example.com
@@ -575,9 +593,9 @@ All components expose Prometheus metrics:
 
 | Component | Port | Path |
 |-----------|------|------|
-| Control Plane API | 8000 | /metrics |
-| Temporal Worker API | 8000 | /metrics |
-| Context Graph API | 8000 | /metrics |
+| Agent Orchestrator API | 8000 | /metrics |
+| Background Jobs API | 8000 | /metrics |
+| Agent Memory API | 8000 | /metrics |
 
 Pod annotations are pre-configured for Prometheus scraping.
 
@@ -585,9 +603,9 @@ Pod annotations are pre-configured for Prometheus scraping.
 
 | Component | Liveness | Readiness |
 |-----------|----------|-----------|
-| Control Plane API | `/api/health` | `/api/health` |
-| Temporal Worker API | `/health` | `/ready` |
-| Context Graph API | `/health` | `/health` |
+| Agent Orchestrator API | `/api/health` | `/api/health` |
+| Background Jobs API | `/health` | `/ready` |
+| Agent Memory API | `/health` | `/health` |
 
 ## OCI Artifacts
 
@@ -596,9 +614,9 @@ All charts are published as individual OCI artifacts:
 | Chart | OCI URL |
 |-------|---------|
 | Umbrella Stack | `oci://ghcr.io/kubiyabot/charts/kubiya-stack` |
-| Control Plane | `oci://ghcr.io/kubiyabot/charts/control-plane` |
-| Temporal Worker | `oci://ghcr.io/kubiyabot/charts/temporal-worker` |
-| Context Graph | `oci://ghcr.io/kubiyabot/charts/context-graph` |
+| Agent Orchestrator | `oci://ghcr.io/kubiyabot/charts/agent-orchestrator` |
+| Background Jobs | `oci://ghcr.io/kubiyabot/charts/background-jobs` |
+| Agent Memory | `oci://ghcr.io/kubiyabot/charts/agent-memory` |
 
 ## Upgrading
 
@@ -632,11 +650,11 @@ kubectl get pods -n kubiya -l app.kubernetes.io/instance=kubiya
 ### View Logs
 
 ```bash
-# Control Plane API
-kubectl logs -n kubiya -l app.kubernetes.io/component=api,app.kubernetes.io/name=control-plane
+# Agent Orchestrator API
+kubectl logs -n kubiya -l app.kubernetes.io/component=api,app.kubernetes.io/name=agent-orchestrator
 
-# Control Plane Worker
-kubectl logs -n kubiya -l app.kubernetes.io/component=worker,app.kubernetes.io/name=control-plane
+# Agent Orchestrator Worker
+kubectl logs -n kubiya -l app.kubernetes.io/component=worker,app.kubernetes.io/name=agent-orchestrator
 ```
 
 ### Common Issues
@@ -656,7 +674,7 @@ kubectl logs -n kubiya -l app.kubernetes.io/component=worker,app.kubernetes.io/n
 - [Kubiya Platform Architecture](https://docs.kubiya.ai/core-concepts/control-plane/architecture) - Detailed architecture documentation
 - [Self-Hosting Guide](https://docs.kubiya.ai/cli/control-plane-self-hosting) - Deployment options and requirements
 - [Background Jobs](https://docs.kubiya.ai/core-concepts/background-jobs) - Job scheduling and Temporal integration
-- [Cognitive Memory](https://docs.kubiya.ai/core-concepts/cognitive-memory) - Context Graph and memory features
+- [Cognitive Memory](https://docs.kubiya.ai/core-concepts/cognitive-memory) - Agent Memory and memory features
 
 ### Source Repositories
 

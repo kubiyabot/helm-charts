@@ -1,0 +1,54 @@
+# Default values for policy-enforcer
+
+enabled: false
+replicaCount: 1
+
+image:
+  repository: ghcr.io/kubiyabot/opawatchdog
+  pullPolicy: IfNotPresent
+  tag: v0.0.7
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 5001
+  targetPort: 5001
+
+# Probe timing (endpoint is TCP on service port)
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Environment variables for the enforcer
+env: {}

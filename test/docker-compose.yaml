@@ -33,6 +33,12 @@ services:
       timeout: 5s
       retries: 5
 
+  # Policy Enforcer (OPA Watchdog)
+  policy-enforcer:
+    image: ghcr.io/kubiyabot/opawatchdog:v0.0.7
+    ports:
+      - "5001:5001"
+
   # Neo4j for knowledge graph (optional)
   neo4j:
     image: neo4j:5.15.0-community

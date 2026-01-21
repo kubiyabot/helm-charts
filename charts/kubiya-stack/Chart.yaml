@@ -25,6 +25,12 @@ dependencies:
     alias: agent-memory
     condition: agent-memory.enabled
 
+  - name: policy-enforcer
+    version: "0.1.0"
+    repository: "file://../policy-enforcer"
+    alias: policy-enforcer
+    condition: policy-enforcer.enabled
+
   # --- AI Gateway ---
   - name: litellm-helm
     version: "0.1.604"

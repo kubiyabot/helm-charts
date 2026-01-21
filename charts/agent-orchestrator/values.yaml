@@ -36,6 +36,7 @@ env:
   ENVIRONMENT: "production"
   LOG_LEVEL: "INFO"
   WEBSOCKET_ENABLED: "true"
+  # ENFORCER_SERVICE_URL: ""  # Optional: policy enforcer endpoint (OPA Watchdog)
 
 # Environment from ConfigMaps/Secrets
 envFrom: []

@@ -8,6 +8,8 @@ global:
   security:
     # Required for non-Bitnami images like pgvector
     allowInsecureImages: true
+  policyEnforcer:
+    enabled: false  # Set true when policy-enforcer.enabled is true to auto-wire ENFORCER_SERVICE_URL
 
 # ==============================================================================
 # 1. Kubiya Components
@@ -60,6 +62,11 @@ agent-memory:
   env: []
   # Note: ENVIRONMENT, LOG_LEVEL, CONTROL_PLANE_API_BASE handled by global defaults
   envFrom: []
+
+# Policy Enforcer (OPA Watchdog)
+policy-enforcer:
+  enabled: false
+  env: {}
 
 # LiteLLM - AI Gateway / Proxy
 # Multi-provider LLM access (OpenAI, Claude, etc.)

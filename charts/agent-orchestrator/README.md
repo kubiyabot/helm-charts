@@ -252,6 +252,7 @@ Environment variables are sourced from three places:
 | `ENVIRONMENT` | Deployment environment | `production` (from global) |
 | `LOG_LEVEL` | Log level (DEBUG, INFO, WARNING, ERROR) | `INFO` (from global) |
 | `WEBSOCKET_ENABLED` | Enable WebSocket support | `true` |
+| `ENFORCER_SERVICE_URL` | Policy enforcer endpoint (OPA Watchdog) | `http://<release>-policy-enforcer:5001` when enabled via kubiya-stack |
 
 **3. Required via secrets (envFrom):**
 

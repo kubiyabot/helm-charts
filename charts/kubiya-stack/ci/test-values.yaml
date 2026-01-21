@@ -5,9 +5,11 @@
 global:
   security:
     allowInsecureImages: true
+  policyEnforcer:
+    enabled: true
 
-# Control Plane - minimal config
-control-plane:
+# Agent Orchestrator - minimal config
+agent-orchestrator:
   api:
     enabled: true
     replicaCount: 1
@@ -35,10 +37,10 @@ control-plane:
   affinity: {}
   envFrom:
     - secretRef:
-        name: control-plane-test-secrets
+        name: agent-orchestrator-test-secrets
 
-# Temporal Worker - minimal config
-temporal-worker:
+# Background Jobs - minimal config
+background-jobs:
   api:
     enabled: true
     replicaCount: 1
@@ -66,11 +68,15 @@ temporal-worker:
   affinity: {}
   envFrom:
     - secretRef:
-        name: temporal-worker-test-secrets
+        name: background-jobs-test-secrets
 
-# Context Graph - disabled by default, can enable for full stack test
-context-graph:
+# Agent Memory - disabled by default, can enable for full stack test
+agent-memory:
   enabled: false
+
+# Policy Enforcer - enabled for integration coverage
+policy-enforcer:
+  enabled: true
 
 # PostgreSQL - minimal config
 postgresql:

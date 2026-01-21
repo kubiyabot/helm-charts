@@ -11,7 +11,7 @@ test/
 │   └── 01-init.sql        # PostgreSQL setup
 ├── mocks/                 # Mock services
 │   ├── mock-litellm/      # Mock LiteLLM API
-│   └── mock-control-plane/ # Mock Control Plane API
+│   └── mock-control-plane/ # Mock Agent Orchestrator (Control Plane) API
 └── README.md              # This file
 ```
 
@@ -20,7 +20,7 @@ test/
 ### Start Test Services
 
 ```bash
-# Start core services (PostgreSQL + Redis + Mocks)
+# Start core services (PostgreSQL + Redis + Policy Enforcer + Mocks)
 docker-compose up -d
 
 # Start full stack including Neo4j
@@ -36,8 +36,12 @@ docker-compose ps
 # Test mock LiteLLM
 curl http://localhost:4000/health
 
-# Test mock Control Plane
+# Test mock Agent Orchestrator (Control Plane)
 curl http://localhost:7777/health
+
+# Policy Enforcer (OPA Watchdog)
+# Note: If the container is running, the port is exposed on 5001.
+# (Health endpoint depends on image version.)
 
 # Test PostgreSQL
 psql postgresql://kubiya:kubiya@localhost:5432/agent_control_plane -c "SELECT 1"
@@ -77,9 +81,9 @@ Provides OpenAI-compatible endpoints:
 - `POST /v1/embeddings` - Text embeddings
 - `GET /health` - Health check
 
-### Mock Control Plane
+### Mock Agent Orchestrator (Control Plane)
 
-Provides Control Plane API endpoints:
+Provides Agent Orchestrator (Control Plane) API endpoints:
 - `GET /api/v1/auth/validate` - Token validation
 - `GET /models` - List LLM models
 - `GET /api/v1/creds/llm` - LLM credentials

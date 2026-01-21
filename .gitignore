@@ -58,3 +58,4 @@ _docs_wip/
 # Added by Maturity Check
 .terraform/
 *.tfstate
+tmpcharts-*/
