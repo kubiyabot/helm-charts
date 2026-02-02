@@ -1,0 +1,117 @@
+# Global configuration for the umbrella chart
+#
+# USAGE GUIDE:
+# 1. This file contains generalized defaults for the Agent Browser Transmission solution.
+# 2. For PRODUCTION deployment, refer to '_WIP/prod-values.yaml' which contains
+#    the specific configuration (IPs, secrets, domains) proven to work in the POC.
+# 3. Always override critical values (secrets, domains, IPs) in a separate values file.
+
+# -----------------------------------------------------------------------------
+# NEKO Subchart Configuration
+# -----------------------------------------------------------------------------
+neko:
+  image:
+    repository: ghcr.io/m1k1o/neko/firefox
+    tag: 3.0.9
+    pullPolicy: IfNotPresent
+
+  turn:
+    # -------------------------------------------------------------------------
+    # TURN Connectivity Configuration (CRITICAL)
+    # -------------------------------------------------------------------------
+    # The Frontend URL is sent to the Client (Browser). It MUST be reachable from the internet.
+    # Typically this is the Public LoadBalancer IP of the STUNner Gateway.
+    frontendUrl: "turn:<PUBLIC-STUNNER-LB-IP>:3478"
+
+    # The Backend URL is used by the Neko Pod. It MUST be reachable from inside the cluster.
+    # Due to lack of UDP hairpinning in many cloud LBs, this MUST be the internal K8s DNS.
+    backendUrl: "turn:udp-gateway.stunner.svc.cluster.local:3478"
+
+    # Credentials are managed via existing secret
+    # Ensure this secret exists in the namespace before deployment
+    secretName: "neko-secrets"
+    usernameKey: TURN_USERNAME
+    credentialKey: TURN_PASSWORD
+
+  auth:
+    # Neko Admin/User passwords
+    secretName: "neko-secrets"
+    adminPassKey: NEKO_PASSWORD_ADMIN
+    userPassKey: NEKO_PASSWORD
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
+  ingress:
+    enabled: true
+    host: neko.example.com
+    # Choose appropriate ingress class (internal vs external)
+    className: nginx
+    tls:
+      enabled: true
+      clusterIssuer: letsencrypt-prod
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  shmSize: 2Gi
+
+# -----------------------------------------------------------------------------
+# STUNner Subchart Configuration
+# -----------------------------------------------------------------------------
+stunner:
+  enabled: true
+
+stunner-gateway-operator:
+  stunnerGatewayOperator:
+    enabled: true
+    deployment:
+      nodeSelector:
+        kubernetes.io/os: linux
+    dataplane:
+      mode: managed
+      spec:
+        replicas: 1
+        image:
+          tag: 1.1.0
+        resources:
+          limits:
+            cpu: 2
+            memory: 512Mi
+          requests:
+            cpu: 500m
+            memory: 128Mi
+        hostNetwork: false
+
+  stunnerAuthService:
+    enabled: true
+    deployment:
+      replicas: 1
+      nodeSelector:
+        kubernetes.io/os: linux
+
+# -----------------------------------------------------------------------------
+# Architecture Nuances & Connectivity
+# -----------------------------------------------------------------------------
+#
+# 1. Connectivity Flow:
+#    Client -> [HTTPS/WSS] -> Ingress -> Neko (Signaling)
+#    Client <-> [UDP/DTLS] <-> STUNner (Public IP) <-> [UDP] <-> Neko
+#
+# 2. Key Configuration:
+#    - Neko MUST use the Internal DNS of STUNner for backend connections.
+#    - Client MUST use the Public IP of STUNner for frontend connections.
+#    - UDP Mux is enabled on Neko (port 59000) to simplify routing.
+#    - UDPRoute (in Neko chart) bridges STUNner Gateway to Neko Service.
+#
+# 3. Security:
+#    - Signaling is TLS encrypted.
+#    - Media is DTLS/SRTP encrypted.
+#    - Ingress uses restricted-nginx (internal only for POC).
