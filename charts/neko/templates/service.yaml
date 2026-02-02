@@ -11,5 +11,9 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
       name: http
+    - port: 59000
+      targetPort: 59000
+      protocol: UDP
+      name: udpmux
   selector:
     {{- include "neko.selectorLabels" . | nindent 4 }}

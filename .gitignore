@@ -53,3 +53,7 @@ _debug_values_overrides.yaml
 # Added by Maturity Check
 .terraform/
 *.tfstate
+
+# Work in progress files
+_docs_wip/
+_WIP/

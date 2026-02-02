@@ -1,10 +1,11 @@
 image:
   repository: ghcr.io/m1k1o/neko/firefox
-  tag: latest  # latest stable compatible with Stunner
+  tag: 3.0.9  # latest stable compatible with Stunner
   pullPolicy: IfNotPresent
 
 turn:
-  url: "turn:stunner-ip-address:3478"
+  frontendUrl: "turn:x.x.x.x:3478"
+  backendUrl: "turn:udp-gateway.stunner.svc.cluster.local:3478"
   # If secretName is set, username and credential are looked up from the secret.
   # Otherwise, they are taken from the values below.
   # username: "<example username>"
@@ -27,17 +28,17 @@ service:
   port: 80
   targetPort: 8080
 
+# Ingress Controller (nginx only for now)
 ingress:
-  enabled: false
-  host: neko.example.com
-  # tls: true
-  # annotations:
-  #   kubernetes.io/ingress.class: external-nginx
-  #   cert-manager.io/cluster-issuer: letsencrypt-prod
-  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  #   nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-  #   nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-  #   nginx.ingress.kubernetes.io/websocket-services: "neko"
+  enabled: true
+  host: neko.kubiya.ai
+  # User external or internal ingress class for public/internal access modes
+  className: external-nginx
+  # Compatibility fix: choose between ingress class via spec (newer k8s) or via annotation (legacy/nginx specific)
+  useIngressClassName: false
+  tls:
+    enabled: true
+    clusterIssuer: letsencrypt-prod
 
 serviceAccount:
   create: true
@@ -53,3 +54,7 @@ resources:
     memory: 512Mi
 
 shmSize: 2Gi
+
+pdb:
+  enabled: false
+  minAvailable: 1

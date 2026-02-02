@@ -1,6 +1,6 @@
 apiVersion: v2
 name: neko
-description: Neko - A self hosted virtual browser
+description: Minimal chart for Neko - self hosted virtual browser supporting STUNner.
 type: application
-version: 0.1.0
-appVersion: "latest"
+version: 0.2.2
+appVersion: "3.0.9"

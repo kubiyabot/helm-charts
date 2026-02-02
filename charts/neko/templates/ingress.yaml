@@ -1,23 +1,33 @@
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "neko.fullname" . }}
   labels:
     {{- include "neko.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- if not .Values.ingress.useIngressClassName }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.className }}
+    {{- end }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.tls.clusterIssuer }}
+    # --- REQUIRED FOR WEBSOCKETS ---
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"  # Required for Upgrade header
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600" # Prevents closing idle connections
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off" # Avoid buffering of stream chunks to prevent massive latency or connection drops.
+    nginx.ingress.kubernetes.io/upstream-keepalive-timeout: "3600"
 spec:
-  {{- if .Values.ingress.tls }}
+  {{- if .Values.ingress.useIngressClassName }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host | quote }}
+        - {{ .Values.ingress.host }}
       secretName: {{ include "neko.fullname" . }}-tls
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.host | quote }}
+    - host: {{ .Values.ingress.host }}
       http:
         paths:
           - path: /
